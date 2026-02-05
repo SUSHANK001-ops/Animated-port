@@ -9,7 +9,7 @@ const TechStackTerminal = () => {
   const techStack = [
     'Frontend: React, Next.js, JavaScript, TypeScript',
     'Styling: TailwindCSS, CSS Modules',
-    '3D Graphics: Three.js',
+    'Animations: GSAP, Three.js',
     'Backend: Node.js, Express, Python, ',
     'Database: PostgreSQL, MongoDB',
     'Tools: Git, Docker, Git Actions',
@@ -68,7 +68,7 @@ const TechStackTerminal = () => {
   return (
     <div
       ref={terminalRef}
-      className="hidden md:block fixed right-10 top-48 w-80 font-mono text-sm bg-black bg-opacity-70 backdrop-blur border border-green-500 border-opacity-50 rounded-lg p-6 shadow-2xl"
+      className="hidden md:block absolute right-10 top-48 w-80 font-mono text-sm bg-black bg-opacity-70 backdrop-blur border border-green-500 border-opacity-50 rounded-lg p-6 shadow-2xl z-10"
     >
       {/* Terminal Header */}
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-green-500 border-opacity-30">

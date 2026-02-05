@@ -143,6 +143,6 @@ const ThreeScene: React.FC = () => {
     };
   }, []);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;
+  return <div ref={containerRef} className="absolute inset-0 w-full h-full" />;
 };
 export default ThreeScene;

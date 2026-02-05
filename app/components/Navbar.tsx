@@ -77,7 +77,7 @@ const Navbar = () => {
       <Menu className="md:hidden hover:scale-105 " onClick={() => setIsMenuOpen(!isMenuOpen)} />
       <div
         ref={mobileMenuRef}
-        className="menuitems flex flex-col  absolute top-0 
+        className="menuitems md:hidden flex flex-col  absolute top-0 
          bg-gray-900 bg-opacity-70  rounded-lg gap-4 w-screen h-screen -right-full text-white font-semibold"
       >
         <div className="navlinks flex flex-col gap-8  text-3xl justify-center h-full w-full items-center">
