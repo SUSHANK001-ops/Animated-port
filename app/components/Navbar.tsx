@@ -59,7 +59,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="right-section md:flex hidden gap-8 text-white font-semibold">
-        <a onMouseEnter={handleMouseEnter} href="">
+        <a onMouseEnter={handleMouseEnter} href="#about">
           About me
         </a>
         <a onMouseEnter={handleMouseEnter} href="">
@@ -91,7 +91,7 @@ const Navbar = () => {
           <X className=" absolute top-8 right-8 cursor-pointer z-50" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); }} />
          
          <div className="navlinks flex flex-col gap-8  text-3xl justify-center h-full w-full items-center">
-          <a href="">About me</a>
+          <a href="#about">About me</a>
           <a href="">Services</a>
           <a href="">Projects</a>
           <a href="">Contact</a>

@@ -3,6 +3,23 @@
     width: 50vw;
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
 }
+
+@media (max-width: 768px) {
+    .left{
+        width: 90vw;
+        height: auto;
+        min-height: 40vh;
+        padding-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .left{
+        width: 95vw;
+        height: auto;
+        min-height: 35vh;
+    }
+}
 .right img{
     border-radius: 56% 8% 60% 21% / 7% 67% 12% 37% ;
     /* border-radius: 47% 44% 26% 0% / 17% 47% 12% 37%  ; */
