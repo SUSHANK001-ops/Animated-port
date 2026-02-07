@@ -1,7 +1,8 @@
 "use client"
 import { ReactLenis, LenisRef } from 'lenis/react'
 import gsap from 'gsap'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import LoadingScreen from './components/LoadingScreen'
 import Navbar from './components/Navbar'
 import Homepage from './components/Homepage'
 import AboutPage from './components/AboutPage'
@@ -15,6 +16,8 @@ import Footer from './components/Footer'
 
 export default function Home() {
   const lenisRef = useRef<LenisRef>(null)
+  const [loading, setLoading] = useState(true)
+  const mainRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function update(time: number) {
@@ -29,9 +32,31 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+  }, [loading])
+
+  const handleLoadingComplete = () => {
+    setLoading(false)
+    // Animate main content in
+    if (mainRef.current) {
+      gsap.fromTo(
+        mainRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, ease: 'power2.out' }
+      )
+    }
+  }
+
   return (
-    <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
-      <div className='min-h-screen overflow-x-hidden'>
+    <>
+      {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
+      <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
+        <div ref={mainRef} className='min-h-screen overflow-x-hidden' style={{ opacity: loading ? 0 : 1 }}>
       {/* Noise overlay for texture */}
       <div className="noise-overlay" />
       
@@ -63,5 +88,6 @@ export default function Home() {
       <Footer />
       </div>
     </ReactLenis>
+    </>
   )
 }

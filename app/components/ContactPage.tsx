@@ -19,17 +19,37 @@ const ContactPage = () => {
     message: '',
   })
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const copyEmail = () => {
-    navigator.clipboard.writeText('sushanka@example.com')
+    navigator.clipboard.writeText('mail@sushanka.com.np')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log('Form submitted:', formState)
+    setSending(true)
+    setSendStatus('idle')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+
+      if (!res.ok) throw new Error('Failed to send')
+
+      setSendStatus('success')
+      setFormState({ name: '', email: '', subject: '', message: '' })
+    } catch {
+      setSendStatus('error')
+    } finally {
+      setSending(false)
+      setTimeout(() => setSendStatus('idle'), 4000)
+    }
   }
 
   useEffect(() => {
@@ -192,13 +212,26 @@ const ContactPage = () => {
 
           <button
             type="submit"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-sm
-                       bg-green-400 text-black
-                       hover:shadow-[0_0_30px_rgba(0,255,136,0.2)] transition-all duration-300
-                       active:scale-[0.98]"
+            disabled={sending}
+            className={`group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-sm
+                       transition-all duration-300 active:scale-[0.98]
+                       ${sendStatus === 'success' ? 'bg-green-500 text-black' : sendStatus === 'error' ? 'bg-red-500 text-white' : 'bg-green-400 text-black hover:shadow-[0_0_30px_rgba(0,255,136,0.2)]'}
+                       ${sending ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <span>Send Message</span>
-            <Send size={16} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+            <span>
+              {sending
+                ? 'Sending...'
+                : sendStatus === 'success'
+                ? 'Message Sent!'
+                : sendStatus === 'error'
+                ? 'Failed to Send'
+                : 'Send Message'}
+            </span>
+            {sendStatus === 'success' ? (
+              <Check size={16} />
+            ) : (
+              <Send size={16} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+            )}
           </button>
         </form>
 
@@ -213,7 +246,7 @@ const ContactPage = () => {
               <span className="text-xs font-mono uppercase tracking-wider text-neutral-500">Email</span>
             </div>
             <div className="flex items-center justify-between">
-              <p className="text-white/80 text-sm">sushanka@example.com</p>
+              <p className="text-white/80 text-sm">mail@sushanka.com.np</p>
               <button
                 onClick={copyEmail}
                 className="p-2 rounded-lg hover:bg-white/5 transition-colors duration-200"
@@ -247,9 +280,9 @@ const ContactPage = () => {
             </span>
             <div className="space-y-3">
               {[
-                { name: 'GitHub', url: 'https://github.com' },
-                { name: 'LinkedIn', url: 'https://linkedin.com' },
-                { name: 'Twitter / X', url: 'https://x.com' },
+                { name: 'GitHub', url: 'https://github.com/SUSHANK001-ops' },
+                { name: 'LinkedIn', url: 'https://www.linkedin.com/in/lamichhane--68b754341/?skipRedirect=true' },
+                    { name: 'Instagram ', url: 'https://www.instagram.com/sushank.js/' },
               ].map((social) => (
                 <a
                   key={social.name}
