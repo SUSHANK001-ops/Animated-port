@@ -49,7 +49,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="p-6 navbar fixed top-0 left-0 w-full flex justify-between items-center z-50  bg-opacity-50">
+    <nav className="p-6 navbar fixed top-0 left-0 w-full flex justify-between items-center z-50 bg-black/20 backdrop-blur-md border-b border-white/5">
       {/* Navbar content goes here */}
       <div className="left-section">
         <div className="flex gap-2 text-xl  font-[Kalam] font-normal  text-white">
@@ -58,17 +58,20 @@ const Navbar = () => {
           <p>||</p>
         </div>
       </div>
-      <div className="right-section md:flex hidden gap-8 text-white font-semibold">
+      <div className="right-section md:flex hidden gap-8 text-white font-semibold text-sm tracking-wide">
         <a onMouseEnter={handleMouseEnter} href="#about">
-          About me
+          About
         </a>
-        <a onMouseEnter={handleMouseEnter} href="">
+        <a onMouseEnter={handleMouseEnter} href="#services">
           Services
         </a>
-        <a onMouseEnter={handleMouseEnter} href="">
+        <a onMouseEnter={handleMouseEnter} href="#projects">
           Projects
         </a>
-        <a onMouseEnter={handleMouseEnter} href="">
+        <a onMouseEnter={handleMouseEnter} href="#experience">
+          Experience
+        </a>
+        <a onMouseEnter={handleMouseEnter} href="#contact">
           Contact
         </a>
       </div>
@@ -91,10 +94,11 @@ const Navbar = () => {
           <X className=" absolute top-8 right-8 cursor-pointer z-50" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); }} />
          
          <div className="navlinks flex flex-col gap-8  text-3xl justify-center h-full w-full items-center">
-          <a href="#about">About me</a>
-          <a href="">Services</a>
-          <a href="">Projects</a>
-          <a href="">Contact</a>
+          <a href="#about" onClick={() => setIsMenuOpen(false)}>About</a>
+          <a href="#services" onClick={() => setIsMenuOpen(false)}>Services</a>
+          <a href="#projects" onClick={() => setIsMenuOpen(false)}>Projects</a>
+          <a href="#experience" onClick={() => setIsMenuOpen(false)}>Experience</a>
+          <a href="#contact" onClick={() => setIsMenuOpen(false)}>Contact</a>
           </div> 
         </div>
       </div>

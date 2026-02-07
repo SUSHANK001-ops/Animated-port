@@ -57,7 +57,7 @@ const Homepage = () => {
         {/* Title */}
         <h1
           ref={titleRef}
-          className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight bg-linear-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent cursor-default transition-all duration-300 hover:scale-105"
+          className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight text-green-400 cursor-default transition-all duration-300 hover:scale-105"
           onMouseEnter={(e) => {
             gsap.to(e.currentTarget, { scale: 1.05, duration: 0.3, color: 'white' })
           }}

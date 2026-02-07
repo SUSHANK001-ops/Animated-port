@@ -98,7 +98,7 @@ const TechStackTerminal = () => {
       </div>
 
       {/* Glow effect */}
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-green-500 to-cyan-500 opacity-0 blur -z-10 group-hover:opacity-10 transition-opacity"></div>
+      <div className="absolute inset-0 rounded-lg bg-green-500 opacity-0 blur -z-10 group-hover:opacity-10 transition-opacity"></div>
     </div>
   )
 }
