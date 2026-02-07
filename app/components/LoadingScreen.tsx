@@ -250,12 +250,20 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       </div>
 
       {/* Bottom signature line */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
-        <div className="w-8 h-px bg-white/10" />
-        <span className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest">
-          Portfolio 2026
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-px bg-white/10" />
+          <span className="text-[10px] font-mono text-neutral-600 italic">
+            योगः कर्मसु कौशलम्
+          </span>
+          <div className="w-8 h-px bg-white/10" />
+        </div>
+        <span className="text-[9px] font-mono text-neutral-700">
+          Excellence in action is Yoga &mdash; Bhagavad Gita 2.50
         </span>
-        <div className="w-8 h-px bg-white/10" />
+        <span className="text-[9px] font-mono text-neutral-700 mt-1">
+          &copy; {new Date().getFullYear()}
+        </span>
       </div>
     </div>
   )

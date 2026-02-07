@@ -147,7 +147,7 @@ const Marquee = () => {
         {/* CTA Buttons */}
         <div ref={ctaRef} className="flex flex-wrap gap-4 mb-16">
           <a
-            href="/resume.pdf"
+            href="/sushankResume.pdf"
             download
             className="group inline-flex items-center gap-3 px-7 py-3.5 rounded-xl font-semibold text-sm
                        bg-green-400 text-black

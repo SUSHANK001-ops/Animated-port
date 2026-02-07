@@ -2,14 +2,13 @@
 import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowUp, Heart } from 'lucide-react'
+import { ArrowUp } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const Footer = () => {
   const footerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const yearRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -92,11 +91,16 @@ const Footer = () => {
         {/* Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-600">
           <p className="font-mono">
-            &copy; <span ref={yearRef}>2026</span> Sushanka Lamichhane. All rights reserved.
+            &copy; 2026 Sushanka Lamichhane. All rights reserved.
           </p>
-          <p className="flex items-center gap-1.5 font-mono">
-            Built with <Heart size={12} className="text-red-400 fill-red-400" /> using Next.js & GSAP
-          </p>
+          <div className="flex flex-col items-center md:items-end gap-0.5">
+            <p className="font-mono italic text-neutral-500">
+              &ldquo;विद्या ददाति विनयम्&rdquo;
+            </p>
+            <p className="font-mono text-neutral-600" style={{ fontSize: '10px' }}>
+              Knowledge gives humility &mdash; Hitopadesha
+            </p>
+          </div>
         </div>
       </div>
     </footer>

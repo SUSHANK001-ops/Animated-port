@@ -3,11 +3,11 @@ import "./ExtraCss/About.css";
 import Marquee from "./UI/Marquee";
 const AboutPage = () => {
   return (
-    <div id="about" className="relative -mt-10">
+    <div id="about" className="relative mt-16">
    
     
     <div className="flex md:min-h-screen flex-col md:flex-row px-4 md:px-10 items-center justify-center md:justify-between bg-background text-foreground">
-      <div className="left md:h-[70vh] md:w-[50vw] flex flex-col justify-center items-center text-center md:bg-rose-700">
+      <div className="left md:h-[70vh] md:w-[50vw] flex flex-col justify-center items-center text-center md:bg-[#06974f] ">
         <h1 className="mt-4 md:mt-3 text-2xl md:text-4xl font-bold">About me</h1>
         <p className="text-sm md:text-xl p-3 sm:p-5 sm:mt-8 w-full max-w-[90vw] md:w-10/12">
           Hi, I&apos;m Sushank Lamichhane, a BSc IT student with a passion for
