@@ -13,7 +13,7 @@ const projects = [
       'A real-time chatting application with instant messaging, user authentication, and a sleek conversational UI. Built as a full-stack project with modern web technologies.',
     tags: ['MERN Stack', 'Socket.io', 'Real-time', 'Authentication'],
     color: '#00ff88',
-    liveUrl: 'https://senchat.sushank.com.np',
+    liveUrl: 'https://senchat.sushanka.com.np',
     githubUrl: '',
     featured: true,
   },
