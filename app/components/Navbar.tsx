@@ -54,7 +54,9 @@ const Navbar = () => {
       <div className="left-section">
         <div className="flex gap-2 text-xl  font-[Kalam] font-normal  text-white">
           <p className="">||</p>
-          <h2> सुशांक </h2>
+         <a href="#home">
+          <h2>  सुशांक </h2>
+          </a> 
           <p>||</p>
         </div>
       </div>
@@ -87,7 +89,9 @@ const Navbar = () => {
           <div className="absolute top-8 left-8">
         <div className="flex gap-2 text-xl  font-[Kalam] font-normal  text-white">
           <p className="">||</p>
-          <h2> सुशांक </h2>
+         <a href="#home">
+          <h2>  सुशांक </h2>
+          </a> 
           <p>||</p>
         </div>
       </div>
