@@ -27,7 +27,6 @@ const ContactPage = () => {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSending(true)
