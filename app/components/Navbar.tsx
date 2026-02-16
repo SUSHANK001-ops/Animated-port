@@ -52,10 +52,10 @@ const Navbar = () => {
     <nav className="p-6 navbar fixed top-0 left-0 w-full flex justify-between items-center z-50 bg-black/20 backdrop-blur-md border-b border-white/5">
       {/* Navbar content goes here */}
       <div className="left-section">
-        <div className="flex gap-2 text-xl  font-[Kalam] font-normal  text-white">
-          <p className="">||</p>
+        <div className="flex gap-2 text-xl font-devanagari font-medium text-white">
+          <p>||</p>
          <a href="#home">
-          <h2>  सुशांक </h2>
+          <h2>सुशांक</h2>
           </a> 
           <p>||</p>
         </div>
@@ -87,10 +87,10 @@ const Navbar = () => {
       >
         <div className="navlinks flex flex-col gap-8  text-3xl justify-center h-full w-full items-center">
           <div className="absolute top-8 left-8">
-        <div className="flex gap-2 text-xl  font-[Kalam] font-normal  text-white">
-          <p className="">||</p>
+        <div className="flex gap-2 text-xl font-devanagari font-medium text-white">
+          <p>||</p>
          <a href="#home">
-          <h2>  सुशांक </h2>
+          <h2>सुशांक</h2>
           </a> 
           <p>||</p>
         </div>
