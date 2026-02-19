@@ -1,257 +1,329 @@
-'use client'
-import React, { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ExternalLink, Github, ArrowRight } from 'lucide-react'
-
-gsap.registerPlugin(ScrollTrigger)
-
-const projects = [
+'use client';
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ExternalLinkIcon, Github } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  color: string;
+  liveUrl: string;
+  githubUrl: string;
+  featured: boolean;
+}
+const projects: Project[] = [
   {
-    title: 'SenChat',
+    title: "SenChat",
     description:
-      'A real-time chatting application with instant messaging, user authentication, and a sleek conversational UI. Built as a full-stack project with modern web technologies.',
-    tags: ['MERN Stack', 'Socket.io', 'Real-time', 'Authentication'],
-    color: '#00ff88',
-    liveUrl: 'https://senchat.sushanka.com.np',
-    githubUrl: '',
+      "A real-time chatting application with instant messaging, user authentication, and a sleek conversational UI. Built as a full-stack project with modern web technologies.",
+    tags: ["MERN Stack", "Socket.io", "Real-time", "Authentication"],
+    color: "#00ff88",
+    liveUrl: "https://senchat.sushanka.com.np",
+    githubUrl: "",
     featured: true,
   },
   {
-    title: 'SenBlog',
+    title: "SenBlog",
     description:
-      'A full-stack blogging platform with rich text editing, user dashboards, and content management. Features responsive design, authentication, and a clean reading experience.',
-    tags: ['MongoDB', 'Express', 'React', 'Node.js'],
-    color: '#00d4ff',
-    liveUrl: 'https://senblog.vercel.app/',
-    githubUrl: '',
+      "A full-stack blogging platform with rich text editing, user dashboards, and content management. Features responsive design, authentication, and a clean reading experience.",
+    tags: ["MongoDB", "Express", "React", "Node.js"],
+    color: "#00d4ff",
+    liveUrl: "https://senblog.vercel.app/",
+    githubUrl: "",
     featured: true,
   },
   {
-    title: 'SenTools',
+    title: "SenTools",
     description:
-      'A comprehensive utility toolkit web app with multiple developer and productivity tools built into a single platform. Clean UI with intuitive navigation.',
-    tags: ['Next.js', 'JavaScript', 'Tailwind CSS'],
-    color: '#E9A8F2',
-    liveUrl: 'https://sentools.vercel.app/',
-    githubUrl: 'https://github.com/SUSHANK001-ops/SenTOols.git',
+      "A comprehensive utility toolkit web app with multiple developer and productivity tools built into a single platform. Clean UI with intuitive navigation.",
+    tags: ["Next.js", "JavaScript", "Tailwind CSS"],
+    color: "#E9A8F2",
+    liveUrl: "https://sentools.vercel.app/",
+    githubUrl: "https://github.com/SUSHANK001-ops/SenTOols.git",
     featured: true,
   },
-]
-
+  {
+  "title": "UrlShare",
+  "description": "A full-stack file sharing web app that allows users to upload files up to 100MB and generate public download links with QR code sharing and automatic expiration. Built with a responsive UI and cloud-based file storage.",
+  "tags": ["Next.js", "Express", "PostgreSQL", "Cloudinary"],
+  "color": "#6C9BFF",
+  "liveUrl": "https://urlshare.sushanka.com.np",
+  "githubUrl": "https://github.com/SUSHANK001-ops/UrlShare.git",
+  "featured": true
+}
+];
 const ProjectsPage = () => {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const headingRef = useRef<HTMLDivElement>(null)
-  const projectRefs = useRef<HTMLDivElement[]>([])
-  const [activeProject, setActiveProject] = useState<number | null>(null)
+  const lineRef = useRef<HTMLDivElement>(null);
+  const marqueeTrackRef = useRef<HTMLDivElement>(null);
+  const tweenRef = useRef<gsap.core.Tween | null>(null);
+  const tagline1Ref = useRef<HTMLSpanElement>(null);
+  const tagline2Ref = useRef<HTMLSpanElement>(null);
+  const taglineWrapperRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Heading
-      gsap.fromTo(
-        headingRef.current,
-        { opacity: 0, y: 60 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none reverse',
-          },
-        }
-      )
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
-      // Project cards
-      projectRefs.current.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          {
-            opacity: 0,
-            x: i % 2 === 0 ? -100 : 100,
-          },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        )
-      })
-    }, sectionRef)
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
 
-    return () => ctx.revert()
-  }, [])
+    gsap.fromTo(
+      lineRef.current,
+      { scaleX: 0 },
+      {
+        scaleX: 1,
+        duration: 1.2,
+        ease: "power3.inOut",
+        scrollTrigger: {
+          trigger: lineRef.current,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+
+    // Taglines fall from top (triggered by wrapper visibility)
+    gsap.fromTo(
+      tagline1Ref.current,
+      { y: -120, opacity: 0, rotation: -8 },
+      {
+        y: 0,
+        opacity: 1,
+        rotation: 0,
+        duration: 0.8,
+        ease: "bounce.out",
+        scrollTrigger: {
+          trigger: taglineWrapperRef.current,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+
+    gsap.fromTo(
+      tagline2Ref.current,
+      { y: -120, opacity: 0, rotation: 6 },
+      {
+        y: 0,
+        opacity: 1,
+        rotation: 0,
+        duration: 0.8,
+        delay: 0.2,
+        ease: "bounce.out",
+        scrollTrigger: {
+          trigger: taglineWrapperRef.current,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+
+    // Infinite marquee for project cards (desktop only)
+    if (!isMobile && marqueeTrackRef.current) {
+      tweenRef.current = gsap.to(marqueeTrackRef.current, {
+        xPercent: -50,
+        repeat: -1,
+        duration: 30,
+        ease: "none",
+      });
+    }
+
+    return () => {
+      tweenRef.current?.kill();
+    };
+  }, [isMobile]);
+
+  const handleMouseEnter = () => tweenRef.current?.pause();
+  const handleMouseLeave = () => tweenRef.current?.resume();
+
+  // Drag / swipe support
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartProgress = useRef(0);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if (isMobile) return;
+    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    if (tweenRef.current) {
+      tweenRef.current.pause();
+      dragStartProgress.current = tweenRef.current.progress();
+    }
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, [isMobile]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current || !tweenRef.current || !marqueeTrackRef.current) return;
+    const delta = e.clientX - dragStartX.current;
+    const trackWidth = marqueeTrackRef.current.scrollWidth / 2;
+    const progressDelta = -delta / trackWidth;
+    let newProgress = dragStartProgress.current + progressDelta;
+    // Wrap progress between 0 and 1 for seamless looping
+    newProgress = ((newProgress % 1) + 1) % 1;
+    tweenRef.current.progress(newProgress);
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    tweenRef.current?.resume();
+  }, []);
+
+  // Duplicate projects for seamless infinite loop
+  const duplicatedProjects = [...projects, ...projects];
 
   return (
-    <section
-      ref={sectionRef}
-      id="projects"
-      className="relative min-h-screen w-full py-24 px-6 md:px-16 lg:px-24 overflow-hidden"
-    >
-      {/* Background effects */}
-      <div className="absolute top-0 right-1/4 w-125 h-125 bg-cyan-500/3 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-125 h-125 bg-green-500/3 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Heading */}
-      <div ref={headingRef} className="text-center mb-20">
-        <p className="text-sm md:text-base uppercase tracking-[0.3em] text-neutral-500 mb-4 font-mono">
-          Featured Work
-        </p>
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-          <span className="text-green-400">
-            Projects
+    <div id="projects" className=" my-20 bg-[#1B1B1B] flex flex-col items-center">
+      <h1 className="text-5xl md:text-6xl mt-5 font-bold text-[#06DF73]">
+        My Projects
+      </h1>
+      <div
+        ref={lineRef}
+        className="mx-auto mt-6 h-0.5 w-24 bg-green-400 origin-center"
+      />
+      <div ref={taglineWrapperRef} className="flex flex-row p-6 items-center justify-center w-full">
+        <div className="relative flex flex-col items-start">
+          <span
+            ref={tagline1Ref}
+            className="bg-[#FADE2B] text-gray-800 px-5 py-3 text-3xl md:text-4xl rounded-sm relative z-20 shadow-md opacity-0"
+          >
+            Code with Purpose
           </span>
-        </h2>
-        <div className="mx-auto mt-6 h-0.5 w-24 bg-green-400" />
+          <span
+            ref={tagline2Ref}
+            className="bg-[#fa542b] text-gray-800 px-5 py-3 text-3xl md:text-4xl rounded-sm relative z-10 -mt-3 ml-10 md:ml-20 shadow-md opacity-0"
+          >
+            Build with Impact
+          </span>
+        </div>
       </div>
 
-      {/* Projects List */}
-      <div className="max-w-6xl mx-auto space-y-8">
-        {projects.map((project, index) => (
-          <div
-            key={index}
-            ref={(el) => {
-              if (el) projectRefs.current[index] = el
-            }}
-            className={`group relative rounded-2xl border transition-all duration-500 overflow-hidden
-              ${activeProject === index
-                ? 'border-white/20 bg-white/5'
-                : 'border-white/5 bg-white/2 hover:border-white/10'
-              }`}
-            onMouseEnter={() => setActiveProject(index)}
-            onMouseLeave={() => setActiveProject(null)}
-          >
-            {/* Glow effect */}
+      {/* Mobile: normal vertical layout */}
+      {isMobile && (
+        <div className="flex flex-col items-center gap-6 mt-24 w-[90%] mx-auto">
+          {projects.map((project, idx) => (
             <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-              style={{
-                background: `radial-gradient(ellipse at 0% 50%, ${project.color}08, transparent 50%)`,
-              }}
-            />
-
-            <div className="relative p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
-              {/* Project Number */}
-              <div className="shrink-0">
-                <span
-                  className="text-7xl md:text-8xl font-bold leading-none transition-colors duration-500"
-                  style={{
-                    color: activeProject === index ? project.color : 'rgba(255,255,255,0.05)',
-                    WebkitTextStroke: activeProject === index ? 'none' : `1px rgba(255,255,255,0.1)`,
-                  }}
-                >
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    {project.featured && (
-                      <span
-                        className="inline-block text-xs font-mono uppercase tracking-wider mb-2 px-3 py-1 rounded-full"
-                        style={{
-                          color: project.color,
-                          backgroundColor: `${project.color}15`,
-                          border: `1px solid ${project.color}30`,
-                        }}
-                      >
-                        Featured
-                      </span>
-                    )}
-                    <h3 className="text-2xl md:text-3xl font-bold text-white/90 group-hover:text-white transition-colors duration-300">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Links */}
-                  <div className="flex gap-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center
-                                   hover:border-white/30 hover:bg-white/5 transition-all duration-300"
-                        aria-label="View source code"
-                      >
-                        <Github size={16} className="text-neutral-400" />
-                      </a>
-                    )}
+              key={idx}
+              className="p-4 w-full border-2 border-gray-100 rounded-lg shadow-md"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-7xl text-gray-200">
+                  {" "}
+                  {idx < 9 ? `0${idx + 1}` : idx + 1}
+                </h1>
+                <div className="flex gap-3 items-center">
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
+                  >
+                    <ExternalLinkIcon /> <span>Live</span>
+                  </a>
+                  {project.githubUrl && (
                     <a
-                      href={project.liveUrl}
+                      href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center
-                                 hover:border-white/30 hover:bg-white/5 transition-all duration-300"
-                      aria-label="View live project"
+                      className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
                     >
-                      <ExternalLink size={16} className="text-neutral-400" />
+                      code <Github />
                     </a>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300 leading-relaxed mb-6 max-w-2xl">
-                  {project.description}
-                </p>
-
-                {/* Tags & CTA */}
-                <div className="flex flex-wrap items-center gap-3">
-                  {project.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="text-xs px-3 py-1.5 rounded-full border border-white/10 text-neutral-500
-                                 group-hover:text-neutral-300 group-hover:border-white/15 transition-all duration-300 font-mono"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  <div className="ml-auto hidden md:flex items-center gap-2 text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0"
-                    style={{ color: project.color }}
-                  >
-                    <span>View Project</span>
-                    <ArrowRight size={14} />
-                  </div>
+                  )}
                 </div>
               </div>
+              <h2 className="text-2xl font-bold text-gray-200">{project.title}</h2>
+              <p className="text-gray-400">{project.description}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {project.tags.map((tag, tagIndex) => (
+                  <span
+                    key={tagIndex}
+                    className="bg-gray-600 px-2 py-1 rounded-2xl text-center text-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            {/* Bottom accent line */}
-            <div
-              className="h-px w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"
-              style={{
-                background: `${project.color}30`,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* View all CTA */}
-      <div className="text-center mt-16">
-        <a
-          href="https://github.com/SUSHANK001-ops"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-white/10 text-neutral-300
-                     hover:border-white/25 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+      {/* Desktop: Marquee container */}
+      {!isMobile && (
+        <div
+          className="w-[80%] overflow-hidden mt-24 mx-auto cursor-grab active:cursor-grabbing select-none"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={(e) => {
+            handleMouseLeave();
+            handlePointerUp();
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         >
-          <span className="font-mono text-sm">View All on GitHub</span>
-          <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-        </a>
-      </div>
-    </section>
-  )
-}
+          <div
+            ref={marqueeTrackRef}
+            className="flex w-max gap-6 py-4"
+          >
+            {duplicatedProjects.map((project, idx) => (
+              <div
+                key={idx}
+                className="p-4 h-100 w-80 shrink-0 border-2 border-gray-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105"
+              >
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-7xl text-gray-200">
+                  {" "}
+                  {(idx % projects.length) < 9
+                    ? `0${(idx % projects.length) + 1}`
+                    : (idx % projects.length) + 1}
+                </h1>
+                <div className="flex gap-3 items-center">
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
+                  >
+                    <ExternalLinkIcon /> <span>Live</span>
+                  </a>
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
+                    >
+                      code <Github />
+                    </a>
+                  )}
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-200">{project.title}</h2>
+              <p className="text-gray-400">{project.description}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {project.tags.map((tag, tagIndex) => (
+                  <span
+                    key={tagIndex}
+                    className="bg-gray-600 px-2 py-1 rounded-2xl text-center text-sm"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-export default ProjectsPage
+export default ProjectsPage;
