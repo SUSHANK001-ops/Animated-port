@@ -193,7 +193,7 @@ const Marquee = () => {
           {[...marqueeWords, ...marqueeWords].map((word, i) => (
             <span
               key={i}
-              className="mx-6 text-lg md:text-xl font-medium text-white/10 uppercase tracking-widest select-none"
+              className="mx-6 text-lg md:text-xl font-medium text-gray-200 uppercase tracking-widest select-none"
             >
               {word}
             </span>

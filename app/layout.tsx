@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Noto_Sans_Devanagari } from "next/font/google";
+import { Space_Grotesk, Noto_Sans_Devanagari ,Kalam } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -14,6 +14,12 @@ const notoSansDevanagari = Noto_Sans_Devanagari({
   weight: ["400", "500", "600", "700"],
 });
 
+const kalam = Kalam({
+  weight: ['300', '400', '700'], // Specify the desired weights
+  subsets: ['latin'], // Specify the necessary subsets
+  display: 'swap', // 'swap' ensures the fallback font is used while Kalam loads
+  variable: '--font-kalam', // Optional: for use with CSS variables or Tailwind CSS
+});
 export const metadata: Metadata = {
   title: "Sushanka Lamichhane - Developer Portfolio",
   description:
@@ -84,7 +90,7 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${spaceGrotesk.variable} ${notoSansDevanagari.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${notoSansDevanagari.variable} ${kalam.variable} antialiased`}
       >
         {children}
       </body>

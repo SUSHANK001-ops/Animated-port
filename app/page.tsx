@@ -66,8 +66,7 @@ export default function Home() {
       <AboutPage />
       <Marquee />
       
-      {/* Divider */}
-      <div className="section-divider" />
+      
       
       <ServicesPage />
       
