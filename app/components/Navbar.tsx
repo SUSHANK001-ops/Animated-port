@@ -4,12 +4,14 @@ import { SplitText } from "gsap/SplitText";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useSections } from "./SectionContext";
 
 const Navbar = () => {
   const mobileMenuRef = useRef(null);
   const navbarRef = useRef<HTMLElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
+  const { scrollToSection } = useSections();
 
   // Hide on scroll down, show on scroll up
   useEffect(() => {
@@ -83,26 +85,26 @@ const Navbar = () => {
         <div className="left-section">
           <div className="flex gap-2 text-xl font-devanagari font-medium text-white">
             <p className="font-Kalam">||</p>
-            <Link href="#home" className="hover:scale-105 transition-transform duration-300 font-Kalam">
+            <Link href="#home" className="hover:scale-105 transition-transform duration-300 font-Kalam" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>
               <h2>सुशांक</h2>
             </Link>
             <p className="font-Kalam">||</p>
           </div>
         </div>
         <div className="right-section md:flex hidden gap-8 text-white font-semibold text-sm tracking-wide">
-          <Link onMouseEnter={handleMouseEnter} href="#about">
+          <Link onMouseEnter={handleMouseEnter} href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>
             About
           </Link>
-          <Link onMouseEnter={handleMouseEnter} href="#services">
+          <Link onMouseEnter={handleMouseEnter} href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>
             Services
           </Link>
-          <Link onMouseEnter={handleMouseEnter} href="#projects">
+          <Link onMouseEnter={handleMouseEnter} href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>
             Projects
           </Link>
-          <Link onMouseEnter={handleMouseEnter} href="#experience">
+          <Link onMouseEnter={handleMouseEnter} href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>
             Experience
           </Link>
-          <Link onMouseEnter={handleMouseEnter} href="#contact">
+          <Link onMouseEnter={handleMouseEnter} href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>
             Contact
           </Link>
         </div>
@@ -118,7 +120,7 @@ const Navbar = () => {
           <div className="absolute top-8 left-8">
             <div className="flex gap-2 text-xl font-devanagari font-medium text-white">
               <p>||</p>
-              <Link href="#home">
+              <Link href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home'); setIsMenuOpen(false); }}>
                 <h2>सुशांक</h2>
               </Link>
               <p>||</p>
@@ -126,11 +128,11 @@ const Navbar = () => {
           </div>
           <X className="absolute top-8 right-8 cursor-pointer z-50" onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); }} />
           <div className="navlinks flex flex-col gap-8 text-3xl justify-center h-full w-full items-center">
-            <Link href="#about" onClick={() => setIsMenuOpen(false)}>About</Link>
-            <Link href="#services" onClick={() => setIsMenuOpen(false)}>Services</Link>
-            <Link href="#projects" onClick={() => setIsMenuOpen(false)}>Projects</Link>
-            <Link href="#experience" onClick={() => setIsMenuOpen(false)}>Experience</Link>
-            <Link href="#contact" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+            <Link href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setIsMenuOpen(false); }}>About</Link>
+            <Link href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); setIsMenuOpen(false); }}>Services</Link>
+            <Link href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); setIsMenuOpen(false); }}>Projects</Link>
+            <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); setIsMenuOpen(false); }}>Experience</Link>
+            <Link href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); setIsMenuOpen(false); }}>Contact</Link>
           </div>
         </div>
       </div>

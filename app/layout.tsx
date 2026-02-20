@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Noto_Sans_Devanagari ,Kalam } from "next/font/google";
 import "./globals.css";
+import { SectionProvider } from "./components/SectionContext";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -92,7 +93,9 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${notoSansDevanagari.variable} ${kalam.variable} antialiased`}
       >
-        {children}
+        <SectionProvider>
+          {children}
+        </SectionProvider>
       </body>
     </html>
   );

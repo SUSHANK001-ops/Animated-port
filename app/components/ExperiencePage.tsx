@@ -3,6 +3,8 @@ import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+import { useSections } from './SectionContext'
+
 gsap.registerPlugin(ScrollTrigger)
 
 const experiences = [
@@ -46,6 +48,12 @@ const experiences = [
 
 const ExperiencePage = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const { registerSection } = useSections()
+
+  useEffect(() => {
+    registerSection('experience', sectionRef.current)
+  }, [registerSection])
+
   const headingRef = useRef<HTMLDivElement>(null)
   const timelineRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<HTMLDivElement[]>([])
