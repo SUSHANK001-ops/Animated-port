@@ -81,7 +81,7 @@ const Navbar = () => {
   return (
     <nav ref={navbarRef} className="fixed top-0 left-0 flex items-center justify-center w-full z-50">
       {/* Navbar content goes here */}
-      <div className="p-6 navbar mt-8 items-center  gap-28 md:gap-9 rounded-full w-fit flex justify-center z-50 bg-black/20 backdrop-blur-md border-b border-white/5">
+      <div className="p-5 navbar mt-8 items-center  gap-28 md:gap-9 rounded-full w-fit flex justify-center z-50 bg-black/20 backdrop-blur-md border-b border-white/5">
         <div className="left-section">
           <div className="flex gap-2 text-xl font-devanagari font-medium text-white">
             <p className="font-Kalam">||</p>
@@ -100,6 +100,9 @@ const Navbar = () => {
           </Link>
           <Link onMouseEnter={handleMouseEnter} href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>
             Projects
+          </Link>
+          <Link onMouseEnter={handleMouseEnter} href="/Blog" >
+          Blogs
           </Link>
           <Link onMouseEnter={handleMouseEnter} href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>
             Experience
@@ -131,6 +134,9 @@ const Navbar = () => {
             <Link href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setIsMenuOpen(false); }}>About</Link>
             <Link href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); setIsMenuOpen(false); }}>Services</Link>
             <Link href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); setIsMenuOpen(false); }}>Projects</Link>
+            <Link onMouseEnter={handleMouseEnter} href="/Blog" >
+          Blogs
+          </Link>
             <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); setIsMenuOpen(false); }}>Experience</Link>
             <Link href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); setIsMenuOpen(false); }}>Contact</Link>
           </div>
