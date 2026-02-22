@@ -69,6 +69,47 @@ const TableOfContents = ({ content }: { content: string }) => {
   )
 }
 
+// InlineImage: accepts a string URL or a Blob and provides a string src for Next Image
+const InlineImage: React.FC<{
+  src?: string | Blob
+  alt?: string
+  sizes?: string
+  className?: string
+  fill?: boolean
+}> = ({ src, alt, sizes, className, fill }) => {
+  const [url, setUrl] = useState<string>('')
+
+  useEffect(() => {
+    if (!src) {
+      setUrl('')
+      return
+    }
+
+    if (typeof src === 'string') {
+      setUrl(src)
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(src as Blob)
+    setUrl(objectUrl)
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [src])
+
+  if (!url) return null
+
+  return (
+    <Image
+      src={url}
+      alt={alt || ''}
+      fill={fill}
+      sizes={sizes}
+      className={className}
+    />
+  )
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 const BlogPostPage = () => {
   const [blogData, setBlogData] = useState<BlogPost[]>([])
@@ -370,9 +411,9 @@ const BlogPostPage = () => {
               img: ({ src, alt }) => (
                 <figure className="my-9">
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
-                    <Image
-                      src={src || ''}
-                      alt={alt || ''}
+                    <InlineImage
+                      src={src as any}
+                      alt={alt as string}
                       fill
                       className="object-cover object-center"
                       sizes="(max-width: 768px) 100vw, 720px"
