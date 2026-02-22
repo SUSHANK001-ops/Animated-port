@@ -7,8 +7,21 @@ import Link from 'next/link'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 
+interface BlogPost {
+  slug: string
+  title: string
+  timeToRead: number | string
+  Titledescription?: string
+  image?: string
+  tags?: string[]
+  category?: string
+  dateposted?: string
+  author?: string
+  content?: string
+}
+
 const Blogs = () => {
-  const [blogData, setBlogData] = useState([])
+  const [blogData, setBlogData] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -22,6 +35,7 @@ const Blogs = () => {
         setError("Failed to fetch blogs. Please try again later.")
       } finally {
         setLoading(false)
+        console.log(blogData)
       }
     }
     fetchBlogs()
@@ -55,13 +69,15 @@ const Blogs = () => {
                 className="group relative flex flex-col bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:-translate-y-2 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-black/60 transition-all duration-300 cursor-pointer"
               >
                 <div className="relative h-52 w-full overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover brightness-75 group-hover:brightness-100 group-hover:scale-105 transition-all duration-500"
-                  />
+                  {post.image && (
+                    <Image
+                      src={post.image}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover brightness-75 group-hover:brightness-100 group-hover:scale-105 transition-all duration-500"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-linear-to-t from-zinc-900 via-zinc-900/20 to-transparent" />
                   {post.category && (
                     <div>
