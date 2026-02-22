@@ -3,11 +3,18 @@ import React, { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import ThreeScene from './ThreeScene'
 import TechStackTerminal from './TechStackTerminal'
+import { useSections } from './SectionContext' 
 
 const Homepage = () => {
   const titleRef = useRef<HTMLDivElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const { registerSection } = useSections()
+
+  useEffect(() => {
+    registerSection('home', rootRef.current)
+  }, [registerSection])
 
   useEffect(() => {
     // Animate title
@@ -48,7 +55,7 @@ const Homepage = () => {
   }, [])
 
   return (
-    <div id='home' className="relative w-full h-screen overflow-hidden">
+    <div ref={rootRef} id='home' className="relative w-full h-screen overflow-hidden">
       <ThreeScene />
       <TechStackTerminal />
 

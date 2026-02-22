@@ -4,10 +4,18 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Send, Mail, MapPin, ArrowUpRight, Copy, Check } from 'lucide-react'
 
+import { useSections } from './SectionContext'
+
 gsap.registerPlugin(ScrollTrigger)
 
 const ContactPage = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const { registerSection } = useSections()
+
+  useEffect(() => {
+    registerSection('contact', sectionRef.current)
+  }, [registerSection])
+
   const headingRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const infoRef = useRef<HTMLDivElement>(null)

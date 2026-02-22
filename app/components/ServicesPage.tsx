@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Code, Palette, Server, Smartphone, Zap, Globe } from 'lucide-react'
+import { useSections } from './SectionContext' 
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -53,6 +54,12 @@ const services = [
 
 const ServicesPage = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const { registerSection } = useSections();
+
+  useEffect(() => {
+    registerSection('services', sectionRef.current)
+  }, [registerSection])
+
   const headingRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<HTMLDivElement[]>([])
   const lineRef = useRef<HTMLDivElement>(null)

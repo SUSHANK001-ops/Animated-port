@@ -3,6 +3,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ExternalLinkIcon, Github } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSections } from "./SectionContext";
+import BounceAnimation from "./UI/BounceAnimation";
 interface Project {
   title: string;
   description: string;
@@ -54,12 +56,15 @@ const projects: Project[] = [
 }
 ];
 const ProjectsPage = () => {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { registerSection } = useSections();
+  useEffect(() => {
+    registerSection('projects', rootRef.current);
+  }, [registerSection]);
+
   const lineRef = useRef<HTMLDivElement>(null);
   const marqueeTrackRef = useRef<HTMLDivElement>(null);
   const tweenRef = useRef<gsap.core.Tween | null>(null);
-  const tagline1Ref = useRef<HTMLSpanElement>(null);
-  const tagline2Ref = useRef<HTMLSpanElement>(null);
-  const taglineWrapperRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -87,41 +92,7 @@ const ProjectsPage = () => {
       }
     );
 
-    // Taglines fall from top (triggered by wrapper visibility)
-    gsap.fromTo(
-      tagline1Ref.current,
-      { y: -120, opacity: 0, rotation: -8 },
-      {
-        y: 0,
-        opacity: 1,
-        rotation: 0,
-        duration: 0.8,
-        ease: "bounce.out",
-        scrollTrigger: {
-          trigger: taglineWrapperRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse",
-        },
-      }
-    );
-
-    gsap.fromTo(
-      tagline2Ref.current,
-      { y: -120, opacity: 0, rotation: 6 },
-      {
-        y: 0,
-        opacity: 1,
-        rotation: 0,
-        duration: 0.8,
-        delay: 0.2,
-        ease: "bounce.out",
-        scrollTrigger: {
-          trigger: taglineWrapperRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse",
-        },
-      }
-    );
+   
 
     // Infinite marquee for project cards (desktop only)
     if (!isMobile && marqueeTrackRef.current) {
@@ -178,7 +149,7 @@ const ProjectsPage = () => {
   const duplicatedProjects = [...projects, ...projects];
 
   return (
-    <div id="projects" className=" my-20 bg-[#1B1B1B] flex flex-col items-center">
+    <div ref={rootRef} id="projects" className=" my-20 bg-[#1B1B1B] flex flex-col items-center">
       <h1 className="text-5xl md:text-6xl mt-5 font-bold text-[#06DF73]">
         My Projects
       </h1>
@@ -186,22 +157,7 @@ const ProjectsPage = () => {
         ref={lineRef}
         className="mx-auto mt-6 h-0.5 w-24 bg-green-400 origin-center"
       />
-      <div ref={taglineWrapperRef} className="flex flex-row p-6 items-center justify-center w-full">
-        <div className="relative flex flex-col items-start">
-          <span
-            ref={tagline1Ref}
-            className="bg-[#FADE2B] text-gray-800 px-5 py-3 text-3xl md:text-4xl rounded-sm relative z-20 shadow-md opacity-0"
-          >
-            Code with Purpose
-          </span>
-          <span
-            ref={tagline2Ref}
-            className="bg-[#fa542b] text-gray-800 px-5 py-3 text-3xl md:text-4xl rounded-sm relative z-10 -mt-3 ml-10 md:ml-20 shadow-md opacity-0"
-          >
-            Build with Impact
-          </span>
-        </div>
-      </div>
+      <BounceAnimation tagline1="Code with Purpose" tagline2=" Build with Impact" />
 
       {/* Mobile: normal vertical layout */}
       {isMobile && (
@@ -259,7 +215,7 @@ const ProjectsPage = () => {
         <div
           className="w-[80%] overflow-hidden mt-24 mx-auto cursor-grab active:cursor-grabbing select-none"
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={(e) => {
+          onMouseLeave={() => {
             handleMouseLeave();
             handlePointerUp();
           }}

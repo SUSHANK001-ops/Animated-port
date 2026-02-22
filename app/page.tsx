@@ -13,6 +13,7 @@ import ProjectsPage from './components/ProjectsPage'
 import ExperiencePage from './components/ExperiencePage'
 import ContactPage from './components/ContactPage'
 import Footer from './components/Footer'
+import { SectionProvider } from './components/SectionContext'
 
 export default function Home() {
   const lenisRef = useRef<LenisRef>(null)
@@ -56,6 +57,7 @@ export default function Home() {
     <>
       {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
       <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
+        <SectionProvider>
         <div ref={mainRef} className='min-h-screen overflow-x-hidden' style={{ opacity: loading ? 0 : 1 }}>
       {/* Noise overlay for texture */}
       <div className="noise-overlay" />
@@ -85,8 +87,7 @@ export default function Home() {
       
       <ContactPage />
       <Footer />
-      </div>
-    </ReactLenis>
+      </div>        </SectionProvider>    </ReactLenis>
     </>
   )
 }
