@@ -35,7 +35,7 @@ const Blogs = () => {
         setError("Failed to fetch blogs. Please try again later.")
       } finally {
         setLoading(false)
-        console.log(blogData)
+        
       }
     }
     fetchBlogs()
