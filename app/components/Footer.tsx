@@ -1,14 +1,18 @@
 'use client'
 import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { SplitText } from 'gsap/SplitText'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowUp } from 'lucide-react'
+import Link from 'next/link'
+import { useSections } from './SectionContext'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, SplitText)
 
 const Footer = () => {
   const footerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const { scrollToSection } = useSections()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -41,11 +45,11 @@ const Footer = () => {
       ref={footerRef}
       className="relative w-full border-t border-white/5 overflow-hidden"
     >
-      {/* Top gradient line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-green-400/20" />
 
       <div ref={contentRef} className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 py-16">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+
           {/* Left - Branding */}
           <div className="flex flex-col items-center md:items-start gap-3">
             <div className="flex gap-2 text-xl font-[Kalam] font-normal text-white/80">
@@ -58,18 +62,14 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Center - Navigation */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-neutral-500">
-            {['About', 'Services', 'Projects', 'Experience', 'Contact'].map((link) => (
-              <a
-                key={link}
-                href={`#${link.toLowerCase()}`}
-                className="hover:text-white transition-colors duration-300 relative group"
-              >
-                {link}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-green-400 group-hover:w-full transition-all duration-300" />
-              </a>
-            ))}
+          {/* Center - Navigation (same as navbar) */}
+          <div className="flex flex-wrap justify-center gap-8 text-white font-semibold text-sm tracking-wide">
+            <Link href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>About</Link>
+            <Link href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</Link>
+            <Link href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>Projects</Link>
+            <Link href="/Blog">Blogs</Link>
+            <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>Experience</Link>
+            <Link href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</Link>
           </div>
 
           {/* Right - Back to top */}
@@ -85,7 +85,6 @@ const Footer = () => {
           </button>
         </div>
 
-        {/* Divider */}
         <div className="my-10 h-px bg-white/5" />
 
         {/* Bottom */}

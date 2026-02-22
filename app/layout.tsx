@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Noto_Sans_Devanagari ,Kalam } from "next/font/google";
 import "./globals.css";
+import '@mdxeditor/editor/style.css';
 import { SectionProvider } from "./components/SectionContext";
 
 const spaceGrotesk = Space_Grotesk({

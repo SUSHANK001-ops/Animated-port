@@ -9,7 +9,7 @@ const AboutPage = () => {
   const { registerSection } = useSections();
 
   useEffect(() => {
-    registerSection('about', rootRef.current);
+    registerSection("about", rootRef.current);
   }, [registerSection]);
 
   return (
@@ -20,17 +20,14 @@ const AboutPage = () => {
             About me
           </h1>
           <p className="text-sm p-3    w-full max-w-[70vw] md:w-10/12 mt-4 md:mt-6 ">
-            Hi, I’m Sushank Lamichhane, a BSc IT student and passionate web
-            developer who loves turning ideas into real, impactful digital
-            products. I specialize in building modern, responsive, and
-            user-focused websites using technologies like JavaScript, React,
-            Next.js, and Tailwind CSS, with added creativity through smooth
-            animations using GSAP. Beyond coding, I enjoy combining technology
-            with design and problem-solving — whether it’s developing full web
-            applications, creating useful tools, or crafting clean UI
-            experiences. I focus on writing efficient code, learning
-            continuously, and building projects that are not just visually
-            appealing but also practical and meaningful.
+            Hi, I'm Sushanka Lamichhane, a BSc IT student and Full-Stack
+            Developer with a passion for technology and creativity. I specialize
+            in crafting visually stunning, responsive websites by blending a
+            keen eye for design with strong technical problem-solving.  Beyond
+            coding, I thrive in agile environments, valuing collaborative
+            teamwork, time management, and adaptability. My goal is to use my
+            analytical thinking and creative design approach to build seamless
+            digital experiences that leave a lasting impression.
           </p>
         </div>
         <div className="right w-10/12 sm:w-8/12 md:w-4/12 flex justify-center mt-8 md:mt-0">
