@@ -5,10 +5,9 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
+import '../blog-content.css'
 
 interface BlogPost {
   slug: string
@@ -34,19 +33,46 @@ const ReadingProgress = ({ progress }: { progress: number }) => (
   </div>
 )
 
-// ─── Table of Contents ────────────────────────────────────────────────────────
-const TableOfContents = ({ content }: { content: string }) => {
-  const headings = content
-    .split('\n')
+// Helper: detect if content is HTML (from the rich text editor) vs Markdown
+function isHTMLContent(content: string): boolean {
+  // If it contains common HTML block tags, treat as HTML
+  return /<(p|div|h[1-6]|ul|ol|li|blockquote|pre|table|figure|br|hr)[\/\s>]/i.test(content);
+}
+
+// Helper: extract headings from HTML content
+function extractHTMLHeadings(html: string) {
+  const headings: { level: number; text: string; id: string }[] = [];
+  const regex = /<h([1-3])[^>]*>(.*?)<\/h[1-3]>/gi;
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    const level = parseInt(match[1]);
+    const text = match[2].replace(/<[^>]*>/g, ""); // strip inner tags
+    const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    headings.push({ level, text, id });
+  }
+  return headings;
+}
+
+// Helper: extract headings from Markdown content
+function extractMarkdownHeadings(content: string) {
+  return content
+    .split("\n")
     .filter((line) => line.match(/^#{1,3} /))
     .map((line) => {
-      const level = line.match(/^(#+)/)?.[1].length ?? 1
-      const text = line.replace(/^#+\s/, '')
-      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-      return { level, text, id }
-    })
+      const level = line.match(/^(#+)/)?.[1].length ?? 1;
+      const text = line.replace(/^#+\s/, "");
+      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      return { level, text, id };
+    });
+}
 
-  if (headings.length < 2) return null
+// ─── Table of Contents ────────────────────────────────────────────────────────
+const TableOfContents = ({ content }: { content: string }) => {
+  const headings = isHTMLContent(content)
+    ? extractHTMLHeadings(content)
+    : extractMarkdownHeadings(content);
+
+  if (headings.length < 2) return null;
 
   return (
     <nav className="p-5 bg-white/5 border border-white/10 rounded-xl">
@@ -66,7 +92,7 @@ const TableOfContents = ({ content }: { content: string }) => {
         ))}
       </ul>
     </nav>
-  )
+  );
 }
 
 // InlineImage: accepts a string URL or a Blob and provides a string src for Next Image
@@ -109,6 +135,42 @@ const InlineImage: React.FC<{
     />
   )
 }
+
+// ─── Blog Content Renderer ────────────────────────────────────────────────────
+// Adds IDs to headings for anchor links, renders HTML with proper styling
+function addIdsToHTML(html: string): string {
+  return html.replace(
+    /<(h[1-6])([^>]*)>(.*?)<\/h[1-6]>/gi,
+    (match, tag, attrs, inner) => {
+      const text = inner.replace(/<[^>]*>/g, "");
+      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      // Don't add id if one already exists
+      if (/id\s*=/.test(attrs)) return match;
+      return `<${tag}${attrs} id="${id}">${inner}</${tag}>`;
+    }
+  );
+}
+
+const BlogContent = ({ content }: { content: string }) => {
+  const processedContent = useMemo(() => {
+    if (!content) return "";
+    if (isHTMLContent(content)) {
+      return addIdsToHTML(content);
+    }
+    // Fallback: if content is plain/markdown text, wrap in <p> tags
+    return content
+      .split("\n\n")
+      .map((block) => `<p>${block.replace(/\n/g, "<br/>")}</p>`)
+      .join("");
+  }, [content]);
+
+  return (
+    <div
+      className="blog-html-content"
+      dangerouslySetInnerHTML={{ __html: processedContent }}
+    />
+  );
+};
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const BlogPostPage = () => {
@@ -185,7 +247,7 @@ const BlogPostPage = () => {
             The post you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
           <Link
-            href="/blog"
+            href="/Blog"
             className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:border-emerald-500/50 hover:text-white transition-all duration-200"
           >
             ← Back to Blog
@@ -223,7 +285,7 @@ const BlogPostPage = () => {
         <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-16 pb-10 flex flex-col gap-5">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-[13px] text-gray-500">
-            <Link href="/blog" className="hover:text-emerald-400 transition-colors">
+            <Link href="/Blog" className="hover:text-emerald-400 transition-colors">
               Blog
             </Link>
             <span className="text-white/20">›</span>
@@ -272,19 +334,7 @@ const BlogPostPage = () => {
             </div>
           </div>
 
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-400 hover:border-emerald-500/40 hover:text-emerald-400 transition-colors cursor-default"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
+        
         </div>
       </header>
 
@@ -322,127 +372,8 @@ const BlogPostPage = () => {
           {/* Mobile share row */}
           
 
-          {/* Markdown content */}
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              h1: ({ children }) => {
-                const id = String(children).toLowerCase().replace(/[^a-z0-9]+/g, '-')
-                return (
-                  <h1 id={id} className="text-4xl font-bold text-white mt-12 mb-5 leading-tight tracking-tight">
-                    {children}
-                  </h1>
-                )
-              },
-              h2: ({ children }) => {
-                const id = String(children).toLowerCase().replace(/[^a-z0-9]+/g, '-')
-                return (
-                  <h2
-                    id={id}
-                    className="relative text-2xl font-semibold text-white mt-12 mb-4 pl-5
-                               before:content-[''] before:absolute before:left-0 before:top-1
-                               before:bottom-1 before:w-[3px] before:rounded-full
-                               before:bg-gradient-to-b before:from-emerald-400 before:to-cyan-400"
-                  >
-                    {children}
-                  </h2>
-                )
-              },
-              h3: ({ children }) => {
-                const id = String(children).toLowerCase().replace(/[^a-z0-9]+/g, '-')
-                return (
-                  <h3 id={id} className="text-xl font-semibold text-gray-100 mt-10 mb-3">
-                    {children}
-                  </h3>
-                )
-              },
-              p: ({ children }) => (
-                <p className="text-[17px] leading-[1.8] text-gray-300 mb-5">{children}</p>
-              ),
-              strong: ({ children }) => (
-                <strong className="font-semibold text-white">{children}</strong>
-              ),
-              em: ({ children }) => (
-                <em className="italic text-gray-400">{children}</em>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc ml-6 mb-6 flex flex-col gap-2">{children}</ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="list-decimal ml-6 mb-6 flex flex-col gap-2">{children}</ol>
-              ),
-              li: ({ children }) => (
-                <li className="text-[17px] leading-[1.7] text-gray-300 pl-1">{children}</li>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="my-8 px-6 py-5 bg-white/5 border border-white/10 border-l-4 border-l-emerald-500 rounded-r-xl text-gray-400 italic text-lg leading-relaxed [&>p]:mb-0">
-                  {children}
-                </blockquote>
-              ),
-              code: ({ inline, children }: any) =>
-                inline ? (
-                  <code className="font-mono text-[0.85em] px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                    {children}
-                  </code>
-                ) : (
-                  <div className="my-7 rounded-xl overflow-hidden border border-white/10 bg-[#0d1117]">
-                    <div className="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/10">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-                    </div>
-                    <pre className="p-5 overflow-x-auto text-sm leading-[1.7] text-gray-300 font-mono">
-                      <code>{children}</code>
-                    </pre>
-                  </div>
-                ),
-              a: ({ href, children }) => (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-400 no-underline border-b border-emerald-500/30 hover:border-emerald-400 transition-colors"
-                >
-                  {children}
-                </a>
-              ),
-              hr: () => <hr className="my-12 border-t border-white/10" />,
-              // ── INLINE IMAGE inside markdown content ──
-              img: ({ src, alt }) => (
-                <figure className="my-9">
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
-                    <InlineImage
-                      src={src as any}
-                      alt={alt as string}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 768px) 100vw, 720px"
-                    />
-                  </div>
-                  {alt && (
-                    <figcaption className="mt-3 text-center text-[13px] text-gray-500 italic">
-                      {alt}
-                    </figcaption>
-                  )}
-                </figure>
-              ),
-              table: ({ children }) => (
-                <div className="overflow-x-auto my-7 rounded-xl border border-white/10">
-                  <table className="w-full border-collapse text-[15px]">{children}</table>
-                </div>
-              ),
-              th: ({ children }) => (
-                <th className="px-4 py-3 bg-white/5 text-left text-[13px] font-semibold text-gray-400 tracking-wide border-b border-white/10">
-                  {children}
-                </th>
-              ),
-              td: ({ children }) => (
-                <td className="px-4 py-3 text-gray-300 border-b border-white/5">{children}</td>
-              ),
-            }}
-          >
-            {post.content ?? ''}
-          </ReactMarkdown>
+          {/* Blog content */}
+          <BlogContent content={post.content ?? ''} />
 
           {/* ── Author card ──────────────────────────────────────────────────── */}
           <div className="flex items-center gap-5 mt-16 p-6 bg-white/5 border border-white/10 rounded-2xl">
@@ -457,7 +388,19 @@ const BlogPostPage = () => {
               <p className="text-sm text-gray-400 mt-0.5">Developer &amp; Writer</p>
             </div>
           </div>
-
+  {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap mt-4 gap-2">
+              {post.tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-400 hover:border-emerald-500/40 hover:text-emerald-400 transition-colors cursor-default"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
           {/* ── Back link ────────────────────────────────────────────────────── */}
           <div className="mt-10">
             <Link
