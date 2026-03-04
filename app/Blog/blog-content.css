@@ -3,8 +3,10 @@
 
 .blog-html-content {
   font-size: 17px;
-  line-height: 1.55;
+  line-height: 1.8;
   color: #d1d5db;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ── Headings ── */
@@ -12,9 +14,9 @@
   font-size: 2.25rem;
   font-weight: 700;
   color: #ffffff;
-  margin-top: 2.25rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.15;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
@@ -22,9 +24,10 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;
-  margin-top: 2rem;
-  margin-bottom: 0.6rem;
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
   padding-left: 1.25rem;
+  line-height: 1.3;
   position: relative;
 }
 
@@ -43,21 +46,24 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #f3f4f6;
-  margin-top: 1.75rem;
-  margin-bottom: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
 }
 
 .blog-html-content h4 {
   font-size: 1.1rem;
   font-weight: 600;
   color: #e5e7eb;
-  margin-top: 1.5rem;
-  margin-bottom: 0.4rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 /* ── Text ── */
 .blog-html-content p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  line-height: 1.8;
 }
 
 .blog-html-content strong,
@@ -125,7 +131,7 @@
 }
 
 .blog-html-content li {
-  line-height: 1.55;
+  line-height: 1.75;
   padding-left: 0.25rem;
 }
 
@@ -241,8 +247,63 @@
   /* Let the inline color attribute work as-is */
 }
 
+/* Preserve all inline styles from the editor */
+.blog-html-content span[style] {
+  /* Allow inline styles like font-size, color, background-color, line-height */
+}
+
+/* Ensure spans with line-height apply properly */
+.blog-html-content p span,
+.blog-html-content li span {
+  display: inline;
+}
+
 /* ── First Paragraph ── */
 .blog-html-content > p:first-child {
   font-size: 1.125rem;
   color: #e5e7eb;
+  line-height: 1.85;
+}
+
+/* ── Selection ── */
+.blog-html-content ::selection {
+  background: rgba(52, 211, 153, 0.25);
+  color: #ffffff;
+}
+
+/* ── Empty Paragraphs (editor artifacts) ── */
+.blog-html-content p:empty,
+.blog-html-content p br:only-child {
+  min-height: 1.8em;
+}
+
+/* ── Responsive Adjustments ── */
+@media (max-width: 768px) {
+  .blog-html-content {
+    font-size: 15.5px;
+    line-height: 1.75;
+  }
+
+  .blog-html-content h1 {
+    font-size: 1.75rem;
+    margin-top: 2rem;
+  }
+
+  .blog-html-content h2 {
+    font-size: 1.35rem;
+    margin-top: 1.75rem;
+  }
+
+  .blog-html-content h3 {
+    font-size: 1.15rem;
+    margin-top: 1.5rem;
+  }
+
+  .blog-html-content pre code {
+    font-size: 0.8rem;
+  }
+
+  .blog-html-content blockquote {
+    font-size: 1rem;
+  }
 }

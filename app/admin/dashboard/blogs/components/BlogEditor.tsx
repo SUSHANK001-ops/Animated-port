@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   $getRoot,
   $getSelection,
@@ -11,6 +11,8 @@ import {
   FORMAT_ELEMENT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  COMMAND_PRIORITY_LOW,
   type LexicalEditor,
   type EditorState,
   type TextFormatType,
@@ -275,6 +277,7 @@ function ColorPickerDropdown({
       <button
         type="button"
         title={title}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => setOpen(!open)}
         className="flex flex-col items-center p-1 rounded text-white/50 hover:text-white hover:bg-white/10 transition-colors"
       >
@@ -285,13 +288,17 @@ function ColorPickerDropdown({
         />
       </button>
       {open && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 bg-[#222] border border-white/10 rounded-lg shadow-2xl p-2 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 bg-[#222] border border-white/10 rounded-lg shadow-2xl p-2 animate-in fade-in slide-in-from-top-1 duration-150"
+          onMouseDown={(e) => e.preventDefault()}
+        >
           <div className="grid grid-cols-10 gap-0.5 w-[220px]">
             {COLOR_PRESETS.map((c) => (
               <button
                 key={c}
                 type="button"
                 title={c}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onApply(c);
                   setOpen(false);
@@ -308,6 +315,7 @@ function ColorPickerDropdown({
             <input
               type="color"
               value={color || "#ffffff"}
+              onMouseDown={(e) => e.stopPropagation()}
               onChange={(e) => {
                 onApply(e.target.value);
                 setOpen(false);
@@ -318,6 +326,7 @@ function ColorPickerDropdown({
             {color && (
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onApply("");
                   setOpen(false);
@@ -452,7 +461,7 @@ function ToolbarPlugin({ onImageUpload }: { onImageUpload: (file: File) => Promi
     setBgColor($getSelectionStyleValueForProperty(sel, "background-color", ""));
 
     const anchor = sel.anchor.getNode();
-    let element =
+    const element =
       anchor.getKey() === "root" ? anchor : anchor.getTopLevelElementOrThrow();
     const dom = editor.getElementByKey(element.getKey());
 
@@ -468,9 +477,21 @@ function ToolbarPlugin({ onImageUpload }: { onImageUpload: (file: File) => Promi
   }, [editor]);
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    const unregUpdate = editor.registerUpdateListener(({ editorState }) => {
       editorState.read($updateToolbar);
     });
+    const unregSelect = editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      () => {
+        $updateToolbar();
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+    return () => {
+      unregUpdate();
+      unregSelect();
+    };
   }, [editor, $updateToolbar]);
 
   /* ---- actions ---- */
@@ -698,12 +719,18 @@ function InitPlugin({ html }: { html: string }) {
     if (loaded.current || !html) return;
     loaded.current = true;
 
-    editor.update(() => {
-      const dom = new DOMParser().parseFromString(html, "text/html");
-      const nodes = $generateNodesFromDOM(editor, dom);
-      const root = $getRoot();
-      root.clear();
-      if (nodes.length > 0) root.append(...nodes);
+    // Use requestAnimationFrame to avoid glitchy double-render
+    requestAnimationFrame(() => {
+      editor.update(
+        () => {
+          const dom = new DOMParser().parseFromString(html, "text/html");
+          const nodes = $generateNodesFromDOM(editor, dom);
+          const root = $getRoot();
+          root.clear();
+          if (nodes.length > 0) root.append(...nodes);
+        },
+        { tag: "history-merge" }, // prevent undo from clearing initial content
+      );
     });
   }, [editor, html]);
 
@@ -715,23 +742,31 @@ function InitPlugin({ html }: { html: string }) {
 export default function BlogEditor({ value, onChange, onImageUpload }: BlogEditorProps) {
   const [wordCount, setWordCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const handleChange = useCallback(
     (_state: EditorState, editor: LexicalEditor) => {
-      editor.read(() => {
-        const html = $generateHtmlFromNodes(editor, null);
-        const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-        setCharCount(text.length);
-        setWordCount(text ? text.split(/\s+/).length : 0);
-        onChange(html);
-      });
+      // Debounce HTML serialization to prevent glitchy rapid re-renders
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        editor.read(() => {
+          const html = $generateHtmlFromNodes(editor, null);
+          const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+          setCharCount(text.length);
+          setWordCount(text ? text.split(/\s+/).length : 0);
+          onChange(html);
+        });
+      }, 100);
     },
     [onChange],
   );
 
+  // Memoize config to avoid re-creating on each render (causes editor reset glitch)
+  const config = useMemo(() => ({ ...editorConfig }), []);
+
   return (
     <div className="border border-white/10 rounded-lg overflow-hidden bg-[#1a1a1a] flex flex-col max-h-[85vh]">
-      <LexicalComposer initialConfig={editorConfig}>
+      <LexicalComposer initialConfig={config}>
         {/* Toolbar */}
         <ToolbarPlugin onImageUpload={onImageUpload} />
 
@@ -740,12 +775,18 @@ export default function BlogEditor({ value, onChange, onImageUpload }: BlogEdito
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className="min-h-[500px] p-6 text-white/90 focus:outline-none leading-relaxed"
-                style={{ minHeight: 500 }}
+                className="min-h-[500px] p-6 text-white/90 focus:outline-none"
+                style={{
+                  minHeight: 500,
+                  lineHeight: 1.8,
+                  fontSize: "16px",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word",
+                }}
               />
             }
             placeholder={
-              <div className="absolute top-6 left-6 text-white/30 pointer-events-none select-none">
+              <div className="absolute top-6 left-6 text-white/30 pointer-events-none select-none" style={{ lineHeight: 1.8 }}>
                 Start writing your blog post...
               </div>
             }
