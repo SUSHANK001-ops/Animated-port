@@ -1,16 +1,59 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $createParagraphNode,
+  $insertNodes,
+  FORMAT_TEXT_COMMAND,
+  FORMAT_ELEMENT_COMMAND,
+  UNDO_COMMAND,
+  REDO_COMMAND,
+  type LexicalEditor,
+  type EditorState,
+  type TextFormatType,
+  type ElementFormatType,
+} from "lexical";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  HeadingNode,
+  QuoteNode,
+  type HeadingTagType,
+} from "@lexical/rich-text";
+import {
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  $isListNode,
+  ListItemNode,
+  ListNode,
+} from "@lexical/list";
+import { $isLinkNode, AutoLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
+import { $setBlocksType, $patchStyleText, $getSelectionStyleValueForProperty } from "@lexical/selection";
+import { $getNearestNodeOfType } from "@lexical/utils";
 import {
   Bold,
   Italic,
   Underline,
   Strikethrough,
-  List,
+  List as ListIcon,
   ListOrdered,
   Code,
   ImageIcon,
-  Link as LinkIcon,
   Minus,
   Undo,
   Redo,
@@ -18,16 +61,19 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Type,
+  Link as LinkIcon,
+  Quote as QuoteIcon,
+  Heading1,
+  Heading2,
+  Heading3,
   Pilcrow,
-  RemoveFormatting,
-  Palette,
+  ChevronDown,
+  Baseline,
   Highlighter,
-  Subscript,
-  Superscript,
-  Table,
-  Quote,
+  Plus,
 } from "lucide-react";
+
+/* ──────────────────── Types ──────────────────── */
 
 interface BlogEditorProps {
   value: string;
@@ -35,749 +81,697 @@ interface BlogEditorProps {
   onImageUpload: (file: File) => Promise<string>;
 }
 
-const TEXT_COLORS = [
-  { label: "White", value: "#ffffff" },
-  { label: "Light Gray", value: "#d4d4d4" },
-  { label: "Gray", value: "#9ca3af" },
-  { label: "Green", value: "#00ff88" },
-  { label: "Blue", value: "#60a5fa" },
-  { label: "Purple", value: "#a78bfa" },
-  { label: "Pink", value: "#f472b6" },
-  { label: "Red", value: "#f87171" },
-  { label: "Orange", value: "#fb923c" },
-  { label: "Yellow", value: "#fbbf24" },
-  { label: "Teal", value: "#2dd4bf" },
-  { label: "Cyan", value: "#22d3ee" },
-];
+/* ──────────────────── Theme ──────────────────── */
 
-const HIGHLIGHT_COLORS = [
-  { label: "None", value: "transparent" },
-  { label: "Yellow", value: "rgba(251,191,36,0.25)" },
-  { label: "Green", value: "rgba(0,255,136,0.2)" },
-  { label: "Blue", value: "rgba(96,165,250,0.2)" },
-  { label: "Purple", value: "rgba(167,139,250,0.2)" },
-  { label: "Pink", value: "rgba(244,114,182,0.2)" },
-  { label: "Red", value: "rgba(248,113,113,0.2)" },
-  { label: "Orange", value: "rgba(251,146,60,0.2)" },
-];
+const editorTheme = {
+  paragraph: "mb-2 leading-relaxed text-white/80",
+  text: {
+    bold: "font-bold text-white",
+    italic: "italic",
+    underline: "underline",
+    strikethrough: "line-through",
+    code: "font-mono bg-white/[0.08] text-[#00ff88] text-[0.9em] px-1.5 py-0.5 rounded",
+  },
+  heading: {
+    h1: "text-3xl font-bold mb-4 mt-6 text-white leading-tight",
+    h2: "text-2xl font-semibold mb-3 mt-5 text-white leading-tight",
+    h3: "text-xl font-medium mb-2 mt-4 text-white leading-tight",
+  },
+  list: {
+    ul: "list-disc pl-7 my-3 space-y-1 text-white/80",
+    ol: "list-decimal pl-7 my-3 space-y-1 text-white/80",
+    listitem: "mb-1 leading-relaxed",
+    nested: { listitem: "list-none" },
+  },
+  quote:
+    "border-l-4 border-[#00ff88]/50 pl-5 py-3 my-4 bg-white/[0.02] rounded-r-lg italic text-white/60",
+  code: "bg-[#0d0d0d] block p-5 rounded-lg my-4 overflow-x-auto border border-white/[0.08] text-[#e2e8f0] font-mono text-sm leading-relaxed",
+  codeHighlight: {},
+  link: "text-[#00ff88] underline underline-offset-2 decoration-[#00ff88]/40 cursor-pointer",
+};
 
-export default function BlogEditor({
-  value,
-  onChange,
-  onImageUpload,
-}: BlogEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
-  const [currentBlock, setCurrentBlock] = useState("p");
-  const [currentColor, setCurrentColor] = useState("#ffffff");
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-  const [charCount, setCharCount] = useState(0);
-  const isInitialMount = useRef(true);
-  const lastValueRef = useRef(value);
-  const colorPickerRef = useRef<HTMLDivElement>(null);
-  const highlightPickerRef = useRef<HTMLDivElement>(null);
+/* ──────────────────── Config ──────────────────── */
 
-  // Close color pickers on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target as Node)) {
-        setShowColorPicker(false);
-      }
-      if (highlightPickerRef.current && !highlightPickerRef.current.contains(e.target as Node)) {
-        setShowHighlightPicker(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+const editorConfig = {
+  namespace: "BlogEditor",
+  theme: editorTheme,
+  nodes: [
+    HeadingNode,
+    ListNode,
+    ListItemNode,
+    QuoteNode,
+    CodeNode,
+    CodeHighlightNode,
+    LinkNode,
+    AutoLinkNode,
+  ],
+  onError: (error: Error) => console.error("Lexical Error:", error),
+};
 
-  // Sync editor content only when value changes externally
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (editorRef.current && value) {
-        editorRef.current.innerHTML = value;
-        updateCounts(value);
-      }
-      return;
-    }
+/* ──────────────────── Block labels ──────────────────── */
 
-    if (editorRef.current && value !== lastValueRef.current) {
-      const selection = window.getSelection();
-      const hadFocus = document.activeElement === editorRef.current;
+const BLOCK_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
+  paragraph: { label: "Normal", icon: <Pilcrow size={14} /> },
+  h1: { label: "Heading 1", icon: <Heading1 size={14} /> },
+  h2: { label: "Heading 2", icon: <Heading2 size={14} /> },
+  h3: { label: "Heading 3", icon: <Heading3 size={14} /> },
+  bullet: { label: "Bullet List", icon: <ListIcon size={14} /> },
+  number: { label: "Numbered List", icon: <ListOrdered size={14} /> },
+  quote: { label: "Quote", icon: <QuoteIcon size={14} /> },
+  code: { label: "Code Block", icon: <Code size={14} /> },
+};
 
-      let savedRange: Range | null = null;
-      if (hadFocus && selection && selection.rangeCount > 0) {
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
+/* ──────────────────── Toolbar Button ──────────────────── */
 
-      editorRef.current.innerHTML = value;
-      lastValueRef.current = value;
-      updateCounts(value);
-
-      if (hadFocus && savedRange && selection) {
-        try {
-          selection.removeAllRanges();
-          selection.addRange(savedRange);
-        } catch {
-          // Range may be invalid
-        }
-      }
-    }
-  }, [value]);
-
-  const updateCounts = (html: string) => {
-    const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-    setCharCount(text.length);
-    setWordCount(text ? text.split(/\s+/).length : 0);
-  };
-
-  const updateActiveFormats = useCallback(() => {
-    const formats = new Set<string>();
-    try {
-      if (document.queryCommandState("bold")) formats.add("bold");
-      if (document.queryCommandState("italic")) formats.add("italic");
-      if (document.queryCommandState("underline")) formats.add("underline");
-      if (document.queryCommandState("strikeThrough")) formats.add("strikeThrough");
-      if (document.queryCommandState("insertUnorderedList")) formats.add("ul");
-      if (document.queryCommandState("insertOrderedList")) formats.add("ol");
-      if (document.queryCommandState("justifyLeft")) formats.add("justifyLeft");
-      if (document.queryCommandState("justifyCenter")) formats.add("justifyCenter");
-      if (document.queryCommandState("justifyRight")) formats.add("justifyRight");
-      if (document.queryCommandState("justifyFull")) formats.add("justifyFull");
-      if (document.queryCommandState("subscript")) formats.add("subscript");
-      if (document.queryCommandState("superscript")) formats.add("superscript");
-
-      const color = document.queryCommandValue("foreColor");
-      if (color) {
-        // Convert rgb to hex
-        const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-        if (match) {
-          const hex = "#" + [match[1], match[2], match[3]].map((x) => parseInt(x).toString(16).padStart(2, "0")).join("");
-          setCurrentColor(hex);
-        } else if (color.startsWith("#")) {
-          setCurrentColor(color);
-        }
-      }
-    } catch {
-      // queryCommandState can throw in some edge cases
-    }
-    setActiveFormats(formats);
-
-    try {
-      const block = document.queryCommandValue("formatBlock");
-      setCurrentBlock(block || "p");
-    } catch {
-      setCurrentBlock("p");
-    }
-  }, []);
-
-  const emitChange = useCallback(() => {
-    if (editorRef.current) {
-      const html = editorRef.current.innerHTML;
-      lastValueRef.current = html;
-      onChange(html);
-      updateCounts(html);
-    }
-  }, [onChange]);
-
-  const execCommand = useCallback(
-    (command: string, val?: string) => {
-      editorRef.current?.focus();
-      document.execCommand(command, false, val);
-      emitChange();
-      updateActiveFormats();
-    },
-    [emitChange, updateActiveFormats]
-  );
-
-  const handleInput = () => {
-    emitChange();
-    updateActiveFormats();
-  };
-
-  const handleSelectionChange = useCallback(() => {
-    if (editorRef.current && editorRef.current.contains(document.activeElement)) {
-      updateActiveFormats();
-    }
-  }, [updateActiveFormats]);
-
-  useEffect(() => {
-    document.addEventListener("selectionchange", handleSelectionChange);
-    return () => document.removeEventListener("selectionchange", handleSelectionChange);
-  }, [handleSelectionChange]);
-
-  // Keyboard shortcuts
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key.toLowerCase()) {
-        case "b":
-          e.preventDefault();
-          execCommand("bold");
-          break;
-        case "i":
-          e.preventDefault();
-          execCommand("italic");
-          break;
-        case "u":
-          e.preventDefault();
-          execCommand("underline");
-          break;
-        case "z":
-          if (e.shiftKey) {
-            e.preventDefault();
-            execCommand("redo");
-          } else {
-            e.preventDefault();
-            execCommand("undo");
-          }
-          break;
-        case "k":
-          e.preventDefault();
-          insertLink();
-          break;
-        case "e":
-          e.preventDefault();
-          insertInlineCode();
-          break;
-        case "d":
-          e.preventDefault();
-          execCommand("strikeThrough");
-          break;
-      }
-    }
-
-    if (e.key === "Tab") {
-      e.preventDefault();
-      if (e.shiftKey) {
-        execCommand("outdent");
-      } else {
-        execCommand("indent");
-      }
-    }
-
-    // Enter inside a code block should just add a newline
-    if (e.key === "Enter" && !e.shiftKey) {
-      const sel = window.getSelection();
-      if (sel && sel.anchorNode) {
-        let node: Node | null = sel.anchorNode;
-        while (node && node !== editorRef.current) {
-          if (node instanceof HTMLElement && node.tagName === "PRE") {
-            e.preventDefault();
-            document.execCommand("insertHTML", false, "\n");
-            emitChange();
-            return;
-          }
-          node = node.parentNode;
-        }
-      }
-    }
-  };
-
-  const handleImageUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    await insertImage(file);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const insertImage = async (file: File) => {
-    setUploading(true);
-    try {
-      const url = await onImageUpload(file);
-      editorRef.current?.focus();
-      document.execCommand(
-        "insertHTML",
-        false,
-        `<figure style="margin:20px 0;text-align:center;"><img src="${url}" alt="blog image" style="max-width:100%;height:auto;border-radius:8px;" /><figcaption contenteditable="true" style="font-size:0.875rem;color:rgba(255,255,255,0.4);margin-top:8px;font-style:italic;">Image caption</figcaption></figure><p><br></p>`
-      );
-      emitChange();
-    } catch (error) {
-      console.error("Failed to upload image:", error);
-      alert("Failed to upload image");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
-    for (const file of files) {
-      await insertImage(file);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const insertLink = () => {
-    const selection = window.getSelection();
-    const selectedText = selection?.toString() || "";
-    const url = prompt("Enter URL:", "https://");
-    if (url && url !== "https://") {
-      if (selectedText) {
-        execCommand("createLink", url);
-        // Make sure newly created links open in new tab
-        if (editorRef.current) {
-          const links = editorRef.current.querySelectorAll('a[href="' + url + '"]');
-          links.forEach((link) => {
-            link.setAttribute("target", "_blank");
-            link.setAttribute("rel", "noopener noreferrer");
-          });
-          emitChange();
-        }
-      } else {
-        const linkText = prompt("Enter link text:", "Link text") || "Link";
-        document.execCommand(
-          "insertHTML",
-          false,
-          `<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`
-        );
-        emitChange();
-      }
-    }
-  };
-
-  const insertInlineCode = () => {
-    const selection = window.getSelection();
-    const selectedText = selection?.toString() || "code";
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em;">${selectedText}</code>`
-    );
-    emitChange();
-  };
-
-  const insertCodeBlock = () => {
-    editorRef.current?.focus();
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<pre style="background:#0d0d0d;padding:20px;border-radius:8px;overflow-x:auto;font-family:'Fira Code',monospace;font-size:0.9rem;line-height:1.7;margin:16px 0;border:1px solid rgba(255,255,255,0.08);color:#e2e8f0;"><code>// Your code here</code></pre><p><br></p>`
-    );
-    emitChange();
-  };
-
-  const insertTable = () => {
-    editorRef.current?.focus();
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<table style="width:100%;border-collapse:collapse;margin:16px 0;"><thead><tr><th style="background:rgba(255,255,255,0.05);padding:10px 14px;text-align:left;border:1px solid rgba(255,255,255,0.1);font-weight:600;">Header 1</th><th style="background:rgba(255,255,255,0.05);padding:10px 14px;text-align:left;border:1px solid rgba(255,255,255,0.1);font-weight:600;">Header 2</th><th style="background:rgba(255,255,255,0.05);padding:10px 14px;text-align:left;border:1px solid rgba(255,255,255,0.1);font-weight:600;">Header 3</th></tr></thead><tbody><tr><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 1</td><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 2</td><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 3</td></tr><tr><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 4</td><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 5</td><td style="padding:10px 14px;border:1px solid rgba(255,255,255,0.1);">Cell 6</td></tr></tbody></table><p><br></p>`
-    );
-    emitChange();
-  };
-
-  const insertBlockquote = () => {
-    editorRef.current?.focus();
-    const selection = window.getSelection();
-    const selectedText = selection?.toString() || "Quote text here...";
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<blockquote style="border-left:4px solid rgba(0,255,136,0.5);padding:12px 20px;margin:16px 0;background:rgba(255,255,255,0.02);border-radius:0 8px 8px 0;font-style:italic;color:rgba(255,255,255,0.6);">${selectedText}</blockquote><p><br></p>`
-    );
-    emitChange();
-  };
-
-  const setTextColor = (color: string) => {
-    execCommand("foreColor", color);
-    setCurrentColor(color);
-    setShowColorPicker(false);
-  };
-
-  const setHighlightColor = (color: string) => {
-    if (color === "transparent") {
-      execCommand("removeFormat");
-    } else {
-      execCommand("hiliteColor", color);
-    }
-    setShowHighlightPicker(false);
-  };
-
-  const clearFormatting = () => {
-    execCommand("removeFormat");
-    execCommand("formatBlock", "p");
-  };
-
-  const setFontSize = (size: string) => {
-    editorRef.current?.focus();
-    document.execCommand("fontSize", false, size);
-    emitChange();
-  };
-
-  const ToolbarButton = ({
-    onClick,
-    children,
-    title,
-    disabled,
-    active,
-    shortcut,
-  }: {
-    onClick: () => void;
-    children: React.ReactNode;
-    title: string;
-    disabled?: boolean;
-    active?: boolean;
-    shortcut?: string;
-  }) => (
+function TBtn({
+  onClick,
+  children,
+  title,
+  active,
+  disabled,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  title: string;
+  active?: boolean;
+  disabled?: boolean;
+}) {
+  return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      title={shortcut ? `${title} (${shortcut})` : title}
-      className={`p-1.5 rounded transition-all duration-150 ${
+      title={title}
+      className={`p-1.5 rounded transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed ${
         active
           ? "bg-[#00ff88]/20 text-[#00ff88] shadow-[0_0_6px_rgba(0,255,136,0.15)]"
           : "text-white/50 hover:text-white hover:bg-white/10"
-      } disabled:opacity-30 disabled:cursor-not-allowed`}
+      }`}
     >
       {children}
     </button>
   );
+}
 
-  const ToolbarDivider = () => <div className="w-px h-6 bg-white/8 mx-1.5" />;
+function Sep() {
+  return <div className="w-px h-6 bg-white/10 mx-1" />;
+}
+
+/* ──────────────────── Color Presets ──────────────────── */
+
+const COLOR_PRESETS = [
+  "#000000", "#434343", "#666666", "#999999", "#b7b7b7", "#cccccc", "#d9d9d9", "#efefef", "#f3f3f3", "#ffffff",
+  "#980000", "#ff0000", "#ff9900", "#ffff00", "#00ff00", "#00ffff", "#4a86e8", "#0000ff", "#9900ff", "#ff00ff",
+  "#e6b8af", "#f4cccc", "#fce5cd", "#fff2cc", "#d9ead3", "#d0e0e3", "#c9daf8", "#cfe2f3", "#d9d2e9", "#ead1dc",
+  "#dd7e6b", "#ea9999", "#f9cb9c", "#ffe599", "#b6d7a8", "#a2c4c9", "#a4c2f4", "#9fc5e8", "#b4a7d6", "#d5a6bd",
+  "#cc4125", "#e06666", "#f6b26b", "#ffd966", "#93c47d", "#76a5af", "#6d9eeb", "#6fa8dc", "#8e7cc3", "#c27ba0",
+  "#a61c00", "#cc0000", "#e69138", "#f1c232", "#6aa84f", "#45818e", "#3c78d8", "#3d85c6", "#674ea7", "#a64d79",
+  "#85200c", "#990000", "#b45f06", "#bf9000", "#38761d", "#134f5c", "#1155cc", "#0b5394", "#351c75", "#741b47",
+  "#5b0f00", "#660000", "#783f04", "#7f6000", "#274e13", "#0c343d", "#1c4587", "#073763", "#20124d", "#4c1130",
+];
+
+/* ──────────────────── Font Size Control ──────────────────── */
+
+const MIN_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 72;
+const DEFAULT_FONT_SIZE = 16;
+
+function FontSizeControl({
+  fontSize,
+  editor,
+}: {
+  fontSize: number;
+  editor: LexicalEditor;
+}) {
+  const applySize = useCallback(
+    (size: number) => {
+      editor.update(() => {
+        const sel = $getSelection();
+        if ($isRangeSelection(sel)) {
+          $patchStyleText(sel, { "font-size": size + "px" });
+        }
+      });
+    },
+    [editor],
+  );
+
+  return (
+    <div className="flex items-center gap-0">
+      <button
+        type="button"
+        title="Decrease font size"
+        onClick={() => applySize(Math.max(MIN_FONT_SIZE, fontSize - 1))}
+        className="p-1 rounded-l text-white/50 hover:text-white hover:bg-white/10 transition-colors border border-white/10 border-r-0"
+      >
+        <Minus size={12} />
+      </button>
+      <input
+        type="text"
+        value={fontSize}
+        onChange={(e) => {
+          const n = parseInt(e.target.value, 10);
+          if (!isNaN(n) && n >= MIN_FONT_SIZE && n <= MAX_FONT_SIZE) applySize(n);
+        }}
+        className="w-8 text-center text-xs bg-white/5 border border-white/10 text-white/70 py-1 outline-none focus:border-[#00ff88]/40"
+      />
+      <button
+        type="button"
+        title="Increase font size"
+        onClick={() => applySize(Math.min(MAX_FONT_SIZE, fontSize + 1))}
+        className="p-1 rounded-r text-white/50 hover:text-white hover:bg-white/10 transition-colors border border-white/10 border-l-0"
+      >
+        <Plus size={12} />
+      </button>
+    </div>
+  );
+}
+
+/* ──────────────────── Color Picker Dropdown ──────────────────── */
+
+function ColorPickerDropdown({
+  color,
+  onApply,
+  icon,
+  title,
+}: {
+  color: string;
+  onApply: (color: string) => void;
+  icon: React.ReactNode;
+  title: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const cb = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", cb);
+    return () => document.removeEventListener("mousedown", cb);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        title={title}
+        onClick={() => setOpen(!open)}
+        className="flex flex-col items-center p-1 rounded text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        <span className="flex items-center">{icon}</span>
+        <span
+          className="w-4 h-1 rounded-sm mt-0.5"
+          style={{ backgroundColor: color || "#ffffff" }}
+        />
+      </button>
+      {open && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 bg-[#222] border border-white/10 rounded-lg shadow-2xl p-2 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="grid grid-cols-10 gap-0.5 w-[220px]">
+            {COLOR_PRESETS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                title={c}
+                onClick={() => {
+                  onApply(c);
+                  setOpen(false);
+                }}
+                className={`w-5 h-5 rounded-sm border transition-transform hover:scale-125 ${
+                  color === c ? "border-[#00ff88] ring-1 ring-[#00ff88]/50" : "border-white/10"
+                }`}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+          </div>
+          {/* Custom color input */}
+          <div className="mt-2 pt-2 border-t border-white/10 flex items-center gap-2">
+            <input
+              type="color"
+              value={color || "#ffffff"}
+              onChange={(e) => {
+                onApply(e.target.value);
+                setOpen(false);
+              }}
+              className="w-6 h-6 rounded cursor-pointer border border-white/10 bg-transparent"
+            />
+            <span className="text-[10px] text-white/40">Custom</span>
+            {color && (
+              <button
+                type="button"
+                onClick={() => {
+                  onApply("");
+                  setOpen(false);
+                }}
+                className="ml-auto text-[10px] text-white/40 hover:text-white/70 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ──────────────────── Block Dropdown ──────────────────── */
+
+function BlockDropdown({
+  blockType,
+  editor,
+}: {
+  blockType: string;
+  editor: LexicalEditor;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const cb = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", cb);
+    return () => document.removeEventListener("mousedown", cb);
+  }, []);
+
+  const apply = (type: string) => {
+    editor.update(() => {
+      const sel = $getSelection();
+      if (!$isRangeSelection(sel)) return;
+
+      if (type === "paragraph") {
+        $setBlocksType(sel, () => $createParagraphNode());
+      } else if (type === "h1" || type === "h2" || type === "h3") {
+        $setBlocksType(sel, () => $createHeadingNode(type as HeadingTagType));
+      } else if (type === "quote") {
+        $setBlocksType(sel, () => $createQuoteNode());
+      } else if (type === "bullet") {
+        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+      } else if (type === "number") {
+        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+      } else if (type === "code") {
+        $setBlocksType(sel, () => new CodeNode());
+      }
+    });
+    setOpen(false);
+  };
+
+  const cur = BLOCK_LABELS[blockType] ?? BLOCK_LABELS.paragraph;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs text-white/70 bg-white/5 border border-white/10 hover:border-white/20 transition-colors min-w-[130px]"
+      >
+        <span className="flex items-center gap-1.5">
+          {cur.icon}
+          {cur.label}
+        </span>
+        <ChevronDown size={12} className="ml-auto opacity-50" />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 w-56 bg-[#222] border border-white/10 rounded-lg shadow-2xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+          {Object.entries(BLOCK_LABELS).map(([key, { label, icon }]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => apply(key)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors ${
+                blockType === key
+                  ? "text-[#00ff88] bg-[#00ff88]/10"
+                  : "text-white/70 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {icon}
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ──────────────────── Toolbar Plugin ──────────────────── */
+
+function ToolbarPlugin({ onImageUpload }: { onImageUpload: (file: File) => Promise<string> }) {
+  const [editor] = useLexicalComposerContext();
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [isStrikethrough, setIsStrikethrough] = useState(false);
+  const [isCode, setIsCode] = useState(false);
+  const [isLink, setIsLink] = useState(false);
+  const [blockType, setBlockType] = useState("paragraph");
+  const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
+  const [fontColor, setFontColor] = useState("");
+  const [bgColor, setBgColor] = useState("");
+
+  /* ---- keep toolbar state in sync ---- */
+  const $updateToolbar = useCallback(() => {
+    const sel = $getSelection();
+    if (!$isRangeSelection(sel)) return;
+
+    setIsBold(sel.hasFormat("bold"));
+    setIsItalic(sel.hasFormat("italic"));
+    setIsUnderline(sel.hasFormat("underline"));
+    setIsStrikethrough(sel.hasFormat("strikethrough"));
+    setIsCode(sel.hasFormat("code"));
+
+    const node = sel.anchor.getNode();
+    const parent = node.getParent();
+    setIsLink($isLinkNode(parent) || $isLinkNode(node));
+
+    /* font-size / color / background-color */
+    const fsVal = $getSelectionStyleValueForProperty(sel, "font-size", `${DEFAULT_FONT_SIZE}px`);
+    setFontSize(parseInt(fsVal, 10) || DEFAULT_FONT_SIZE);
+    setFontColor($getSelectionStyleValueForProperty(sel, "color", ""));
+    setBgColor($getSelectionStyleValueForProperty(sel, "background-color", ""));
+
+    const anchor = sel.anchor.getNode();
+    let element =
+      anchor.getKey() === "root" ? anchor : anchor.getTopLevelElementOrThrow();
+    const dom = editor.getElementByKey(element.getKey());
+
+    if (dom !== null) {
+      if ($isListNode(element)) {
+        const parentList = $getNearestNodeOfType<ListNode>(anchor, ListNode);
+        setBlockType(parentList ? parentList.getListType() : element.getListType());
+      } else {
+        const tag = $isHeadingNode(element) ? element.getTag() : element.getType();
+        setBlockType(tag in BLOCK_LABELS ? tag : "paragraph");
+      }
+    }
+  }, [editor]);
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read($updateToolbar);
+    });
+  }, [editor, $updateToolbar]);
+
+  /* ---- actions ---- */
+  const insertLink = useCallback(() => {
+    if (isLink) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    } else {
+      const url = prompt("Enter URL:", "https://");
+      if (url && url !== "https://") {
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url, target: "_blank" });
+      }
+    }
+  }, [editor, isLink]);
+
+  const insertImage = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      try {
+        const url = await onImageUpload(file);
+        editor.update(() => {
+          const dom = new DOMParser().parseFromString(
+            `<p><img src="${url}" alt="blog image" style="max-width:100%;border-radius:8px;" /></p>`,
+            "text/html",
+          );
+          const nodes = $generateNodesFromDOM(editor, dom);
+          $insertNodes(nodes);
+        });
+      } catch (err) {
+        console.error("Image upload failed:", err);
+        alert("Failed to upload image");
+      }
+    };
+    input.click();
+  }, [editor, onImageUpload]);
+
+  const insertHR = useCallback(() => {
+    editor.update(() => {
+      const dom = new DOMParser().parseFromString("<hr/>", "text/html");
+      const nodes = $generateNodesFromDOM(editor, dom);
+      $insertNodes(nodes);
+    });
+  }, [editor]);
+
+  const applyFontColor = useCallback(
+    (color: string) => {
+      editor.update(() => {
+        const sel = $getSelection();
+        if ($isRangeSelection(sel)) {
+          $patchStyleText(sel, { color: color || null });
+        }
+      });
+    },
+    [editor],
+  );
+
+  const applyBgColor = useCallback(
+    (color: string) => {
+      editor.update(() => {
+        const sel = $getSelection();
+        if ($isRangeSelection(sel)) {
+          $patchStyleText(sel, { "background-color": color || null });
+        }
+      });
+    },
+    [editor],
+  );
+
+  /* ---- render ---- */
+  return (
+    <div className="sticky top-0 z-30 bg-[#1a1a1a] shrink-0 border-b border-white/10">
+      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2">
+        {/* Undo / Redo */}
+        <TBtn onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} title="Undo (Ctrl+Z)">
+          <Undo size={16} />
+        </TBtn>
+        <TBtn onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)} title="Redo (Ctrl+Y)">
+          <Redo size={16} />
+        </TBtn>
+
+        <Sep />
+
+        {/* Block type */}
+        <BlockDropdown blockType={blockType} editor={editor} />
+
+        <Sep />
+
+        {/* Inline format */}
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold" as TextFormatType)}
+          title="Bold (Ctrl+B)"
+          active={isBold}
+        >
+          <Bold size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic" as TextFormatType)}
+          title="Italic (Ctrl+I)"
+          active={isItalic}
+        >
+          <Italic size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline" as TextFormatType)}
+          title="Underline (Ctrl+U)"
+          active={isUnderline}
+        >
+          <Underline size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough" as TextFormatType)}
+          title="Strikethrough"
+          active={isStrikethrough}
+        >
+          <Strikethrough size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code" as TextFormatType)}
+          title="Inline Code"
+          active={isCode}
+        >
+          <Code size={16} />
+        </TBtn>
+
+        <Sep />
+
+        {/* Font size */}
+        <FontSizeControl fontSize={fontSize} editor={editor} />
+
+        <Sep />
+
+        {/* Text color */}
+        <ColorPickerDropdown
+          color={fontColor}
+          onApply={applyFontColor}
+          icon={<Baseline size={16} />}
+          title="Text Color"
+        />
+
+        {/* Highlight color */}
+        <ColorPickerDropdown
+          color={bgColor}
+          onApply={applyBgColor}
+          icon={<Highlighter size={16} />}
+          title="Highlight Color"
+        />
+
+        <Sep />
+
+        {/* Alignment */}
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left" as ElementFormatType)}
+          title="Align Left"
+        >
+          <AlignLeft size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center" as ElementFormatType)}
+          title="Align Center"
+        >
+          <AlignCenter size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right" as ElementFormatType)}
+          title="Align Right"
+        >
+          <AlignRight size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify" as ElementFormatType)}
+          title="Justify"
+        >
+          <AlignJustify size={16} />
+        </TBtn>
+
+        <Sep />
+
+        {/* Lists */}
+        <TBtn
+          onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}
+          title="Bullet List"
+          active={blockType === "bullet"}
+        >
+          <ListIcon size={16} />
+        </TBtn>
+        <TBtn
+          onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}
+          title="Numbered List"
+          active={blockType === "number"}
+        >
+          <ListOrdered size={16} />
+        </TBtn>
+
+        <Sep />
+
+        {/* Link */}
+        <TBtn onClick={insertLink} title="Insert Link (Ctrl+K)" active={isLink}>
+          <LinkIcon size={16} />
+        </TBtn>
+
+        {/* Image */}
+        <TBtn onClick={insertImage} title="Upload Image">
+          <ImageIcon size={16} />
+        </TBtn>
+
+        {/* HR */}
+        <TBtn onClick={insertHR} title="Horizontal Rule">
+          <Minus size={16} />
+        </TBtn>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────── Initial Content Plugin ──────────────────── */
+
+function InitPlugin({ html }: { html: string }) {
+  const [editor] = useLexicalComposerContext();
+  const loaded = useRef(false);
+
+  useEffect(() => {
+    if (loaded.current || !html) return;
+    loaded.current = true;
+
+    editor.update(() => {
+      const dom = new DOMParser().parseFromString(html, "text/html");
+      const nodes = $generateNodesFromDOM(editor, dom);
+      const root = $getRoot();
+      root.clear();
+      if (nodes.length > 0) root.append(...nodes);
+    });
+  }, [editor, html]);
+
+  return null;
+}
+
+/* ──────────────────── Main Component ──────────────────── */
+
+export default function BlogEditor({ value, onChange, onImageUpload }: BlogEditorProps) {
+  const [wordCount, setWordCount] = useState(0);
+  const [charCount, setCharCount] = useState(0);
+
+  const handleChange = useCallback(
+    (_state: EditorState, editor: LexicalEditor) => {
+      editor.read(() => {
+        const html = $generateHtmlFromNodes(editor, null);
+        const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+        setCharCount(text.length);
+        setWordCount(text ? text.split(/\s+/).length : 0);
+        onChange(html);
+      });
+    },
+    [onChange],
+  );
 
   return (
     <div className="border border-white/10 rounded-lg overflow-hidden bg-[#1a1a1a] flex flex-col max-h-[85vh]">
-      {/* Toolbar - Sticky */}
-      <div className="sticky top-0 z-30 bg-[#1a1a1a] flex-shrink-0">
-      {/* Toolbar Row 1 - Format & Style */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-white/10 bg-white/[0.02]">
-        <ToolbarButton onClick={() => execCommand("undo")} title="Undo" shortcut="Ctrl+Z">
-          <Undo size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("redo")} title="Redo" shortcut="Ctrl+Shift+Z">
-          <Redo size={15} />
-        </ToolbarButton>
+      <LexicalComposer initialConfig={editorConfig}>
+        {/* Toolbar */}
+        <ToolbarPlugin onImageUpload={onImageUpload} />
 
-        <ToolbarDivider />
-
-        {/* Block format */}
-        <select
-          value={currentBlock}
-          onChange={(e) => execCommand("formatBlock", e.target.value)}
-          className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white/70 focus:outline-none focus:border-[#00ff88]/40 cursor-pointer"
-          title="Block Format"
-        >
-          <option value="p" className="bg-[#1a1a1a]">Paragraph</option>
-          <option value="h1" className="bg-[#1a1a1a]">Heading 1</option>
-          <option value="h2" className="bg-[#1a1a1a]">Heading 2</option>
-          <option value="h3" className="bg-[#1a1a1a]">Heading 3</option>
-          <option value="h4" className="bg-[#1a1a1a]">Heading 4</option>
-        </select>
-
-        <ToolbarDivider />
-
-        {/* Font size */}
-        <select
-          onChange={(e) => setFontSize(e.target.value)}
-          className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white/70 focus:outline-none focus:border-[#00ff88]/40 cursor-pointer"
-          title="Font Size"
-          defaultValue="3"
-        >
-          <option value="1" className="bg-[#1a1a1a]">XS</option>
-          <option value="2" className="bg-[#1a1a1a]">Small</option>
-          <option value="3" className="bg-[#1a1a1a]">Normal</option>
-          <option value="4" className="bg-[#1a1a1a]">Medium</option>
-          <option value="5" className="bg-[#1a1a1a]">Large</option>
-          <option value="6" className="bg-[#1a1a1a]">XL</option>
-          <option value="7" className="bg-[#1a1a1a]">XXL</option>
-        </select>
-
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={() => execCommand("bold")} title="Bold" shortcut="Ctrl+B" active={activeFormats.has("bold")}>
-          <Bold size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("italic")} title="Italic" shortcut="Ctrl+I" active={activeFormats.has("italic")}>
-          <Italic size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("underline")} title="Underline" shortcut="Ctrl+U" active={activeFormats.has("underline")}>
-          <Underline size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("strikeThrough")} title="Strikethrough" shortcut="Ctrl+D" active={activeFormats.has("strikeThrough")}>
-          <Strikethrough size={15} />
-        </ToolbarButton>
-
-        <ToolbarDivider />
-
-        {/* Text Color Picker */}
-        <div className="relative" ref={colorPickerRef}>
-          <button
-            type="button"
-            onClick={() => {
-              setShowColorPicker(!showColorPicker);
-              setShowHighlightPicker(false);
-            }}
-            title="Text Color"
-            className="p-1.5 rounded transition-all duration-150 text-white/50 hover:text-white hover:bg-white/10 flex items-center gap-0.5"
-          >
-            <Palette size={15} />
-            <div className="w-3 h-1.5 rounded-sm" style={{ backgroundColor: currentColor }} />
-          </button>
-          {showColorPicker && (
-            <div className="absolute top-full left-0 mt-1 z-50 p-2 bg-[#252525] border border-white/15 rounded-lg shadow-xl min-w-[180px]">
-              <p className="text-[10px] text-white/40 mb-1.5 px-0.5">Text Color</p>
-              <div className="grid grid-cols-6 gap-1">
-                {TEXT_COLORS.map((c) => (
-                  <button
-                    key={c.value}
-                    type="button"
-                    onClick={() => setTextColor(c.value)}
-                    title={c.label}
-                    className={`w-6 h-6 rounded border transition-all ${
-                      currentColor === c.value
-                        ? "border-[#00ff88] scale-110"
-                        : "border-white/10 hover:border-white/30 hover:scale-105"
-                    }`}
-                    style={{ backgroundColor: c.value }}
-                  />
-                ))}
+        {/* Editor */}
+        <div className="relative flex-1 overflow-y-auto">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable
+                className="min-h-[500px] p-6 text-white/90 focus:outline-none leading-relaxed"
+                style={{ minHeight: 500 }}
+              />
+            }
+            placeholder={
+              <div className="absolute top-6 left-6 text-white/30 pointer-events-none select-none">
+                Start writing your blog post...
               </div>
-              <div className="mt-2 pt-2 border-t border-white/10 flex items-center gap-2">
-                <label className="text-[10px] text-white/40">Custom:</label>
-                <input
-                  type="color"
-                  value={currentColor}
-                  onChange={(e) => setTextColor(e.target.value)}
-                  className="w-6 h-6 rounded cursor-pointer border-0 bg-transparent"
-                />
-                <span className="text-[10px] text-white/40 font-mono">{currentColor}</span>
-              </div>
-            </div>
-          )}
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          />
         </div>
 
-        {/* Highlight Color Picker */}
-        <div className="relative" ref={highlightPickerRef}>
-          <button
-            type="button"
-            onClick={() => {
-              setShowHighlightPicker(!showHighlightPicker);
-              setShowColorPicker(false);
-            }}
-            title="Highlight Color"
-            className="p-1.5 rounded transition-all duration-150 text-white/50 hover:text-white hover:bg-white/10"
-          >
-            <Highlighter size={15} />
-          </button>
-          {showHighlightPicker && (
-            <div className="absolute top-full left-0 mt-1 z-50 p-2 bg-[#252525] border border-white/15 rounded-lg shadow-xl min-w-[180px]">
-              <p className="text-[10px] text-white/40 mb-1.5 px-0.5">Highlight</p>
-              <div className="grid grid-cols-4 gap-1">
-                {HIGHLIGHT_COLORS.map((c) => (
-                  <button
-                    key={c.value}
-                    type="button"
-                    onClick={() => setHighlightColor(c.value)}
-                    title={c.label}
-                    className="w-8 h-6 rounded border border-white/10 hover:border-white/30 transition-all hover:scale-105 flex items-center justify-center"
-                    style={{ backgroundColor: c.value === "transparent" ? "transparent" : c.value }}
-                  >
-                    {c.value === "transparent" && (
-                      <span className="text-[9px] text-white/40">✕</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Plugins */}
+        <OnChangePlugin onChange={handleChange} />
+        <HistoryPlugin />
+        <ListPlugin />
+        <LinkPlugin />
+        <InitPlugin html={value} />
 
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={() => execCommand("justifyLeft")} title="Align Left" active={activeFormats.has("justifyLeft")}>
-          <AlignLeft size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("justifyCenter")} title="Align Center" active={activeFormats.has("justifyCenter")}>
-          <AlignCenter size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("justifyRight")} title="Align Right" active={activeFormats.has("justifyRight")}>
-          <AlignRight size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("justifyFull")} title="Justify" active={activeFormats.has("justifyFull")}>
-          <AlignJustify size={15} />
-        </ToolbarButton>
-      </div>
-
-      {/* Toolbar Row 2 - Insert & Lists */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-1.5 border-b border-white/8 bg-white/[0.01]">
-        <ToolbarButton onClick={() => execCommand("insertUnorderedList")} title="Bullet List" active={activeFormats.has("ul")}>
-          <List size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("insertOrderedList")} title="Numbered List" active={activeFormats.has("ol")}>
-          <ListOrdered size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={insertBlockquote} title="Blockquote">
-          <Quote size={15} />
-        </ToolbarButton>
-
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={insertInlineCode} title="Inline Code" shortcut="Ctrl+E">
-          <Code size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={insertCodeBlock} title="Code Block">
-          <span className="text-[10px] font-mono leading-none">{`</>`}</span>
-        </ToolbarButton>
-        <ToolbarButton onClick={insertLink} title="Insert Link" shortcut="Ctrl+K">
-          <LinkIcon size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("insertHorizontalRule")} title="Horizontal Rule">
-          <Minus size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={insertTable} title="Insert Table">
-          <Table size={15} />
-        </ToolbarButton>
-
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={() => execCommand("subscript")} title="Subscript" active={activeFormats.has("subscript")}>
-          <Subscript size={15} />
-        </ToolbarButton>
-        <ToolbarButton onClick={() => execCommand("superscript")} title="Superscript" active={activeFormats.has("superscript")}>
-          <Superscript size={15} />
-        </ToolbarButton>
-
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={handleImageUpload} title="Upload Image" disabled={uploading}>
-          <ImageIcon size={15} />
-        </ToolbarButton>
-        {uploading && (
-          <span className="text-xs text-[#00ff88] ml-1 animate-pulse">Uploading...</span>
-        )}
-
-        <ToolbarDivider />
-
-        <ToolbarButton onClick={clearFormatting} title="Clear All Formatting">
-          <RemoveFormatting size={15} />
-        </ToolbarButton>
-
-        <div className="ml-auto flex items-center gap-3 text-white/25 text-[10px]">
-          <span>Ctrl+B Bold</span>
-          <span>Ctrl+I Italic</span>
-          <span>Ctrl+K Link</span>
-          <span>Ctrl+E Code</span>
-        </div>
-      </div>
-      </div>{/* End sticky toolbar */}
-
-      {/* Scrollable editor area */}
-      <div className="flex-1 overflow-y-auto">
-      {/* Editor area */}
-      <div
-        ref={editorRef}
-        contentEditable
-        suppressContentEditableWarning
-        onInput={handleInput}
-        onKeyDown={handleKeyDown}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onClick={() => updateActiveFormats()}
-        onPaste={(e) => {
-          const items = Array.from(e.clipboardData.items);
-          const imageItem = items.find((item) => item.type.startsWith("image/"));
-          if (imageItem) {
-            e.preventDefault();
-            const file = imageItem.getAsFile();
-            if (file) insertImage(file);
-            return;
-          }
-
-          const html = e.clipboardData.getData("text/html");
-          if (html) {
-            e.preventDefault();
-            const clean = html
-              .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-              .replace(/on\w+="[^"]*"/gi, "");
-            document.execCommand("insertHTML", false, clean);
-            emitChange();
-            return;
-          }
-
-          e.preventDefault();
-          const text = e.clipboardData.getData("text/plain");
-          document.execCommand("insertText", false, text);
-          emitChange();
-        }}
-        className="min-h-[500px] p-6 text-white/90 focus:outline-none leading-relaxed
-          [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h1]:mt-6 [&_h1]:text-white [&_h1]:leading-tight
-          [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-white [&_h2]:leading-tight
-          [&_h3]:text-xl [&_h3]:font-medium [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-white [&_h3]:leading-tight
-          [&_h4]:text-lg [&_h4]:font-medium [&_h4]:mb-2 [&_h4]:mt-3 [&_h4]:text-white/90
-          [&_p]:mb-3 [&_p]:leading-relaxed [&_p]:text-white/80
-          [&_blockquote]:border-l-4 [&_blockquote]:border-[#00ff88]/50 [&_blockquote]:pl-5 [&_blockquote]:py-2 [&_blockquote]:italic [&_blockquote]:text-white/60 [&_blockquote]:my-5 [&_blockquote]:bg-white/[0.02] [&_blockquote]:rounded-r-lg
-          [&_pre]:bg-[#0d0d0d] [&_pre]:p-5 [&_pre]:rounded-lg [&_pre]:my-5 [&_pre]:overflow-x-auto [&_pre]:border [&_pre]:border-white/8 [&_pre]:text-[#e2e8f0]
-          [&_code]:font-mono [&_code]:text-[#00ff88] [&_code]:text-[0.9em]
-          [&_a]:text-[#00ff88] [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-[#00ff88]/40 hover:[&_a]:decoration-[#00ff88]
-          [&_ul]:list-disc [&_ul]:pl-7 [&_ul]:my-3 [&_ul]:space-y-1
-          [&_ol]:list-decimal [&_ol]:pl-7 [&_ol]:my-3 [&_ol]:space-y-1
-          [&_li]:mb-1.5 [&_li]:text-white/80 [&_li]:leading-relaxed
-          [&_img]:rounded-lg [&_img]:max-w-full [&_img]:my-2 [&_img]:shadow-lg
-          [&_figure]:my-5 [&_figure]:text-center
-          [&_figcaption]:text-sm [&_figcaption]:text-white/40 [&_figcaption]:italic [&_figcaption]:mt-2
-          [&_hr]:border-white/10 [&_hr]:my-8
-          [&_strong]:text-white [&_strong]:font-semibold
-          [&_em]:italic
-          [&_s]:line-through [&_s]:text-white/40
-          [&_sub]:text-[0.75em] [&_sup]:text-[0.75em]
-          [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
-          [&_th]:bg-white/5 [&_th]:px-4 [&_th]:py-2 [&_th]:text-left [&_th]:border [&_th]:border-white/10 [&_th]:font-semibold
-          [&_td]:px-4 [&_td]:py-2 [&_td]:border [&_td]:border-white/10
-          [&_tr:hover]:bg-white/[0.02]
-        "
-        style={{ minHeight: "500px" }}
-      />
-      </div>{/* End scrollable area */}
-
-      {/* Status bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-t border-white/8 bg-white/[0.01] text-[10px] text-white/30">
-        <div className="flex items-center gap-4">
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-3 py-1.5 border-t border-white/10 bg-white/[0.02] text-[10px] text-white/30">
           <span className="flex items-center gap-1">
             <Pilcrow size={10} />
-            {currentBlock.toUpperCase() || "P"}
+            Lexical Rich-Text
           </span>
-          {activeFormats.size > 0 && (
-            <span className="flex items-center gap-1">
-              <Type size={10} />
-              {Array.from(activeFormats).join(", ")}
-            </span>
-          )}
-          <span className="flex items-center gap-1">
-            <Palette size={10} />
-            <span className="w-2 h-2 rounded-sm inline-block" style={{ backgroundColor: currentColor }} />
-          </span>
+          <div className="flex items-center gap-3">
+            <span>{wordCount} words</span>
+            <span>{charCount} chars</span>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span>{wordCount} words</span>
-          <span>{charCount} chars</span>
-          <span>Drop / paste images</span>
-        </div>
-      </div>
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+      </LexicalComposer>
     </div>
   );
 }
