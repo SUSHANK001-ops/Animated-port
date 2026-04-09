@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Send, Mail, MapPin, ArrowUpRight, Copy, Check } from 'lucide-react'
+import { Send, Mail, MapPin, ArrowUpRight, Copy, Check, Loader2, ShieldCheck } from 'lucide-react'
 
 import { useSections } from './SectionContext'
 
@@ -26,17 +26,120 @@ const ContactPage = () => {
     subject: '',
     message: '',
   })
+  const [verificationCode, setVerificationCode] = useState('')
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [otpStatus, setOtpStatus] = useState<'idle' | 'sending' | 'sent' | 'verifying' | 'verified' | 'error'>('idle')
+  const [otpMessage, setOtpMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [submitMessage, setSubmitMessage] = useState('')
+  const [verifiedEmail, setVerifiedEmail] = useState('')
+
+  const normalizedEmail = formState.email.trim().toLowerCase()
+  const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+
+  useEffect(() => {
+    if (verifiedEmail && verifiedEmail !== normalizedEmail) {
+      setVerifiedEmail('')
+      setVerificationCode('')
+      setOtpStatus('idle')
+      setOtpMessage('')
+    }
+  }, [normalizedEmail, verifiedEmail])
 
   const copyEmail = () => {
     navigator.clipboard.writeText('mail@sushanka.com.np')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  const requestOtp = async () => {
+    if (!isEmailValid(formState.email)) {
+      setOtpStatus('error')
+      setOtpMessage('Enter a valid email address first.')
+      return
+    }
+
+    setOtpStatus('sending')
+    setOtpMessage('Sending verification code...')
+
+    try {
+      const res = await fetch('/api/contact/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formState.email }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send verification code.')
+      }
+
+      setOtpStatus('sent')
+      setOtpMessage('Verification code sent. Check your inbox.')
+      setVerificationCode('')
+    } catch (error) {
+      setOtpStatus('error')
+      setOtpMessage(error instanceof Error ? error.message : 'Failed to send verification code.')
+    }
+  }
+
+  const verifyOtp = async () => {
+    if (!isEmailValid(formState.email)) {
+      setOtpStatus('error')
+      setOtpMessage('Enter a valid email address first.')
+      return
+    }
+
+    if (!verificationCode.trim()) {
+      setOtpStatus('error')
+      setOtpMessage('Enter the verification code from your email.')
+      return
+    }
+
+    setOtpStatus('verifying')
+    setOtpMessage('Verifying code...')
+
+    try {
+      const res = await fetch('/api/contact/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formState.email, code: verificationCode }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to verify the code.')
+      }
+
+      setOtpStatus('verified')
+      setOtpMessage('Email verified. You can send the message now.')
+      setVerifiedEmail(normalizedEmail)
+      setVerificationCode('')
+    } catch (error) {
+      setOtpStatus('error')
+      setOtpMessage(error instanceof Error ? error.message : 'Failed to verify the code.')
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitMessage('')
+
+    if (!isEmailValid(formState.email)) {
+      setSendStatus('error')
+      setSubmitMessage('Enter a valid email address.')
+      return
+    }
+
+    if (verifiedEmail !== normalizedEmail || otpStatus !== 'verified') {
+      setSendStatus('error')
+      setSubmitMessage('Verify your email before sending the message.')
+      return
+    }
+
     setSending(true)
     setSendStatus('idle')
 
@@ -47,12 +150,19 @@ const ContactPage = () => {
         body: JSON.stringify(formState),
       })
 
-      if (!res.ok) throw new Error('Failed to send')
+      const data = await res.json()
+
+      if (!res.ok) throw new Error(data.error || 'Failed to send')
 
       setSendStatus('success')
+      setSubmitMessage('Your message was sent successfully.')
       setFormState({ name: '', email: '', subject: '', message: '' })
-    } catch {
+      setVerifiedEmail('')
+      setOtpStatus('idle')
+      setOtpMessage('')
+    } catch (error) {
       setSendStatus('error')
+      setSubmitMessage(error instanceof Error ? error.message : 'Unable to send the message right now.')
     } finally {
       setSending(false)
       setTimeout(() => setSendStatus('idle'), 4000)
@@ -184,6 +294,57 @@ const ContactPage = () => {
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
               />
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={requestOtp}
+                  disabled={otpStatus === 'sending' || otpStatus === 'verifying'}
+                  className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 transition-colors hover:border-cyan-300 hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {otpStatus === 'sending' ? <Loader2 size={14} className="animate-spin" /> : null}
+                  Send OTP
+                </button>
+                <span className="text-xs text-neutral-500">
+                  {otpStatus === 'verified' && verifiedEmail === normalizedEmail ? 'Verified for this email.' : 'Request a code before submitting.'}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="Enter 6-digit verification code"
+                  className={inputClasses('verificationCode')}
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onFocus={() => setFocusedField('verificationCode')}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={verifyOtp}
+                    disabled={otpStatus === 'sending' || otpStatus === 'verifying'}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-colors hover:border-white/20 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {otpStatus === 'verifying' ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+                    Verify Code
+                  </button>
+                  {otpStatus === 'verified' && verifiedEmail === normalizedEmail ? (
+                    <span className="inline-flex items-center gap-2 text-sm text-green-400">
+                      <Check size={14} /> Email verified
+                    </span>
+                  ) : null}
+                </div>
+                {otpMessage ? (
+                  <p
+                    className={`text-xs ${otpStatus === 'error' ? 'text-red-400' : otpStatus === 'verified' ? 'text-green-400' : 'text-neutral-500'}`}
+                  >
+                    {otpMessage}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -240,6 +401,11 @@ const ContactPage = () => {
               <Send size={16} className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
             )}
           </button>
+          {submitMessage ? (
+            <p className={`mt-3 text-sm ${sendStatus === 'error' ? 'text-red-400' : 'text-green-400'}`}>
+              {submitMessage}
+            </p>
+          ) : null}
         </form>
 
         {/* Info */}
