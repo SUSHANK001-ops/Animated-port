@@ -20,14 +20,7 @@ const AboutPage = () => {
             About me
           </h1>
           <p className="text-sm p-3    w-full max-w-[70vw] md:w-10/12 mt-4 md:mt-6 ">
-            Hi, I'm Sushanka Lamichhane, a BSc IT student and Full-Stack
-            Developer with a passion for technology and creativity. I specialize
-            in crafting visually stunning, responsive websites by blending a
-            keen eye for design with strong technical problem-solving.  Beyond
-            coding, I thrive in agile environments, valuing collaborative
-            teamwork, time management, and adaptability. My goal is to use my
-            analytical thinking and creative design approach to build seamless
-            digital experiences that leave a lasting impression.
+            A Full-Stack Developer and BSc IT student specializing in modern web applications, responsive UI/UX, and scalable backend systems. He combines technical expertise with creative design thinking to build seamless, user-focused digital experiences. Skilled in frontend and backend development, problem-solving, and agile collaboration, Sushanka focuses on creating high-quality solutions that are both visually impressive and highly functional.
           </p>
         </div>
         <div className="right w-10/12 sm:w-8/12 md:w-4/12 flex justify-center mt-8 md:mt-0">
