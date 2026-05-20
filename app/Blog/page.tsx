@@ -65,7 +65,7 @@ const Blogs = () => {
             {blogData.map((post, idx) => (
               <Link
                 key={idx}
-                href={`/Blog/${post.slug}`}
+                href={`/blog/${post.slug}`}
                 className="group relative flex flex-col bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:-translate-y-2 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-black/60 transition-all duration-300 cursor-pointer"
               >
                 <div className="relative h-52 w-full overflow-hidden">

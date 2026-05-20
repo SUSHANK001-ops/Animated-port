@@ -362,7 +362,7 @@ const BlogPostClient = () => {
             The post you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
           <Link
-            href="/Blog"
+            href="/blog"
             className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:border-emerald-500/50 hover:text-white transition-all duration-200"
           >
             ← Back to Blog
@@ -399,7 +399,7 @@ const BlogPostClient = () => {
         <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-16 pb-10 flex flex-col gap-5">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-[13px] text-gray-500">
-            <Link href="/Blog" className="hover:text-emerald-400 transition-colors">
+            <Link href="/blog" className="hover:text-emerald-400 transition-colors">
               Blog
             </Link>
             <span className="text-white/20">›</span>
@@ -531,7 +531,7 @@ const BlogPostClient = () => {
           {/* ── Back link ────────────────────────────────────────────────────── */}
           <div className="mt-10">
             <Link
-              href="/Blog"
+              href="/blog"
               className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-emerald-400 transition-colors"
             >
               ← Back to all posts
@@ -550,7 +550,7 @@ const BlogPostClient = () => {
             {relatedPosts.map((related, idx) => (
               <Link
                 key={idx}
-                href={`/Blog/${related.slug}`}
+                href={`/blog/${related.slug}`}
                 className="group relative flex flex-col gap-3 p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />

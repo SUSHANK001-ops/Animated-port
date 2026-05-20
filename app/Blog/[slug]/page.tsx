@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://sushanka.com.np'
-    const postUrl = `${siteUrl}/Blog/${slug}`
+    const postUrl = `${siteUrl}/blog/${slug}`
     const title = blog.title
     const description = blog.Titledescription || `Read ${blog.title} by ${blog.author || 'Sushanka Lamichhane'}`
     const image = blog.image || `${siteUrl}/logo.svg`
