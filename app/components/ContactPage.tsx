@@ -455,7 +455,7 @@ const ContactPage = () => {
               {[
                 { name: 'GitHub', url: 'https://github.com/SUSHANK001-ops' },
                 { name: 'LinkedIn', url: 'https://www.linkedin.com/in/lamichhane--68b754341/?skipRedirect=true' },
-                    { name: 'Instagram ', url: 'https://www.instagram.com/sushank.js/' },
+                    { name: 'Instagram ', url: 'https://www.instagram.com/the_sushank_lamichhane/' },
               ].map((social) => (
                 <a
                   key={social.name}
