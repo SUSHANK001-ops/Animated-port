@@ -362,7 +362,7 @@ const BlogPostClient = () => {
             The post you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
           <Link
-            href="/blog"
+            href="https://blog.sushanka.com.np/"
             className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:border-emerald-500/50 hover:text-white transition-all duration-200"
           >
             ← Back to Blog
@@ -399,7 +399,7 @@ const BlogPostClient = () => {
         <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-16 pb-10 flex flex-col gap-5">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-[13px] text-gray-500">
-            <Link href="/blog" className="hover:text-emerald-400 transition-colors">
+            <Link href="https://blog.sushanka.com.np/" className="hover:text-emerald-400 transition-colors">
               Blog
             </Link>
             <span className="text-white/20">›</span>
@@ -531,7 +531,7 @@ const BlogPostClient = () => {
           {/* ── Back link ────────────────────────────────────────────────────── */}
           <div className="mt-10">
             <Link
-              href="/blog"
+              href="https://blog.sushanka.com.np/"
               className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-emerald-400 transition-colors"
             >
               ← Back to all posts

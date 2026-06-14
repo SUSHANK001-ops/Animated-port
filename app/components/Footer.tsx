@@ -67,7 +67,7 @@ const Footer = () => {
             <Link href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>About</Link>
             <Link href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</Link>
             <Link href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>Projects</Link>
-            <Link href="/blog">Blogs</Link>
+            <Link href="https://blog.sushanka.com.np/">Blogs</Link>
             <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>Experience</Link>
             <Link href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>Contact</Link>
           </div>

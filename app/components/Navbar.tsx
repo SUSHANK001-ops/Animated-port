@@ -101,7 +101,7 @@ const Navbar = () => {
           <Link onMouseEnter={handleMouseEnter} href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}>
             Projects
           </Link>
-          <Link onMouseEnter={handleMouseEnter} href="/blog" >
+          <Link onMouseEnter={handleMouseEnter} href="https://blog.sushanka.com.np/" >
           Blogs
           </Link>
           <Link onMouseEnter={handleMouseEnter} href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>
@@ -134,7 +134,7 @@ const Navbar = () => {
             <Link href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setIsMenuOpen(false); }}>About</Link>
             <Link href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); setIsMenuOpen(false); }}>Services</Link>
             <Link href="#projects" onClick={(e) => { e.preventDefault(); scrollToSection('projects'); setIsMenuOpen(false); }}>Projects</Link>
-            <Link onMouseEnter={handleMouseEnter} href="/blog" >
+            <Link onMouseEnter={handleMouseEnter} href="https://blog.sushanka.com.np/" >
           Blogs
           </Link>
             <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); setIsMenuOpen(false); }}>Experience</Link>
