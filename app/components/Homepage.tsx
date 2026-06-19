@@ -1,6 +1,7 @@
 'use client'
 import React, { useRef, useEffect } from 'react'
 import gsap from 'gsap'
+import Script from 'next/script'
 import ThreeScene from './ThreeScene'
 import TechStackTerminal from './TechStackTerminal'
 import { useSections } from './SectionContext' 
@@ -56,6 +57,12 @@ const Homepage = () => {
 
   return (
     <div ref={rootRef} id='home' className="relative w-full h-screen overflow-hidden">
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2939320826714458"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
       <ThreeScene />
       <TechStackTerminal />
 
@@ -90,6 +97,20 @@ const Homepage = () => {
           developer and engineer.<br />
           Welcome to my portfolio!
         </p>
+
+        <div className="mt-8 rounded-2xl border border-white/10 bg-black/30 p-3 shadow-2xl shadow-black/30 backdrop-blur-sm">
+          <p className="mb-2 text-left text-[11px] font-bold tracking-widest uppercase text-green-400/70">
+            Ad preview
+          </p>
+          <ins
+            className="adsbygoogle block min-h-[90px] w-full"
+            style={{ display: 'block' }}
+            data-ad-client="ca-pub-2939320826714458"
+            data-ad-slot="0000000000"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          />
+        </div>
       </div>
 
       {/* Scroll Down Indicator */}

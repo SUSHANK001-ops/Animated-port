@@ -322,6 +322,16 @@ const BlogPostClient = () => {
     fetchBlogs()
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+    } catch (error) {
+      console.error('AdSense initialization failed:', error)
+    }
+  }, [post])
+
   const params = useParams()
   const slug = params?.slug as string
   const post = blogData.find((p) => p.slug === slug)
@@ -431,6 +441,20 @@ const BlogPostClient = () => {
               {post.Titledescription ?? post.Blogdescription}
             </p>
           )}
+
+          <div className="w-full mt-4 rounded-2xl border border-white/10 bg-white/5 p-3 overflow-hidden">
+            <p className="mb-2 text-[11px] font-bold tracking-widest uppercase text-gray-500">
+              Ad preview
+            </p>
+            <ins
+              className="adsbygoogle block"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-2939320826714458"
+              data-ad-slot="0000000000"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+          </div>
 
           {/* Divider */}
           <hr className="border-t border-white/10" />
