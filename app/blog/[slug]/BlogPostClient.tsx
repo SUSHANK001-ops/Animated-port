@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from 'next/navigation'
+import Script from 'next/script'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import Image from 'next/image'
@@ -386,6 +387,12 @@ const BlogPostClient = () => {
 
   return (
     <div className="min-h-screen mt-20 text-gray-200">
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2939320826714458"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
       <ReadingProgress progress={readProgress} />
       <Navbar />
 
