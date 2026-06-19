@@ -5,6 +5,10 @@ declare global{
         conn: Connection | null,
         promise: Promise<Connection> | null
        }
+
+    interface Window {
+        adsbygoogle?: unknown[]
+    }
 }
 
 
