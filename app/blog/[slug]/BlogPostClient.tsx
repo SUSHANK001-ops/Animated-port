@@ -322,8 +322,12 @@ const BlogPostClient = () => {
     fetchBlogs()
   }, [])
 
+  const params = useParams()
+  const slug = params?.slug as string
+  const post = blogData.find((p) => p.slug === slug)
+
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !post) return
 
     try {
       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
@@ -331,10 +335,6 @@ const BlogPostClient = () => {
       console.error('AdSense initialization failed:', error)
     }
   }, [post])
-
-  const params = useParams()
-  const slug = params?.slug as string
-  const post = blogData.find((p) => p.slug === slug)
 
   useEffect(() => {
     const handleScroll = () => {
