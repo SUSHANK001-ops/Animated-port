@@ -1,7 +1,6 @@
 "use client"
 
 import { useParams } from 'next/navigation'
-import Script from 'next/script'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import Image from 'next/image'
@@ -397,12 +396,6 @@ const BlogPostClient = () => {
 
   return (
     <div className="min-h-screen mt-20 text-gray-200">
-      <Script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2939320826714458"
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-      />
       <ReadingProgress progress={readProgress} />
       <Navbar />
 
@@ -441,20 +434,6 @@ const BlogPostClient = () => {
               {post.Titledescription ?? post.Blogdescription}
             </p>
           )}
-
-          <div className="w-full mt-4 rounded-2xl border border-white/10 bg-white/5 p-3 overflow-hidden">
-            <p className="mb-2 text-[11px] font-bold tracking-widest uppercase text-gray-500">
-              Ad preview
-            </p>
-            <ins
-              className="adsbygoogle block"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-2939320826714458"
-              data-ad-slot="0000000000"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-          </div>
 
           {/* Divider */}
           <hr className="border-t border-white/10" />
