@@ -9,6 +9,24 @@ import {
   isValidEmail,
   normalizeEmail,
 } from '@/lib/contactVerification'
+import { getClientIp, rateLimit } from '@/lib/rateLimit'
+
+// How aggressively we throttle verification-code emails.
+const OTP_PER_EMAIL_LIMIT = 3 // codes per email address...
+const OTP_PER_EMAIL_WINDOW = 10 * 60 // ...within 10 minutes
+const OTP_PER_IP_LIMIT = 8 // codes from a single IP...
+const OTP_PER_IP_WINDOW = 60 * 60 // ...within an hour
+
+function tooManyRequests(retryAfter: number) {
+  return NextResponse.json(
+    {
+      error: `Too many verification requests. Please try again in ${Math.ceil(
+        retryAfter / 60
+      )} minute(s).`,
+    },
+    { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+  )
+}
 
 function createTransporter() {
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
@@ -33,6 +51,25 @@ export async function POST(req: NextRequest) {
 
     if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
       return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 })
+    }
+
+    const ip = getClientIp(req)
+
+    // Throttle per (IP + email) to stop repeated codes to the same inbox,
+    // and per IP overall to stop one client from bombing many addresses.
+    const perEmail = await rateLimit(
+      'otp-send',
+      `${ip}:${normalizedEmail}`,
+      OTP_PER_EMAIL_LIMIT,
+      OTP_PER_EMAIL_WINDOW
+    )
+    if (!perEmail.allowed) {
+      return tooManyRequests(perEmail.retryAfter)
+    }
+
+    const perIp = await rateLimit('otp-send-ip', ip, OTP_PER_IP_LIMIT, OTP_PER_IP_WINDOW)
+    if (!perIp.allowed) {
+      return tooManyRequests(perIp.retryAfter)
     }
 
     const otp = generateOtpCode()

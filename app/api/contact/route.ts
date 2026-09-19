@@ -6,6 +6,11 @@ import {
   normalizeEmail,
   verifyVerifiedToken,
 } from '@/lib/contactVerification'
+import { getClientIp, rateLimit } from '@/lib/rateLimit'
+
+// Cap actual message sends even within a valid verified session.
+const SEND_LIMIT = 5 // messages per email...
+const SEND_WINDOW = 60 * 60 // ...within an hour
 
 function escapeHtml(value: string) {
   return value
@@ -38,6 +43,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Please verify your email before sending the message.' },
         { status: 403 }
+      )
+    }
+
+    const ip = getClientIp(req)
+    const sends = await rateLimit('contact-send', `${ip}:${normalizedEmail}`, SEND_LIMIT, SEND_WINDOW)
+    if (!sends.allowed) {
+      return NextResponse.json(
+        {
+          error: `You've sent several messages already. Please try again in ${Math.ceil(
+            sends.retryAfter / 60
+          )} minute(s).`,
+        },
+        { status: 429, headers: { 'Retry-After': String(sends.retryAfter) } }
       )
     }
 
