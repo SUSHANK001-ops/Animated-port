@@ -7,12 +7,15 @@ const TechStackTerminal = () => {
   const terminalRef = React.useRef<HTMLDivElement>(null)
 
   const techStack = [
-    'Frontend: React, Next.js, JavaScript, TypeScript',
-    'Styling: TailwindCSS, CSS Modules',
-    'Animations: GSAP, Three.js',
-    'Backend: Node.js, Express, Python, ',
+    'Cloud: AWS, DigitalOcean',
+    'Containers: Docker, Kubernetes, Helm',
+    'IaC: Terraform, Ansible',
+    'CI/CD: Jenkins, GitHub Actions, ArgoCD',
+    'Monitoring: Prometheus, Grafana',
+    'OS: Linux (Red Hat Certified)',
+    'Frontend: React, Next.js, TypeScript',
+    'Backend: Node.js, Express, Python',
     'Database: PostgreSQL, MongoDB',
-    'Tools: Git, Docker, Git Actions',
   ]
 
   useEffect(() => {
@@ -81,7 +84,7 @@ const TechStackTerminal = () => {
       {/* Terminal Content */}
       <div className="space-y-2">
         <div className="text-green-400 opacity-75">$ whoami</div>
-        <div className="text-green-400 opacity-75">Full Stack developer</div>
+        <div className="text-green-400 opacity-75">DevOps Engineer &amp; Full-Stack Developer</div>
         <div className="text-green-400 opacity-75 mt-4">$ cat skills.txt</div>
 
         {/* Typed lines */}

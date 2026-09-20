@@ -63,22 +63,21 @@ const TextScroll = () => {
                 ref={upperTextRef} 
                 className="upper-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl p-6 sm:p-8 md:p-10 font-bold tracking-tighter origin-top-left"
             >
-                <h1>SO I BUILT</h1>
-                <h1 className="text-[#FF98A2]">DIGITAL SOLUTIONS</h1>
+                <h1>CLOUD</h1>
+                <h1 className="text-[#FF98A2]">INFRASTRUCTURE</h1>
             </div>
             <div 
                 ref={centerTextRef} 
                 className="center-text text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl sm:text-6xl md:text-6xl lg:text-7xl p-6 sm:p-8 md:p-10 font-bold tracking-tighter origin-center whitespace-nowrap"
             >
-                <h1>ENTER</h1>
-                <h1>PORTFOLIO</h1>
+                <h1>THAT</h1>
+                <h1>ACTUALLY</h1>
             </div>
             <div 
                 ref={lowerTextRef} 
                 className="lower-text text-5xl sm:text-5xl md:text-7xl lg:text-8xl p-6 sm:p-8 md:p-10 font-bold tracking-tighter absolute bottom-0 right-0 origin-bottom-right text-right"
             >
-                <h1>THAT ACTUALLY</h1>
-                <h1>SCALE</h1>
+                <h1>SHIPS</h1>
             </div>
         </div>
     );

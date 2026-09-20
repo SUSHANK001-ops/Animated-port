@@ -217,7 +217,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
           className="text-center"
         >
           <p className="text-xs md:text-sm uppercase tracking-[0.4em] text-neutral-500 font-mono">
-            Developer &bull; Designer &bull; Engineer
+            DevOps Engineer &bull; Cloud Infrastructure &bull; Full-Stack Developer
           </p>
         </div>
 
