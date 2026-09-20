@@ -131,3 +131,39 @@ body {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+/* ---- Section divider ---- */
+.section-divider {
+  height: 1px;
+  max-width: 80%;
+  margin: 0 auto;
+  background: var(--border);
+}
+
+/* ---- Scroll ribbon outlined text (nbnzia-style) ---- */
+.ribbon-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(240, 240, 240, 0.55);
+}
+@media (min-width: 768px) {
+  .ribbon-outline {
+    -webkit-text-stroke: 2px rgba(240, 240, 240, 0.55);
+  }
+}
+
+/* ---- Scroll ribbon arc text (SVG textPath) ---- */
+.ribbon-arc-fill,
+.ribbon-arc-outline {
+  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.ribbon-arc-fill {
+  fill: var(--foreground);
+}
+.ribbon-arc-outline {
+  fill: transparent;
+  stroke: rgba(240, 240, 240, 0.6);
+  stroke-width: 1.5px;
+  paint-order: stroke;
+}

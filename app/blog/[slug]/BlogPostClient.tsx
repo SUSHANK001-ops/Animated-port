@@ -1,8 +1,8 @@
 "use client"
 
 import { useParams } from 'next/navigation'
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
+import Navbar from '../../ui/Navbar'
+import Footer from '../../ui/Footer'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState, useMemo, useCallback } from 'react'

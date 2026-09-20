@@ -1,7 +1,6 @@
 "use client"
-import Navbar from '../components/Navbar'
-import BounceAnimation from '../components/UI/BounceAnimation'
-import Footer from '../components/Footer'
+import Navbar from '../ui/Navbar'
+import Footer from '../ui/Footer'
 import Image from 'next/image'
 import Link from 'next/link'
 import axios from 'axios'
@@ -46,7 +45,7 @@ const Blogs = () => {
       <Navbar />
       <div className='mt-25 h-full'>
         <h1 className='text-3xl font-bold text-center mt-10'>Blog Page</h1>
-        <BounceAnimation tagline1="From curiosity to creation." tagline2="Words, code, and the craft in between." tag1color='EB4C4C' tag2color='FFA6A6' />
+        <p className='mt-4 text-center text-sm text-neutral-400'>From curiosity to creation — words, code, and the craft in between.</p>
       </div>
       
 
