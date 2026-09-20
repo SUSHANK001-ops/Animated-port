@@ -131,3 +131,11 @@ body {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+/* ---- Section divider ---- */
+.section-divider {
+  height: 1px;
+  max-width: 80%;
+  margin: 0 auto;
+  background: var(--border);
+}
