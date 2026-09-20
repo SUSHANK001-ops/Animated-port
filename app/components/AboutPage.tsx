@@ -20,7 +20,7 @@ const AboutPage = () => {
             About me
           </h1>
           <p className="text-sm p-3    w-full max-w-[70vw] md:w-10/12 mt-4 md:mt-6 ">
-            A Full-Stack Developer and BSc IT student specializing in modern web applications, responsive UI/UX, and scalable backend systems. He combines technical expertise with creative design thinking to build seamless, user-focused digital experiences. Skilled in frontend and backend development, problem-solving, and agile collaboration, Sushanka focuses on creating high-quality solutions that are both visually impressive and highly functional.
+            I&apos;m Sushanka Lamichhane — a DevOps Engineer and Full-Stack Developer based in Pokhara, Nepal. I build and deploy production-grade web applications and manage the cloud infrastructure that runs them. My work spans React/Next.js frontends, Node.js/PostgreSQL backends, and full deployment pipelines on AWS and DigitalOcean using Docker, Linux, and CI/CD tooling. Red Hat Linux certified. Trained in Kubernetes, Terraform, Ansible, Jenkins, GitHub Actions, Prometheus, Grafana, and ArgoCD.
           </p>
         </div>
         <div className="right w-10/12 sm:w-8/12 md:w-4/12 flex justify-center mt-8 md:mt-0">
