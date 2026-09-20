@@ -23,9 +23,9 @@ const kalam = Kalam({
   variable: '--font-kalam', // Optional: for use with CSS variables or Tailwind CSS
 });
 export const metadata: Metadata = {
-  title: "Sushanka Lamichhane - Developer Portfolio",
+  title: "Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer",
   description:
-    "Welcome to the portfolio of Sushanka Lamichhane, a passionate developer specializing in web and software development. Explore projects, skills, and experiences that showcase expertise in creating innovative solutions.",
+    "DevOps Engineer and Full-Stack Developer from Nepal. AWS · Docker · Kubernetes · Terraform · CI/CD · Red Hat Certified.",
   keywords: [
     "Sushanka Lamichhane",
     "developer portfolio",
@@ -36,14 +36,25 @@ export const metadata: Metadata = {
     "React developer",
     "Next.js developer",
     "portfolio",
+    "DevOps engineer",
+    "cloud infrastructure",
+    "AWS",
+    "Docker",
+    "Kubernetes",
+    "Terraform",
+    "CI/CD",
+    "Linux",
+    "Red Hat",
+    "Ansible",
+    "Jenkins",
   ],
   authors: [{ name: "Sushanka Lamichhane" }],
   creator: "Sushanka Lamichhane",
   metadataBase: new URL("https://sushanka.com.np"),
   openGraph: {
-    title: "Sushanka Lamichhane - Developer Portfolio",
+    title: "Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer",
     description:
-      "Passionate developer specializing in web and software development. Explore projects, skills, and experiences.",
+      "DevOps Engineer and Full-Stack Developer from Nepal. AWS · Docker · Kubernetes · Terraform · CI/CD · Red Hat Certified.",
     url: "https://sushanka.com.np",
     siteName: "Sushanka Lamichhane Portfolio",
     locale: "en_US",
@@ -59,9 +70,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sushanka Lamichhane - Developer Portfolio",
+    title: "Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer",
     description:
-      "Passionate developer specializing in web and software development. Explore projects, skills, and experiences.",
+      "DevOps Engineer and Full-Stack Developer from Nepal. AWS · Docker · Kubernetes · Terraform · CI/CD · Red Hat Certified.",
     images: ["/profile.jpeg"],
   },
   robots: {

@@ -9,6 +9,7 @@ export type SectionName =
   | "services"
   | "projects"
   | "experience"
+  | "certifications"
   | "contact";
 
 type SectionContextType = {
@@ -28,6 +29,7 @@ export const SectionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const servicesRef = useRef<HTMLElement | null>(null);
   const projectsRef = useRef<HTMLElement | null>(null);
   const experienceRef = useRef<HTMLElement | null>(null);
+  const certificationsRef = useRef<HTMLElement | null>(null);
   const contactRef = useRef<HTMLElement | null>(null);
 
   const refs = {
@@ -36,6 +38,7 @@ export const SectionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     services: servicesRef,
     projects: projectsRef,
     experience: experienceRef,
+    certifications: certificationsRef,
     contact: contactRef,
   } as const;
 
@@ -57,6 +60,9 @@ export const SectionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         break;
       case 'experience':
         el = experienceRef.current;
+        break;
+      case 'certifications':
+        el = certificationsRef.current;
         break;
       case 'contact':
         el = contactRef.current;
@@ -101,6 +107,9 @@ export const SectionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         break;
       case 'experience':
         experienceRef.current = node;
+        break;
+      case 'certifications':
+        certificationsRef.current = node;
         break;
       case 'contact':
         contactRef.current = node;

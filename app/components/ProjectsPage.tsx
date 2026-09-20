@@ -9,6 +9,7 @@ interface Project {
   title: string;
   description: string;
   tags: string[];
+  deployTags?: string[];
   color: string;
   liveUrl: string;
   githubUrl: string;
@@ -46,14 +47,25 @@ const projects: Project[] = [
     featured: true,
   },
   {
-  "title": "UrlShare",
-  "description": "A full-stack file sharing web app that allows users to upload files up to 100MB and generate public download links with QR code sharing and automatic expiration. Built with a responsive UI and cloud-based file storage.",
-  "tags": ["Next.js", "Express", "PostgreSQL", "Cloudinary"],
-  "color": "#6C9BFF",
-  "liveUrl": "https://urlshare.sushanka.com.np",
-  "githubUrl": "https://github.com/SUSHANK001-ops/UrlShare.git",
-  "featured": true
-}
+    title: "UrlShare",
+    description:
+      "A full-stack file sharing web app that allows users to upload files up to 100MB and generate public download links with QR code sharing and automatic expiration. Built with a responsive UI and cloud-based file storage.",
+    tags: ["Next.js", "Express", "PostgreSQL", "Cloudinary"],
+    color: "#6C9BFF",
+    liveUrl: "https://urlshare.sushanka.com.np",
+    githubUrl: "https://github.com/SUSHANK001-ops/UrlShare.git",
+    featured: true,
+  },
+  {
+    title: "VProfile DevOps Project",
+    description:
+      "Multi-tier application deployed on AWS using EC2, RDS, ELB, S3, and Route 53. CI/CD pipeline with Jenkins and GitHub Actions. Containerized with Docker, orchestrated with Kubernetes, infrastructure managed with Terraform and Ansible.",
+    tags: ["AWS", "Docker", "Kubernetes", "Terraform", "Jenkins", "Ansible"],
+    color: "#FF8C00",
+    liveUrl: "",
+    githubUrl: "",
+    featured: true,
+  },
 ];
 const ProjectsPage = () => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -173,14 +185,16 @@ const ProjectsPage = () => {
                   {idx < 9 ? `0${idx + 1}` : idx + 1}
                 </h1>
                 <div className="flex gap-3 items-center">
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
-                  >
-                    <ExternalLinkIcon /> <span>Live</span>
-                  </a>
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
+                    >
+                      <ExternalLinkIcon /> <span>Live</span>
+                    </a>
+                  )}
                   {project.githubUrl && (
                     <a
                       href={project.githubUrl}
@@ -205,6 +219,21 @@ const ProjectsPage = () => {
                   </span>
                 ))}
               </div>
+              {project.deployTags && (
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-cyan-400">
+                    Deployed on:
+                  </span>
+                  {project.deployTags.map((tag, tagIndex) => (
+                    <span
+                      key={tagIndex}
+                      className="border border-cyan-400/40 text-cyan-300 bg-cyan-400/5 px-2 py-1 rounded-2xl text-center text-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -231,7 +260,7 @@ const ProjectsPage = () => {
             {duplicatedProjects.map((project, idx) => (
               <div
                 key={idx}
-                className="p-4 h-100 w-80 shrink-0 border-2 border-gray-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105"
+                className="p-4 min-h-100 w-80 shrink-0 self-start border-2 border-gray-100 rounded-lg shadow-md transition-transform duration-300 hover:scale-105"
               >
               <div className="flex justify-between items-center mb-4">
                 <h1 className="text-7xl text-gray-200">
@@ -241,14 +270,16 @@ const ProjectsPage = () => {
                     : (idx % projects.length) + 1}
                 </h1>
                 <div className="flex gap-3 items-center">
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
-                  >
-                    <ExternalLinkIcon /> <span>Live</span>
-                  </a>
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-100 flex gap-2 items-center hover:scale-105 transition-all duration-100"
+                    >
+                      <ExternalLinkIcon /> <span>Live</span>
+                    </a>
+                  )}
                   {project.githubUrl && (
                     <a
                       href={project.githubUrl}
@@ -273,6 +304,21 @@ const ProjectsPage = () => {
                   </span>
                 ))}
               </div>
+              {project.deployTags && (
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-cyan-400">
+                    Deployed on:
+                  </span>
+                  {project.deployTags.map((tag, tagIndex) => (
+                    <span
+                      key={tagIndex}
+                      className="border border-cyan-400/40 text-cyan-300 bg-cyan-400/5 px-2 py-1 rounded-2xl text-center text-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             ))}
           </div>

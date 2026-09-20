@@ -8,6 +8,7 @@ import { useSections } from './SectionContext'
 const Homepage = () => {
   const titleRef = useRef<HTMLDivElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
+  const badgesRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const { registerSection } = useSections()
@@ -32,6 +33,15 @@ const Homepage = () => {
         subtitleRef.current,
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 1, delay: 0.6 }
+      )
+    }
+
+    // Animate tech badges
+    if (badgesRef.current) {
+      gsap.fromTo(
+        badgesRef.current.children,
+        { opacity: 0, y: 15, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1, delay: 0.9, ease: 'back.out(1.7)' }
       )
     }
 
@@ -90,6 +100,22 @@ const Homepage = () => {
           developer and engineer.<br />
           Welcome to my portfolio!
         </p>
+
+        {/* Tech badges */}
+        <div
+          ref={badgesRef}
+          className="mt-8 flex flex-wrap items-center justify-center gap-2.5"
+        >
+          {['AWS', 'Docker', 'Kubernetes', 'Red Hat Certified'].map((badge) => (
+            <span
+              key={badge}
+              className="rounded-full border border-white/20 px-3.5 py-1.5 text-xs md:text-sm font-mono text-neutral-300
+                         backdrop-blur-sm transition-colors duration-300 hover:border-green-400/50 hover:text-green-400"
+            >
+              {badge}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Scroll Down Indicator */}

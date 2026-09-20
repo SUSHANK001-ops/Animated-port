@@ -7,7 +7,24 @@ import { useSections } from './SectionContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const services = [
+interface Service {
+  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties; className?: string }>
+  title: string
+  description: string
+  color: string
+  tags: string[]
+  accent?: boolean
+}
+
+const services: Service[] = [
+  {
+    icon: Globe,
+    title: 'Cloud & DevOps Engineering',
+    description: 'Deploying and managing cloud infrastructure on AWS and DigitalOcean. CI/CD pipelines with Jenkins and GitHub Actions, containerization with Docker and Kubernetes, IaC with Terraform, and monitoring with Prometheus and Grafana.',
+    color: '#00ff88',
+    tags: ['AWS', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD'],
+    accent: true,
+  },
   {
     icon: Code,
     title: 'Frontend Development',
@@ -42,13 +59,6 @@ const services = [
     description: 'Supercharging web applications with lazy loading, code splitting, caching strategies, and Core Web Vitals optimization.',
     color: '#FFD700',
     tags: ['Lighthouse', 'Web Vitals', 'SEO'],
-  },
-  {
-    icon: Globe,
-    title: 'Full Stack Solutions',
-    description: 'End-to-end development from database architecture to deployment pipelines. Docker, CI/CD, and cloud infrastructure.',
-    color: '#FF6B6B',
-    tags: ['Docker', 'CI/CD', 'AWS'],
   },
 ]
 
@@ -165,8 +175,11 @@ const ServicesPage = () => {
               ref={(el) => {
                 if (el) cardsRef.current[index] = el
               }}
-              className="group relative p-8 rounded-2xl border border-white/5 bg-white/2 backdrop-blur-sm
-                         hover:border-white/15 transition-all duration-500 cursor-default overflow-hidden"
+              className={`group relative p-8 rounded-2xl border backdrop-blur-sm
+                         transition-all duration-500 cursor-default overflow-hidden
+                         ${service.accent
+                           ? 'border-green-400/40 bg-green-400/[0.04] shadow-[0_0_30px_rgba(0,255,136,0.08)] hover:border-green-400/60'
+                           : 'border-white/5 bg-white/2 hover:border-white/15'}`}
               style={{ perspective: '1000px' }}
               onMouseEnter={(e) => {
                 gsap.to(e.currentTarget, {

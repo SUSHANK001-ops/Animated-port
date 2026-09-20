@@ -107,6 +107,9 @@ const Navbar = () => {
           <Link onMouseEnter={handleMouseEnter} href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); }}>
             Experience
           </Link>
+          <Link onMouseEnter={handleMouseEnter} href="#certifications" onClick={(e) => { e.preventDefault(); scrollToSection('certifications'); }}>
+            Certifications
+          </Link>
           <Link onMouseEnter={handleMouseEnter} href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}>
             Contact
           </Link>
@@ -138,6 +141,7 @@ const Navbar = () => {
           Blogs
           </Link>
             <Link href="#experience" onClick={(e) => { e.preventDefault(); scrollToSection('experience'); setIsMenuOpen(false); }}>Experience</Link>
+            <Link href="#certifications" onClick={(e) => { e.preventDefault(); scrollToSection('certifications'); setIsMenuOpen(false); }}>Certifications</Link>
             <Link href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); setIsMenuOpen(false); }}>Contact</Link>
           </div>
         </div>

@@ -18,11 +18,20 @@ const experiences = [
     color: '#00ff88',
   },
   {
+    year: '2025 – 2026',
+    role: 'DevOps Training',
+    company: 'Udemy',
+    description:
+      'Completed Decoding DevOps — 63-hour Udemy course covering Linux, AWS, Docker, Kubernetes, Terraform, Ansible, Jenkins, GitHub Actions, Prometheus, Grafana, and ArgoCD. Built and deployed multi-tier applications on cloud environments.',
+    skills: ['AWS', 'Docker', 'Kubernetes', 'Terraform', 'CI/CD'],
+    color: '#FFD700',
+  },
+  {
     year: 'Aug 2025 - Nov 2025',
     role: 'Web Developer Intern',
-    company: 'Internship',
+    company: 'CYBIT',
     description:
-      'Built and maintained web applications using modern frameworks. Collaborated with teams on real-world projects, implemented features, and gained hands-on industry experience.',
+      'Deployed and maintained web applications on cloud infrastructure. Managed API development, server-side debugging, and sprint delivery across a 4-month remote engagement.',
     skills: ['React', 'Next.js', 'TailwindCSS', 'Git'],
     color: '#00d4ff',
   },

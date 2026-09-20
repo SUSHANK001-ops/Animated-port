@@ -11,6 +11,7 @@ import Marquee from './components/UI/Marquee'
 import ServicesPage from './components/ServicesPage'
 import ProjectsPage from './components/ProjectsPage'
 import ExperiencePage from './components/ExperiencePage'
+import CertificationsPage from './components/CertificationsPage'
 import ContactPage from './components/ContactPage'
 import Footer from './components/Footer'
 import { SectionProvider } from './components/SectionContext'
@@ -81,6 +82,11 @@ export default function Home() {
       <div className="section-divider" />
       
       <ExperiencePage />
+      
+      {/* Divider */}
+      <div className="section-divider" />
+      
+      <CertificationsPage />
       
       {/* Divider */}
       <div className="section-divider" />
