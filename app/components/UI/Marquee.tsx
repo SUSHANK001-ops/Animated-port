@@ -103,10 +103,46 @@ const Marquee = () => {
     return () => ctx.revert()
   }, [])
 
-  const marqueeWords = [
-    'React', 'Next.js', 'TypeScript', 'Node.js', 'MongoDB', 'TailwindCSS',
-    'GSAP', 'Three.js', 'Express', 'PostgreSQL', 'Docker', 'Git',
+  // DevOps tools lead the ticker, followed by a divider, then the app-dev stack.
+  const devopsWords = [
+    'AWS', 'Docker', 'Kubernetes', 'Terraform', 'Ansible', 'Jenkins',
+    'GitHub Actions', 'Prometheus', 'Grafana', 'Linux', 'ArgoCD', 'Helm',
   ]
+  const appWords = [
+    'React', 'Next.js', 'TypeScript', 'Node.js', 'MongoDB', 'TailwindCSS',
+    'GSAP', 'Three.js', 'Express', 'PostgreSQL', 'Git',
+  ]
+
+  // One full "cycle" of the ticker: DevOps group, a colored-dot divider, then the app group.
+  const renderCycle = (cycleKey: string) => (
+    <React.Fragment key={cycleKey}>
+      {devopsWords.map((word, i) => (
+        <span
+          key={`${cycleKey}-devops-${i}`}
+          className="mx-6 text-lg md:text-xl font-medium text-green-400 uppercase tracking-widest select-none"
+        >
+          {word}
+        </span>
+      ))}
+      {/* Divider between DevOps tools and app-dev stack */}
+      <span
+        key={`${cycleKey}-divider`}
+        className="mx-6 flex items-center gap-3 select-none"
+        aria-hidden="true"
+      >
+        <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(0,212,255,0.6)]" />
+        <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(0,255,136,0.6)]" />
+      </span>
+      {appWords.map((word, i) => (
+        <span
+          key={`${cycleKey}-app-${i}`}
+          className="mx-6 text-lg md:text-xl font-medium text-gray-200 uppercase tracking-widest select-none"
+        >
+          {word}
+        </span>
+      ))}
+    </React.Fragment>
+  )
 
   return (
     <div ref={sectionRef} className="relative py-24 overflow-hidden">
@@ -155,7 +191,7 @@ const Marquee = () => {
                        active:scale-[0.98]"
           >
             <Download size={18} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
-            <span>Download CV</span>
+            <span>Download Resume</span>
           </a>
           <a
             href="#projects"
@@ -172,7 +208,7 @@ const Marquee = () => {
         <div ref={statsRef} className="flex flex-wrap gap-8 md:gap-14 mb-16">
           {[
             { value: '10+', label: 'Projects Completed' },
-            { value: '3+', label: 'Happy Clients' },
+            { value: '2+', label: 'Certifications' },
             { value: '1+', label: 'Years Experience' },
           ].map((stat, i) => (
             <div key={i} className="group cursor-default">
