@@ -1,26 +1,23 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Noto_Sans_Devanagari ,Kalam } from "next/font/google";
+import { Geist, JetBrains_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
-import '@mdxeditor/editor/style.css';
-import { SectionProvider } from "./components/SectionContext";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const notoSansDevanagari = Noto_Sans_Devanagari({
   variable: "--font-devanagari",
   subsets: ["devanagari"],
   weight: ["400", "500", "600", "700"],
-});
-
-const kalam = Kalam({
-  weight: ['300', '400', '700'], // Specify the desired weights
-  subsets: ['latin'], // Specify the necessary subsets
-  display: 'swap', // 'swap' ensures the fallback font is used while Kalam loads
-  variable: '--font-kalam', // Optional: for use with CSS variables or Tailwind CSS
 });
 export const metadata: Metadata = {
   title: "Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer",
@@ -103,11 +100,9 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${spaceGrotesk.variable} ${notoSansDevanagari.variable} ${kalam.variable} antialiased`}
+        className={`${geist.variable} ${jetbrainsMono.variable} ${notoSansDevanagari.variable} antialiased`}
       >
-        <SectionProvider>
-          {children}
-        </SectionProvider>
+        {children}
       </body>
     </html>
   );
