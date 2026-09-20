@@ -225,15 +225,9 @@ const Marquee = () => {
 
       {/* Infinite Marquee */}
       <div className="relative w-full overflow-hidden py-6 border-y border-white/5">
-        <div ref={marqueeTrackRef} className="flex whitespace-nowrap w-max">
-          {[...marqueeWords, ...marqueeWords].map((word, i) => (
-            <span
-              key={i}
-              className="mx-6 text-lg md:text-xl font-medium text-gray-200 uppercase tracking-widest select-none"
-            >
-              {word}
-            </span>
-          ))}
+        <div ref={marqueeTrackRef} className="flex items-center whitespace-nowrap w-max">
+          {renderCycle('cycle-1')}
+          {renderCycle('cycle-2')}
         </div>
       </div>
 
