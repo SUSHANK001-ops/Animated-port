@@ -6,6 +6,7 @@ import Services from './_sections/Services'
 import ProjectsGrid from './_sections/ProjectsGrid'
 import Experience from './_sections/Experience'
 import CertificationsTeaser from './_sections/CertificationsTeaser'
+import ScrollRibbon from '../ui/ScrollRibbon'
 
 export const metadata: Metadata = {
   title: 'Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer',
@@ -18,11 +19,26 @@ export default function HomePage() {
     <>
       <Hero />
       <AboutCards />
-      <div className="section-divider" />
+
+      {/* Pinned reverse-U arc ribbon */}
+      <ScrollRibbon
+        text="I turn coffee into code, Google the rest, and act surprised when it actually works"
+        outline
+        pinMultiplier={1.6}
+        fontSize={70}
+      />
+
       <Services />
       <div className="section-divider" />
       <ProjectsGrid />
-      <div className="section-divider" />
+
+      {/* Second pinned arc ribbon (filled) */}
+      <ScrollRibbon
+        text="It works on my machine, so we ship it on a Friday and pray to the deploy gods"
+        pinMultiplier={1.6}
+        fontSize={70}
+      />
+
       <Experience />
       <div className="section-divider" />
       <CertificationsTeaser />
