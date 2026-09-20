@@ -1,7 +1,7 @@
 "use client"
-import Navbar from '../components/Navbar'
+import Navbar from '../ui/Navbar'
 import BounceAnimation from '../components/UI/BounceAnimation'
-import Footer from '../components/Footer'
+import Footer from '../ui/Footer'
 import Image from 'next/image'
 import Link from 'next/link'
 import axios from 'axios'
