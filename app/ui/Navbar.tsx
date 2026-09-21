@@ -61,13 +61,11 @@ const Navbar = () => {
         <div className="hidden items-center gap-6 md:flex">
           <ul className="flex items-center gap-6">
             {links.map((link) => {
-              const active = !link.external && pathname === link.href
+              const active = pathname === link.href
               return (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    target={link.external ? '_blank' : undefined}
-                    rel={link.external ? 'noopener noreferrer' : undefined}
                     data-click-sound
                     className={`text-sm transition-colors hover:text-foreground ${
                       active ? 'text-accent' : 'text-muted'
@@ -131,8 +129,6 @@ const Navbar = () => {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  target={link.external ? '_blank' : undefined}
-                  rel={link.external ? 'noopener noreferrer' : undefined}
                   data-click-sound
                   className="font-mono text-lg text-muted transition-colors hover:text-accent"
                 >
