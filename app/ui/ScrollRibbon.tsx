@@ -10,37 +10,27 @@ interface ScrollRibbonProps {
   text: string
   /** Outlined text instead of filled. */
   outline?: boolean
-  /**
-   * Pin length as a multiple of viewport height. Larger = longer/slower sweep.
-   */
-  pinMultiplier?: number
   /** Font size (px) of the arc text. */
   fontSize?: number
   className?: string
 }
 
 /**
- * Pinned scroll ribbon: text curves along a reverse-U (∩) arc.
+ * Scroll ribbon: text curves along a reverse-U (∩) arc and sweeps horizontally
+ * as the section passes through the viewport.
  *
- * While pinned, the text sweeps along the arc driven by scroll progress,
- * entering from the right and exiting left.
- *
- * DOM-safety: ScrollTrigger's `pin` inserts a "pin-spacer" wrapper into the
- * DOM. If React unmounts the component (route change) while that spacer is
- * still there, React's own removeChild throws. To avoid that we:
- *   - pin an INNER element (not the React-owned outer section),
- *   - use pinType 'transform' (no spacer style surgery on scroll),
- *   - explicitly kill the ScrollTrigger in cleanup BEFORE React unmounts.
+ * NON-PINNED by design: the section scrolls normally and the text's position
+ * along the arc is mapped to scroll progress (scrub). This avoids ScrollTrigger
+ * pin DOM surgery entirely — no pin-spacer, so no React removeChild crash on
+ * route change and no layout overlap with neighbouring sections.
  */
 const ScrollRibbon = ({
   text,
   outline = false,
-  pinMultiplier = 1.4,
-  fontSize = 70,
+  fontSize = 64,
   className = '',
 }: ScrollRibbonProps) => {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const pinRef = useRef<HTMLDivElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const textPathRef = useRef<SVGTextPathElement>(null)
   const [ready, setReady] = useState(false)
@@ -50,14 +40,12 @@ const ScrollRibbon = ({
 
   useEffect(() => {
     const section = sectionRef.current
-    const pin = pinRef.current
     const path = pathRef.current
     const tp = textPathRef.current
-    if (!section || !pin || !path || !tp) return
+    if (!section || !path || !tp) return
 
     let killed = false
     let trigger: ScrollTrigger | null = null
-    let anim: gsap.core.Tween | null = null
 
     const init = () => {
       if (killed) return
@@ -68,29 +56,26 @@ const ScrollRibbon = ({
         return
       }
 
-      const margin = pathLen * 0.12
-      const startOffset = pathLen - margin
-      const endOffset = -textLen + margin
+      // Text enters from the right and exits to the left as the section moves
+      // from the bottom of the viewport to the top.
+      const startOffset = pathLen
+      const endOffset = -textLen
 
+      const setter = gsap.quickSetter(tp, 'attr')
       gsap.set(tp, { attr: { startOffset } })
       setReady(true)
 
-      anim = gsap.to(tp, {
-        attr: { startOffset: endOffset },
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: () => `+=${Math.round(window.innerHeight * pinMultiplier)}`,
-          pin: pin,
-          pinType: 'transform',
-          pinSpacing: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+      trigger = ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const off = startOffset + (endOffset - startOffset) * self.progress
+          setter({ startOffset: off })
         },
       })
-      trigger = anim.scrollTrigger ?? null
 
       ScrollTrigger.refresh()
     }
@@ -103,43 +88,36 @@ const ScrollRibbon = ({
 
     return () => {
       killed = true
-      // Kill trigger first (removes pin, restores DOM) BEFORE React unmounts.
       trigger?.kill()
-      anim?.kill()
     }
-  }, [pinMultiplier, text])
+  }, [text])
 
   return (
     <div
       ref={sectionRef}
-      className={`relative h-screen overflow-hidden ${className}`}
+      className={`relative w-full overflow-hidden py-8 ${className}`}
       aria-label={text}
+      style={{ visibility: ready ? 'visible' : 'hidden' }}
     >
-      <div
-        ref={pinRef}
-        className="flex h-screen items-center justify-center"
-        style={{ visibility: ready ? 'visible' : 'hidden' }}
+      <svg
+        viewBox="0 0 1000 240"
+        className="w-full"
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        aria-label={text}
       >
-        <svg
-          viewBox="0 0 1000 300"
-          className="w-full"
-          preserveAspectRatio="xMidYMid meet"
-          role="img"
-          aria-label={text}
+        {/* Reverse-U (∩) arc: low-left → peak center → low-right (shallow) */}
+        <path ref={pathRef} id={pathId} d="M -20 230 Q 500 40 1020 230" fill="none" />
+        <text
+          className={outline ? 'ribbon-arc-outline' : 'ribbon-arc-fill'}
+          fontSize={fontSize}
+          fontWeight="800"
         >
-          {/* Reverse-U (∩) arc: low-left → peak center → low-right */}
-          <path ref={pathRef} id={pathId} d="M -40 320 Q 500 -40 1040 320" fill="none" />
-          <text
-            className={outline ? 'ribbon-arc-outline' : 'ribbon-arc-fill'}
-            fontSize={fontSize}
-            fontWeight="800"
-          >
-            <textPath ref={textPathRef} href={`#${pathId}`} startOffset={0}>
-              {text}
-            </textPath>
-          </text>
-        </svg>
-      </div>
+          <textPath ref={textPathRef} href={`#${pathId}`} startOffset={0}>
+            {text}
+          </textPath>
+        </text>
+      </svg>
     </div>
   )
 }

@@ -24,8 +24,7 @@ export default function HomePage() {
       <ScrollRibbon
         text="I turn coffee into code, Google the rest, and act surprised when it actually works"
         outline
-        pinMultiplier={1.6}
-        fontSize={70}
+        fontSize={62}
       />
 
       <Services />
@@ -35,8 +34,7 @@ export default function HomePage() {
       {/* Second pinned arc ribbon (filled) */}
       <ScrollRibbon
         text="It works on my machine, so we ship it on a Friday and pray to the deploy gods"
-        pinMultiplier={1.6}
-        fontSize={70}
+        fontSize={62}
       />
 
       <Experience />
