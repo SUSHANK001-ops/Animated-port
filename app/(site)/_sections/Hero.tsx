@@ -1,8 +1,10 @@
 'use client'
 import React, { useEffect, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import gsap from 'gsap'
-import { identity, heroBadges, marqueeItems } from '@/data/config'
-import MarqueeStrip from '../../ui/MarqueeStrip'
+import { ArrowRight, Github, Linkedin } from 'lucide-react'
+import { identity, socials } from '@/data/config'
 import Sticker from '../../ui/Sticker'
 
 const Hero = () => {
@@ -10,102 +12,82 @@ const Hero = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      tl.fromTo(
-        '[data-hero-label]',
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6 }
+      gsap.fromTo(
+        '[data-hero]',
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.09, ease: 'power3.out' }
       )
-        .fromTo(
-          '[data-hero-line]',
-          { opacity: 0, y: 60 },
-          { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 },
-          '-=0.2'
-        )
-        .fromTo(
-          '[data-hero-tagline]',
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.7 },
-          '-=0.4'
-        )
-        .fromTo(
-          '[data-hero-badge]',
-          { opacity: 0, y: 15, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'back.out(1.7)' },
-          '-=0.3'
-        )
     }, rootRef)
-
     return () => ctx.revert()
   }, [])
 
+  const github = socials.find((s) => s.label === 'GitHub')?.url ?? '#'
+  const linkedin = socials.find((s) => s.label === 'LinkedIn')?.url ?? '#'
+
   return (
-    <section
-      ref={rootRef}
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden pt-16"
-    >
-      <div className="grid-bg pointer-events-none absolute inset-0 opacity-60" />
-
-      {/* Draggable sticker prop */}
-      <div className="absolute right-8 top-28 z-20 hidden lg:block">
-        <Sticker name="wave" size={110} draggable rotate={-8} />
+    <section ref={rootRef} className="editorial pt-32 pb-16 md:pt-40">
+      {/* Avatar + availability */}
+      <div data-hero className="mb-8 flex items-center justify-between">
+        <Image
+          src={identity.profileImage}
+          alt={identity.name}
+          width={56}
+          height={56}
+          className="h-14 w-14 rounded-full object-cover ring-1 ring-border"
+        />
+        <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs text-muted">
+          <span className="pulse-dot relative inline-block h-1.5 w-1.5 rounded-full bg-accent" />
+          {identity.availability}
+        </span>
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl flex-1 px-6 pb-28 pt-16 md:px-10">
-        {/* Availability label */}
-        <div
-          data-hero-label
-          className="mb-10 inline-flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted"
+      {/* Name + role */}
+      <h1 data-hero className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+        {identity.name}
+      </h1>
+      <p data-hero className="mt-1 font-mono text-sm text-accent">
+        {identity.role}
+      </p>
+
+      {/* Bio */}
+      <p data-hero className="mt-6 text-lg leading-relaxed text-foreground/75">
+        I build cloud infrastructure and web applications from {identity.location} — clean
+        design, reliable deploys, and things that keep running while you sleep.
+      </p>
+
+      {/* Actions */}
+      <div data-hero className="mt-8 flex flex-wrap items-center gap-3">
+        <Link
+          href="/projects"
+          data-click-sound
+          className="group inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
         >
-          <span className="pulse-dot relative inline-block h-2 w-2 rounded-full bg-accent" />
-          {identity.availability} &rarr;
-        </div>
-
-        {/* Giant stacked hero text */}
-        <h1 className="flex flex-col text-[clamp(3.5rem,15vw,11rem)] font-extrabold leading-[0.85] tracking-tighter">
-          <span data-hero-line className="text-stroke">
-            {identity.heroLines[0]}
-          </span>
-          <span data-hero-line className="text-foreground">
-            {identity.heroLines[1]}
-          </span>
-          <span
-            data-hero-line
-            className="text-accent"
-            style={{ fontSize: '0.5em', lineHeight: 1 }}
-          >
-            {identity.heroLines[2]}
-          </span>
-          <span data-hero-line className="text-foreground">
-            {identity.heroLines[3]}
-          </span>
-        </h1>
-
-        {/* Tagline */}
-        <p
-          data-hero-tagline
-          className="mt-10 max-w-md text-sm text-muted md:text-base"
+          View work
+          <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+        </Link>
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-click-sound
+          className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-foreground"
         >
-          {identity.heroTagline}
-        </p>
+          <Github size={15} /> GitHub
+        </a>
+        <a
+          href={linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-click-sound
+          className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-foreground"
+        >
+          <Linkedin size={15} /> LinkedIn
+        </a>
 
-        {/* Badges */}
-        <div className="mt-8 flex flex-wrap gap-2.5">
-          {heroBadges.map((badge) => (
-            <span
-              key={badge}
-              data-hero-badge
-              className="rounded-full border border-accent/40 bg-accent/5 px-4 py-1.5 font-mono text-xs text-accent"
-            >
-              {badge}
-            </span>
-          ))}
+        {/* Subtle draggable sticker */}
+        <div className="ml-auto hidden sm:block">
+          <Sticker name="wave" size={56} draggable rotate={-6} />
         </div>
-      </div>
-
-      {/* Bottom marquee strip */}
-      <div className="relative">
-        <MarqueeStrip items={marqueeItems} duration={36} />
       </div>
     </section>
   )

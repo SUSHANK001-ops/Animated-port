@@ -214,3 +214,56 @@ body {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   Editorial layout (manishtamang-inspired: calm, narrow, quiet)
+   ============================================================ */
+
+/* Narrow reading column */
+.editorial {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+.editorial-wide {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+/* Quiet uppercase label used above blocks */
+.eyebrow {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Calm editorial card */
+.ed-card {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.ed-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+/* Hairline divider */
+.ed-divider {
+  height: 1px;
+  background: var(--border);
+  border: 0;
+  margin-block: 3.5rem;
+}
+
+/* Prose defaults for calm body copy */
+.prose-calm p {
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+  line-height: 1.75;
+}
