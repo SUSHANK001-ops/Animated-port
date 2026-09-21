@@ -6,6 +6,7 @@ import Services from './_sections/Services'
 import ProjectsGrid from './_sections/ProjectsGrid'
 import Experience from './_sections/Experience'
 import CertificationsTeaser from './_sections/CertificationsTeaser'
+import LatestBlog from './_sections/LatestBlog'
 
 export const metadata: Metadata = {
   title: 'Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer',
@@ -13,19 +14,31 @@ export const metadata: Metadata = {
     'DevOps Engineer and Full-Stack Developer from Nepal. AWS · Docker · Kubernetes · Terraform · CI/CD · Red Hat Certified.',
 }
 
+function Divider() {
+  return (
+    <div className="editorial">
+      <hr className="ed-divider" />
+    </div>
+  )
+}
+
 export default function HomePage() {
   return (
     <>
       <Hero />
+      <Divider />
       <AboutCards />
-      <div className="section-divider" />
+      <Divider />
       <Services />
-      <div className="section-divider" />
+      <Divider />
       <ProjectsGrid />
-      <div className="section-divider" />
+      <Divider />
       <Experience />
-      <div className="section-divider" />
+      <Divider />
       <CertificationsTeaser />
+      <Divider />
+      <LatestBlog />
+      <div className="pb-24" />
     </>
   )
 }
