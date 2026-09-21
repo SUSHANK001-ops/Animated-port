@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { identity, heroBadges, marqueeItems } from '@/data/config'
 import MarqueeStrip from '../../ui/MarqueeStrip'
+import Sticker from '../../ui/Sticker'
 
 const Hero = () => {
   const rootRef = useRef<HTMLElement>(null)
@@ -44,6 +45,11 @@ const Hero = () => {
       className="relative flex min-h-screen flex-col justify-center overflow-hidden pt-16"
     >
       <div className="grid-bg pointer-events-none absolute inset-0 opacity-60" />
+
+      {/* Draggable sticker prop */}
+      <div className="absolute right-8 top-28 z-20 hidden lg:block">
+        <Sticker name="wave" size={110} draggable rotate={-8} />
+      </div>
 
       <div className="relative mx-auto w-full max-w-7xl flex-1 px-6 pb-28 pt-16 md:px-10">
         {/* Availability label */}

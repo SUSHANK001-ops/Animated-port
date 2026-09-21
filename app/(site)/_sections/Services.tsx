@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { services } from '@/data/config'
 import SectionHeader from '../../ui/SectionHeader'
+import Sticker from '../../ui/Sticker'
 import { useGsapReveal } from '../../ui/useGsapReveal'
 
 const Services = () => {
@@ -11,7 +12,10 @@ const Services = () => {
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-24 md:px-10">
-      <SectionHeader label="What I Do" title="Services" className="mb-14" />
+      <div className="mb-14 flex items-start justify-between gap-4">
+        <SectionHeader label="What I Do" title="Services" />
+        <Sticker name="rocket" size={72} float className="hidden shrink-0 sm:block" />
+      </div>
 
       <div ref={listRef} className="border-t border-border">
         {services.map((service, i) => {

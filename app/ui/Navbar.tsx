@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { identity } from '@/data/config'
+import ThemeToggle from './theme/ThemeToggle'
+import SoundToggle from './sound/SoundToggle'
 
 const links = [
   { label: 'About', href: '/about' },
@@ -56,34 +58,45 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop links */}
-        <ul className="hidden items-center gap-7 md:flex">
-          {links.map((link) => {
-            const active = !link.external && pathname === link.href
-            return (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  target={link.external ? '_blank' : undefined}
-                  rel={link.external ? 'noopener noreferrer' : undefined}
-                  className={`text-sm transition-colors hover:text-foreground ${
-                    active ? 'text-accent' : 'text-muted'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+        <div className="hidden items-center gap-6 md:flex">
+          <ul className="flex items-center gap-6">
+            {links.map((link) => {
+              const active = !link.external && pathname === link.href
+              return (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
+                    data-click-sound
+                    className={`text-sm transition-colors hover:text-foreground ${
+                      active ? 'text-accent' : 'text-muted'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="flex items-center gap-2 border-l border-border pl-4">
+            <ThemeToggle />
+            <SoundToggle />
+          </div>
+        </div>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setOpen(true)}
-          className="text-foreground md:hidden"
-          aria-label="Open menu"
-        >
-          <Menu size={22} />
-        </button>
+        {/* Mobile: toggles + menu */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <SoundToggle />
+          <button
+            onClick={() => setOpen(true)}
+            className="ml-1 text-foreground"
+            aria-label="Open menu"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
       </nav>
 
       {/* Mobile slide-in sheet */}
@@ -120,6 +133,7 @@ const Navbar = () => {
                   href={link.href}
                   target={link.external ? '_blank' : undefined}
                   rel={link.external ? 'noopener noreferrer' : undefined}
+                  data-click-sound
                   className="font-mono text-lg text-muted transition-colors hover:text-accent"
                 >
                   {link.label}
