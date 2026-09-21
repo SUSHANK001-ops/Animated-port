@@ -93,18 +93,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="canonical" href="https://sushanka.com.np" />
-        <meta name="theme-color" content="#1A1A1A" />
-        <meta name="color-scheme" content="dark" />
+        {/* Set theme before paint to avoid a flash of the wrong theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
 
       <body
         className={`${geist.variable} ${jetbrainsMono.variable} ${notoSansDevanagari.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

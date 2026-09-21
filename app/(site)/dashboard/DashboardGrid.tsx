@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   BarChart3,
@@ -29,8 +29,25 @@ function formatDate(iso: string) {
   })
 }
 
+interface LiveAnalytics {
+  totalViews: string
+  uniqueVisitorsThisMonth: string
+  mostVisitedPage: string
+}
+
 const DashboardGrid = () => {
   const gridRef = useGsapReveal<HTMLDivElement>({ stagger: 0.08, y: 24 })
+
+  // Live analytics from MongoDB, falling back to config defaults.
+  const [stats, setStats] = useState<LiveAnalytics>(analytics)
+  useEffect(() => {
+    fetch('/api/analytics')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && d.totalViews) setStats(d)
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <div
@@ -129,19 +146,19 @@ const DashboardGrid = () => {
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
-            <p className="text-3xl font-extrabold text-foreground">{analytics.totalViews}</p>
+            <p className="text-3xl font-extrabold text-foreground">{stats.totalViews}</p>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">Total Views</p>
           </div>
           <div>
             <p className="text-3xl font-extrabold text-foreground">
-              {analytics.uniqueVisitorsThisMonth}
+              {stats.uniqueVisitorsThisMonth}
             </p>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">
               Unique / Month
             </p>
           </div>
           <div>
-            <p className="text-3xl font-extrabold text-foreground">{analytics.mostVisitedPage}</p>
+            <p className="text-3xl font-extrabold text-foreground">{stats.mostVisitedPage}</p>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">
               Most Visited
             </p>
