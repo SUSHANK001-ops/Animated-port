@@ -11,7 +11,7 @@ const links = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Certifications', href: '/certifications' },
   { label: 'Guestbook', href: '/guestbook' },
-  { label: 'Blog', href: identity.blogUrl, external: true },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
 ]
 
