@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
+import Providers from "./ui/Providers";
+import { themeInitScript } from "./ui/theme/ThemeProvider";
 
 const geist = Geist({
   variable: "--font-geist",
