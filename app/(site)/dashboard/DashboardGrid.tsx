@@ -52,7 +52,7 @@ const DashboardGrid = () => {
   return (
     <div
       ref={gridRef}
-      className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-1 gap-5 md:grid-cols-2"
     >
       {/* Card 1 — GitHub (2 cols) */}
       <div className="md:col-span-2">
@@ -139,7 +139,7 @@ const DashboardGrid = () => {
       </div>
 
       {/* Card 4 — Analytics (full width) */}
-      <div className="rounded-2xl border border-border bg-surface p-6 md:col-span-2 lg:col-span-4">
+      <div className="rounded-2xl border border-border bg-surface p-6 md:col-span-2">
         <div className="mb-5 flex items-center gap-2 text-muted">
           <BarChart3 size={16} />
           <span className="font-mono text-xs uppercase tracking-widest">Site Analytics</span>

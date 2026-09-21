@@ -1,6 +1,5 @@
 import React from 'react'
 import type { Metadata } from 'next'
-import SectionHeader from '../../ui/SectionHeader'
 import DashboardGrid from './DashboardGrid'
 
 export const metadata: Metadata = {
@@ -10,15 +9,18 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
-      <SectionHeader label="Live" title="Dashboard" className="mb-6" />
-      <p className="mb-14 max-w-xl text-sm text-muted">
+    <div className="mx-auto max-w-4xl px-5 pt-32 pb-24 md:pt-40">
+      <p className="eyebrow mb-3">Live</p>
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+        Dashboard
+      </h1>
+      <p className="mt-4 max-w-xl text-[0.975rem] leading-relaxed text-muted">
         A real-time look at what I&apos;m building, listening to, and learning.
       </p>
 
-      <div className="pb-24">
+      <div className="mt-10">
         <DashboardGrid />
       </div>
-    </section>
+    </div>
   )
 }
