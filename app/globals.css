@@ -3,15 +3,15 @@
 :root,
 :root[data-theme='light'] {
   /* Quiet warm-monochrome (default) — paper & ink, colour only in accents.
-     Tuned to match manishtamang.com: cool warm-grey paper, near-black ink. */
-  --background: #f7f6f4;      /* warm-grey paper */
+     Tuned to match manishtamang.com: cool warm-grey paper, strong black ink. */
+  --background: #f4f3f0;      /* warm-grey paper */
   --surface: #ffffff;         /* raised paper / card */
-  --surface-2: #f0eeea;       /* sunken panel */
-  --border: #e7e5e0;          /* soft hairline */
-  --foreground: #17150f;      /* near-black ink */
-  --muted: #8a867c;           /* pencil grey */
-  --accent: #17150f;          /* ink-as-accent — quiet, monochrome */
-  --link: #2f6f4f;            /* muted green for links only */
+  --surface-2: #eae8e3;       /* sunken panel */
+  --border: #dddad3;          /* visible hairline */
+  --foreground: #121109;      /* strong near-black ink */
+  --muted: #6b675d;           /* readable pencil grey (darker for contrast) */
+  --accent: #121109;          /* ink-as-accent — quiet, monochrome */
+  --link: #256b47;            /* muted green for links only */
   /* Playful colours — used ONLY in bento cards, flowers, pinwheel, badges */
   --c-blue: #a9c8ec;
   --c-pink: #f3b8ce;
@@ -103,7 +103,13 @@ body {
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  /* Subtle dotted paper texture across the whole site */
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--foreground) 7%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
   color: var(--foreground);
   font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
