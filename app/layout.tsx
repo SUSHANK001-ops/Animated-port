@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, JetBrains_Mono, Noto_Sans_Devanagari } from "next/font/google";
+import { Geist, JetBrains_Mono, Noto_Sans_Devanagari, Fraunces } from "next/font/google";
 import "./globals.css";
 import Providers from "./ui/Providers";
 import { themeInitScript } from "./ui/theme/ThemeProvider";
@@ -8,6 +8,14 @@ const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+// Serif display face for headings — the signature editorial voice.
+const fraunces = Fraunces({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -102,7 +110,7 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${geist.variable} ${jetbrainsMono.variable} ${notoSansDevanagari.variable} antialiased`}
+        className={`${geist.variable} ${fraunces.variable} ${jetbrainsMono.variable} ${notoSansDevanagari.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

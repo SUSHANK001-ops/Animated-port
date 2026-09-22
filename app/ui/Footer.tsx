@@ -5,99 +5,142 @@ import { ArrowRight } from 'lucide-react'
 import { identity, nepaliQuote, socials } from '@/data/config'
 import { useGsapReveal } from './useGsapReveal'
 import FlowerField from './delight/FlowerField'
+import SpinBadge from './delight/SpinBadge'
 import NptClock from './delight/NptClock'
 
-const pageLinks = [
+// Four columns, laid out like manishtamang.com's footer.
+const col1 = [
   { label: 'About', href: '/about' },
-  { label: 'Projects', href: '/projects' },
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Certifications', href: '/certifications' },
-  { label: 'Guestbook', href: '/guestbook' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Resume', href: identity.resume, external: true },
 ]
+const col2 = [
+  { label: 'Guestbook', href: '/guestbook' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Home', href: '/' },
+]
+const col3 = [
+  { label: 'Projects', href: '/projects' },
+  { label: 'Photos', href: '/#life-lately' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Experience', href: '/#experience' },
+]
+
+function FooterLink({
+  label,
+  href,
+  external,
+}: {
+  label: string
+  href: string
+  external?: boolean
+}) {
+  const cls =
+    'link-underline text-sm text-muted transition-colors hover:text-foreground'
+  if (external || href.startsWith('http') || href.endsWith('.pdf')) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
+        {label}
+      </a>
+    )
+  }
+  return (
+    <Link href={href} className={cls}>
+      {label}
+    </Link>
+  )
+}
 
 const Footer = () => {
   const ctaRef = useGsapReveal<HTMLDivElement>()
 
   return (
-    <footer className="relative border-t border-border bg-surface">
+    <footer className="relative mt-24 border-t border-border bg-surface">
       {/* CTA */}
-      <div ref={ctaRef} className="editorial-wide pt-20 pb-14 text-center">
-        <p className="eyebrow mb-4">Say hello</p>
-        <h2 className="text-4xl font-semibold leading-[1.02] tracking-tight text-foreground md:text-5xl">
+      <div ref={ctaRef} className="editorial-page pt-20 pb-14 text-center">
+        <p className="eyebrow eyebrow-dot mb-4 justify-center">Say hello</p>
+        <h2 className="display-serif text-4xl text-foreground md:text-5xl">
           Let&apos;s build{' '}
-          <span className="marker-underline">something good.</span>
+          <span className="display-serif-italic marker-underline">something good.</span>
         </h2>
         <Link
           href="/contact"
           data-click-sound
-          className="pop-btn group mt-8 inline-flex items-center gap-2.5 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-background"
+          className="pop-btn group mt-8 inline-flex items-center gap-2.5 rounded-full bg-foreground px-7 py-3 text-sm font-medium text-background"
         >
           Get in touch
-          <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+          <ArrowRight size={16} className="arrow-slide" />
         </Link>
       </div>
 
       {/* Link columns */}
-      <div className="editorial-wide border-t border-border py-10">
+      <div className="editorial-page border-t border-border py-12">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div>
-            <p className="eyebrow mb-3">Pages</p>
-            <ul className="space-y-2">
-              {pageLinks.slice(0, 4).map((l) => (
+            <p className="eyebrow mb-3">Site</p>
+            <ul className="space-y-2.5">
+              {col1.map((l) => (
                 <li key={l.label}>
-                  <Link href={l.href} className="text-sm text-muted transition-colors hover:text-accent">
-                    {l.label}
-                  </Link>
+                  <FooterLink {...l} />
                 </li>
               ))}
             </ul>
           </div>
           <div>
             <p className="eyebrow mb-3">More</p>
-            <ul className="space-y-2">
-              {pageLinks.slice(4).map((l) => (
+            <ul className="space-y-2.5">
+              {col2.map((l) => (
                 <li key={l.label}>
-                  <Link href={l.href} className="text-sm text-muted transition-colors hover:text-accent">
-                    {l.label}
-                  </Link>
+                  <FooterLink {...l} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="eyebrow mb-3">Work</p>
+            <ul className="space-y-2.5">
+              {col3.map((l) => (
+                <li key={l.label}>
+                  <FooterLink {...l} />
                 </li>
               ))}
             </ul>
           </div>
           <div>
             <p className="eyebrow mb-3">Elsewhere</p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {socials.map((s) => (
                 <li key={s.label}>
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-muted transition-colors hover:text-accent"
-                  >
-                    {s.label}
-                  </a>
+                  <FooterLink label={s.label} href={s.url} external />
                 </li>
               ))}
             </ul>
           </div>
-          <div>
-            <p className="eyebrow mb-3">Now</p>
-            <NptClock variant="inline" className="mb-2" />
-            <p className="font-devanagari text-sm text-foreground/70">{nepaliQuote.text}</p>
-            <p className="mt-1 text-xs text-muted">{nepaliQuote.translation}</p>
-          </div>
         </div>
 
-        <p className="mt-10 font-mono text-xs text-muted">
-          &copy; {new Date().getFullYear()} {identity.name}. Built with care in Nepal.
-        </p>
+        {/* Name + year (left) · local time (right) */}
+        <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-mono text-xs text-muted">
+            &copy; {new Date().getFullYear()} {identity.name}
+          </p>
+          <div className="flex items-center gap-4">
+            <p className="font-devanagari text-xs text-foreground/60">
+              {nepaliQuote.text}
+            </p>
+            <NptClock variant="inline" />
+          </div>
+        </div>
       </div>
 
-      {/* Floating flowers */}
-      <FlowerField />
+      {/* Floating flowers + spinning badge */}
+      <div className="relative">
+        <FlowerField />
+        <div className="pointer-events-auto absolute bottom-3 right-5 z-10 hidden sm:block">
+          <SpinBadge />
+        </div>
+      </div>
     </footer>
   )
 }
