@@ -74,6 +74,24 @@ export const identity = {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Photos (Polaroid strip on the homepage)                           */
+/*  Drop real images in /public and update src + caption below.       */
+/* ------------------------------------------------------------------ */
+
+export interface Photo {
+  src: string
+  caption: string
+  rotate?: number
+}
+
+export const photos: Photo[] = [
+  { src: '/profile.jpeg', caption: 'me, mid-deploy', rotate: -5 },
+  { src: '/assests/Placeholder.png', caption: 'the homelab', rotate: 3 },
+  { src: '/profile.jpeg', caption: 'coffee & configs', rotate: -2 },
+  { src: '/assests/Placeholder.png', caption: 'shipping day', rotate: 4 },
+]
+
+/* ------------------------------------------------------------------ */
 /*  Social links                                                      */
 /* ------------------------------------------------------------------ */
 
