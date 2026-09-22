@@ -6,7 +6,6 @@ import { Menu, X } from 'lucide-react'
 import ThemeToggle from './theme/ThemeToggle'
 import SoundToggle from './sound/SoundToggle'
 
-// Order + labels mirror manishtamang.com's floating pill nav.
 const links = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
@@ -29,12 +28,10 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close the mobile sheet on route change.
   useEffect(() => {
     setOpen(false)
   }, [pathname])
 
-  // Lock body scroll while the sheet is open.
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => {
@@ -42,66 +39,69 @@ const Navbar = () => {
     }
   }, [open])
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href)
-
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-4 md:top-4">
-      {/* Desktop floating pill */}
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4">
+      {/* Floating centered pill */}
       <nav
-        className={`nav-pill pointer-events-auto hidden items-center gap-1 px-2 py-1.5 md:flex ${
-          scrolled ? 'scrolled' : ''
+        className={`flex items-center gap-1 rounded-full border px-1.5 py-1.5 transition-all duration-300 ${
+          scrolled
+            ? 'border-border bg-surface/85 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl'
+            : 'border-border/60 bg-surface/60 backdrop-blur-md'
         }`}
       >
-        {links.map((link) => (
-          <Link
-            key={link.label}
-            href={link.href}
-            data-click-sound
-            data-active={isActive(link.href)}
-            className="nav-link"
-          >
-            {link.label}
-          </Link>
-        ))}
-        <span className="mx-1 h-4 w-px bg-border" />
-        <div className="flex items-center gap-0.5 pr-1">
+        {/* Desktop links */}
+        <ul className="hidden items-center md:flex">
+          {links.map((link) => {
+            const active =
+              link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+            return (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  data-click-sound
+                  data-active={active}
+                  className={`nav-link mx-0.5 rounded-full px-3 py-1.5 text-[0.8rem] transition-colors ${
+                    active
+                      ? 'text-foreground'
+                      : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+
+        {/* Divider + toggles (desktop) */}
+        <div className="hidden items-center gap-1 border-l border-border pl-1.5 md:flex">
           <ThemeToggle />
           <SoundToggle />
         </div>
-      </nav>
 
-      {/* Mobile floating pill */}
-      <nav
-        className={`nav-pill pointer-events-auto flex w-full max-w-md items-center justify-between px-4 py-2 md:hidden ${
-          scrolled ? 'scrolled' : ''
-        }`}
-      >
-        <Link
-          href="/"
-          data-click-sound
-          className="font-serif text-base font-medium text-foreground"
-        >
-          Sushanka
-        </Link>
-        <div className="flex items-center gap-1">
+        {/* Mobile: brand + toggles + menu */}
+        <div className="flex items-center gap-1 md:hidden">
+          <Link
+            href="/"
+            className="px-3 font-serif text-base font-medium text-foreground"
+          >
+            Sushanka
+          </Link>
           <ThemeToggle />
           <SoundToggle />
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="ml-0.5 text-foreground transition-transform hover:scale-110 active:scale-95"
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            onClick={() => setOpen(true)}
+            className="ml-0.5 rounded-full p-1.5 text-foreground"
+            aria-label="Open menu"
           >
-            {open ? <X size={20} /> : <Menu size={20} />}
+            <Menu size={20} />
           </button>
         </div>
       </nav>
 
       {/* Mobile slide-in sheet */}
       <div
-        className={`pointer-events-none fixed inset-0 z-40 md:hidden ${
-          open ? '!pointer-events-auto' : ''
-        }`}
+        className={`fixed inset-0 z-50 md:hidden ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
         aria-hidden={!open}
       >
         <div
@@ -116,24 +116,29 @@ const Navbar = () => {
           }`}
         >
           <div className="mb-10 flex items-center justify-between">
-            <span className="font-serif text-lg font-medium text-foreground">Menu</span>
+            <span className="font-serif text-xl font-medium text-foreground">Sushanka</span>
             <button onClick={() => setOpen(false)} aria-label="Close menu">
               <X size={22} className="text-foreground" />
             </button>
           </div>
-          <ul className="flex flex-col gap-1">
-            {links.map((link) => (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  data-click-sound
-                  data-active={isActive(link.href)}
-                  className="block rounded-lg px-3 py-2.5 text-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground data-[active=true]:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+          <ul className="flex flex-col gap-4">
+            {links.map((link) => {
+              const active =
+                link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+              return (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    data-click-sound
+                    className={`font-serif text-lg transition-colors ${
+                      active ? 'text-foreground' : 'text-muted hover:text-foreground'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         </aside>
       </div>

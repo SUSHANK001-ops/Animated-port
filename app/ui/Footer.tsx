@@ -1,144 +1,119 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { identity, nepaliQuote, socials } from '@/data/config'
-import { useGsapReveal } from './useGsapReveal'
+import {
+  User, LayoutDashboard, FileText, Sparkles,
+  MessageSquare, Mail, BookOpen, Wrench,
+  FolderGit2, Image as ImageIcon, MessageCircle, BarChart3,
+  Instagram, Github, Linkedin, Rss,
+} from 'lucide-react'
+import { identity, nepaliQuote } from '@/data/config'
 import FlowerField from './delight/FlowerField'
-import SpinBadge from './delight/SpinBadge'
 import NptClock from './delight/NptClock'
 
-// Four columns, laid out like manishtamang.com's footer.
-const col1 = [
-  { label: 'About', href: '/about' },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Certifications', href: '/certifications' },
-  { label: 'Resume', href: identity.resume, external: true },
-]
-const col2 = [
-  { label: 'Guestbook', href: '/guestbook' },
-  { label: 'Contact', href: '/contact' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Home', href: '/' },
-]
-const col3 = [
-  { label: 'Projects', href: '/projects' },
-  { label: 'Photos', href: '/#life-lately' },
-  { label: 'Services', href: '/#services' },
-  { label: 'Experience', href: '/#experience' },
-]
-
-function FooterLink({
-  label,
-  href,
-  external,
-}: {
+interface FLink {
   label: string
   href: string
+  icon: React.ElementType
   external?: boolean
-}) {
+}
+
+const columns: FLink[][] = [
+  [
+    { label: 'About', href: '/about', icon: User },
+    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { label: 'Certifications', href: '/certifications', icon: FileText },
+    { label: 'Home', href: '/', icon: Sparkles },
+  ],
+  [
+    { label: 'Guestbook', href: '/guestbook', icon: MessageSquare },
+    { label: 'Contact', href: '/contact', icon: Mail },
+    { label: 'Blog', href: '/blog', icon: BookOpen },
+    { label: 'Projects', href: '/projects', icon: Wrench },
+  ],
+  [
+    { label: 'Projects', href: '/projects', icon: FolderGit2 },
+    { label: 'GitHub', href: 'https://github.com/SUSHANK001-ops', icon: ImageIcon, external: true },
+    { label: 'Feedback', href: '/guestbook', icon: MessageCircle },
+    { label: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+  ],
+  [
+    { label: 'Instagram', href: 'https://www.instagram.com/the_sushank_lamichhane/', icon: Instagram, external: true },
+    { label: 'Blog', href: identity.blogUrl, icon: Rss, external: true },
+    { label: 'GitHub', href: 'https://github.com/SUSHANK001-ops', icon: Github, external: true },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lamichhane--68b754341/', icon: Linkedin, external: true },
+  ],
+]
+
+function FooterLink({ item }: { item: FLink }) {
+  const Icon = item.icon
   const cls =
-    'link-underline text-sm text-muted transition-colors hover:text-foreground'
-  if (external || href.startsWith('http') || href.endsWith('.pdf')) {
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
-        {label}
-      </a>
-    )
-  }
-  return (
-    <Link href={href} className={cls}>
-      {label}
+    'group inline-flex items-center gap-2 text-[0.82rem] text-muted transition-colors hover:text-foreground'
+  const inner = (
+    <>
+      <Icon size={13} className="text-muted transition-colors group-hover:text-foreground" />
+      <span className="link-quiet !text-muted group-hover:!text-foreground">{item.label}</span>
+    </>
+  )
+  return item.external ? (
+    <a href={item.href} target="_blank" rel="noopener noreferrer" className={cls}>
+      {inner}
+    </a>
+  ) : (
+    <Link href={item.href} className={cls}>
+      {inner}
     </Link>
   )
 }
 
 const Footer = () => {
-  const ctaRef = useGsapReveal<HTMLDivElement>()
-
   return (
-    <footer className="relative mt-24 border-t border-border bg-surface">
-      {/* CTA */}
-      <div ref={ctaRef} className="editorial-page pt-20 pb-14 text-center">
-        <p className="eyebrow eyebrow-dot mb-4 justify-center">Say hello</p>
-        <h2 className="display-serif text-4xl text-foreground md:text-5xl">
-          Let&apos;s build{' '}
-          <span className="display-serif-italic marker-underline">something good.</span>
-        </h2>
-        <Link
-          href="/contact"
-          data-click-sound
-          className="pop-btn group mt-8 inline-flex items-center gap-2.5 rounded-full bg-foreground px-7 py-3 text-sm font-medium text-background"
-        >
-          Get in touch
-          <ArrowRight size={16} className="arrow-slide" />
-        </Link>
-      </div>
-
-      {/* Link columns */}
-      <div className="editorial-page border-t border-border py-12">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-          <div>
-            <p className="eyebrow mb-3">Site</p>
-            <ul className="space-y-2.5">
-              {col1.map((l) => (
-                <li key={l.label}>
-                  <FooterLink {...l} />
+    <footer className="relative border-t border-border bg-surface">
+      <div className="editorial-wide pt-16 pb-10">
+        {/* Link columns */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
+          {columns.map((col, i) => (
+            <ul key={i} className="space-y-3">
+              {col.map((item, j) => (
+                <li key={`${i}-${j}`}>
+                  <FooterLink item={item} />
                 </li>
               ))}
             </ul>
-          </div>
-          <div>
-            <p className="eyebrow mb-3">More</p>
-            <ul className="space-y-2.5">
-              {col2.map((l) => (
-                <li key={l.label}>
-                  <FooterLink {...l} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="eyebrow mb-3">Work</p>
-            <ul className="space-y-2.5">
-              {col3.map((l) => (
-                <li key={l.label}>
-                  <FooterLink {...l} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="eyebrow mb-3">Elsewhere</p>
-            <ul className="space-y-2.5">
-              {socials.map((s) => (
-                <li key={s.label}>
-                  <FooterLink label={s.label} href={s.url} external />
-                </li>
-              ))}
-            </ul>
-          </div>
+          ))}
         </div>
 
-        {/* Name + year (left) · local time (right) */}
-        <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* Nepali quote */}
+        <div className="mt-10 border-t border-border pt-6">
+          <p className="font-devanagari text-sm text-foreground/70">{nepaliQuote.text}</p>
+          <p className="mt-1 text-xs text-muted">{nepaliQuote.translation}</p>
+        </div>
+
+        {/* Name + year · local time */}
+        <div className="mt-6 flex items-center justify-between">
           <p className="font-mono text-xs text-muted">
-            &copy; {new Date().getFullYear()} {identity.name}
+            {identity.name} &copy; {new Date().getFullYear()}
           </p>
-          <div className="flex items-center gap-4">
-            <p className="font-devanagari text-xs text-foreground/60">
-              {nepaliQuote.text}
-            </p>
-            <NptClock variant="inline" />
-          </div>
+          <NptClock variant="inline" />
         </div>
       </div>
 
-      {/* Floating flowers + spinning badge */}
+      {/* Flowers + spinning badge */}
       <div className="relative">
         <FlowerField />
-        <div className="pointer-events-auto absolute bottom-3 right-5 z-10 hidden sm:block">
-          <SpinBadge />
+        <div className="pointer-events-none absolute bottom-3 right-4 z-10">
+          <svg width="54" height="54" viewBox="0 0 100 100" className="spin-badge">
+            <defs>
+              <path id="badge-curve" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+            </defs>
+            <circle cx="50" cy="50" r="48" fill="var(--c-purple)" />
+            <text className="fill-white" style={{ fontSize: '11px', letterSpacing: '2px' }}>
+              <textPath href="#badge-curve">
+                · BUILT IN NEPAL · CRAFTED WITH CARE
+              </textPath>
+            </text>
+            <circle cx="50" cy="50" r="12" fill="var(--surface)" />
+          </svg>
         </div>
       </div>
     </footer>

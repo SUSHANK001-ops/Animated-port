@@ -29,7 +29,14 @@ function Equalizer() {
   )
 }
 
-const SpotifyNowPlaying = ({ className = '' }: { className?: string }) => {
+const SpotifyNowPlaying = ({
+  className = '',
+  bare = false,
+}: {
+  className?: string
+  /** When true, render without the .bento card wrapper (for embedding in a tile). */
+  bare?: boolean
+}) => {
   const [state, setState] = useState<SpotifyState | null>(null)
 
   useEffect(() => {
@@ -47,7 +54,7 @@ const SpotifyNowPlaying = ({ className = '' }: { className?: string }) => {
   const playing = state?.isPlaying
 
   return (
-    <div className={`bento flex h-full flex-col justify-between ${className}`}>
+    <div className={`${bare ? '' : 'bento'} flex h-full flex-col justify-between ${className}`}>
       <div className="flex items-center gap-2 text-muted">
         <Music2 size={15} />
         <span className="eyebrow">{playing ? 'Now playing' : 'Recent favorite'}</span>

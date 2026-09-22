@@ -39,11 +39,7 @@ export function Block({
   return (
     <section ref={ref} className={className}>
       {label && <Eyebrow className="mb-3">{label}</Eyebrow>}
-      {title && (
-        <h2 className="mb-6 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-          {title}
-        </h2>
-      )}
+      {title && <h2 className="serif-title serif-section mb-6">{title}</h2>}
       {children}
     </section>
   )

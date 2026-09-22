@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import connectDB from '@/lib/db'
 import BlogModel from '@/model/blogModel'
 import { latestBlogFallback } from '@/data/config'
@@ -15,10 +15,9 @@ interface PostPreview {
 function formatDate(value: string) {
   const d = new Date(value)
   if (isNaN(d.getTime())) return value
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-/** Server component — reads latest posts straight from MongoDB. */
 async function getLatestPosts(): Promise<PostPreview[]> {
   try {
     await connectDB()
@@ -42,7 +41,6 @@ async function getLatestPosts(): Promise<PostPreview[]> {
 const LatestBlog = async () => {
   let posts = await getLatestPosts()
 
-  // Fallback so the section still reads well before any posts exist.
   if (posts.length === 0) {
     posts = [
       {
@@ -57,11 +55,10 @@ const LatestBlog = async () => {
   return (
     <div className="editorial">
       <p className="eyebrow mb-3">Writing</p>
-      <h2 className="mb-6 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-        Latest from the blog
-      </h2>
+      <h2 className="serif-title serif-section mb-6">Latest from the blog</h2>
 
-      <div className="divide-y divide-border border-y border-border">
+      {/* Stacked-paper cards */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {posts.map((post, i) => {
           const href = post.slug ? `/blog/${post.slug}` : '/blog'
           return (
@@ -69,17 +66,17 @@ const LatestBlog = async () => {
               key={post.slug || i}
               href={href}
               data-click-sound
-              className="group block py-5 transition-opacity hover:opacity-90"
+              className="paper-card group block"
             >
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="text-base font-medium text-foreground group-hover:text-accent">
-                  {post.title}
-                </h3>
-                <span className="shrink-0 font-mono text-xs text-muted">
-                  {formatDate(post.date)}
-                </span>
-              </div>
-              <p className="mt-1.5 line-clamp-2 text-sm text-muted">{post.description}</p>
+              <span className="font-mono text-[0.65rem] text-muted">
+                {formatDate(post.date)}
+              </span>
+              <h3 className="mt-2 serif-title text-base leading-snug text-foreground group-hover:text-link">
+                {post.title}
+              </h3>
+              <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-muted">
+                {post.description}
+              </p>
             </Link>
           )
         })}
@@ -88,10 +85,10 @@ const LatestBlog = async () => {
       <Link
         href="/blog"
         data-click-sound
-        className="group mt-6 inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-accent"
+        className="group mt-8 inline-flex items-center gap-1.5 text-sm text-link"
       >
-        Read the blog
-        <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+        <span className="link-quiet">Read the blog</span>
+        <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
       </Link>
     </div>
   )
