@@ -2,12 +2,14 @@ import React from 'react'
 import type { Metadata } from 'next'
 import Hero from './_sections/Hero'
 import AboutBento from './_sections/AboutBento'
-import Services from './_sections/Services'
+import TechStack from './_sections/TechStack'
 import ProjectsGrid from './_sections/ProjectsGrid'
-import LifeLately from './_sections/LifeLately'
+import Services from './_sections/Services'
+import LatestBlog from './_sections/LatestBlog'
+import VinylQuote from './_sections/VinylQuote'
+import WidePhoto from './_sections/WidePhoto'
 import Experience from './_sections/Experience'
 import CertificationsTeaser from './_sections/CertificationsTeaser'
-import LatestBlog from './_sections/LatestBlog'
 
 export const metadata: Metadata = {
   title: 'Sushanka Lamichhane – DevOps Engineer & Full-Stack Developer',
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 
 function Divider() {
   return (
-    <div className="editorial my-14">
+    <div className="editorial-page my-14">
       <div className="wavy-divider" />
     </div>
   )
@@ -30,17 +32,21 @@ export default function HomePage() {
       <Divider />
       <AboutBento />
       <Divider />
-      <Services />
+      <TechStack />
       <Divider />
       <ProjectsGrid />
       <Divider />
-      <LifeLately />
+      <Services />
+      <Divider />
+      <LatestBlog />
+      <Divider />
+      <VinylQuote />
+      <div className="my-10" />
+      <WidePhoto />
       <Divider />
       <Experience />
       <Divider />
       <CertificationsTeaser />
-      <Divider />
-      <LatestBlog />
       <div className="pb-24" />
     </>
   )

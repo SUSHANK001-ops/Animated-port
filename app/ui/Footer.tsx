@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { identity, nepaliQuote } from '@/data/config'
 import FlowerField from './delight/FlowerField'
+import SpinBadge from './delight/SpinBadge'
 import NptClock from './delight/NptClock'
 
 interface FLink {
@@ -68,8 +69,8 @@ function FooterLink({ item }: { item: FLink }) {
 
 const Footer = () => {
   return (
-    <footer className="relative border-t border-border bg-surface">
-      <div className="editorial-wide pt-16 pb-10">
+    <footer className="relative mt-24 border-t border-border bg-surface">
+      <div className="editorial-page pt-16 pb-10">
         {/* Link columns */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
           {columns.map((col, i) => (
@@ -101,19 +102,8 @@ const Footer = () => {
       {/* Flowers + spinning badge */}
       <div className="relative">
         <FlowerField />
-        <div className="pointer-events-none absolute bottom-3 right-4 z-10">
-          <svg width="54" height="54" viewBox="0 0 100 100" className="spin-badge">
-            <defs>
-              <path id="badge-curve" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
-            </defs>
-            <circle cx="50" cy="50" r="48" fill="var(--c-purple)" />
-            <text className="fill-white" style={{ fontSize: '11px', letterSpacing: '2px' }}>
-              <textPath href="#badge-curve">
-                · BUILT IN NEPAL · CRAFTED WITH CARE
-              </textPath>
-            </text>
-            <circle cx="50" cy="50" r="12" fill="var(--surface)" />
-          </svg>
+        <div className="absolute bottom-4 right-5 z-10 hidden sm:block">
+          <SpinBadge size={72} />
         </div>
       </div>
     </footer>

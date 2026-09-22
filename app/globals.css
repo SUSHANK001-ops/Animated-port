@@ -487,11 +487,42 @@ body {
    ============================================================ */
 
 /* ---- Serif display headings (the signature editorial voice) ---- */
-.display-serif {
+.display-serif,
+.serif-title {
   font-family: var(--font-serif), "Iowan Old Style", Georgia, serif;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.05;
+}
+/* Section-heading sizing used by the editorial Block + sections */
+.serif-section {
+  font-size: 1.6rem;
+  color: var(--foreground);
+}
+@media (min-width: 768px) {
+  .serif-section {
+    font-size: 1.95rem;
+  }
+}
+/* Quiet link label with a growing underline on hover */
+.link-quiet {
+  position: relative;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+.link-quiet::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1.5px;
+  width: 0;
+  background: currentColor;
+  transition: width 0.25s ease;
+}
+.group:hover .link-quiet::after,
+.link-quiet:hover::after {
+  width: 100%;
 }
 .display-serif-italic {
   font-family: var(--font-serif), Georgia, serif;

@@ -10,7 +10,7 @@ const CertificationsTeaser = () => {
   const preview = certifications.slice(0, 3)
 
   return (
-    <div className="editorial">
+    <div className="editorial-page">
       <Block label="Certified" title="Certifications">
         <div className="space-y-3">
           {preview.map((cert) => (

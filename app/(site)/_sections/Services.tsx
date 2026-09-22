@@ -8,7 +8,7 @@ const Services = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="editorial">
+    <div className="editorial-page" id="services">
       <Block label="What I do" title="Services">
         <div className="border-t border-border">
           {services.map((service, i) => {

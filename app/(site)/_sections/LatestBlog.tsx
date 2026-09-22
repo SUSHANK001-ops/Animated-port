@@ -53,8 +53,8 @@ const LatestBlog = async () => {
   }
 
   return (
-    <div className="editorial">
-      <p className="eyebrow mb-3">Writing</p>
+    <div className="editorial-page">
+      <p className="eyebrow eyebrow-dot mb-3">Writing</p>
       <h2 className="serif-title serif-section mb-6">Latest from the blog</h2>
 
       {/* Stacked-paper cards */}

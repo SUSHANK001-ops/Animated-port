@@ -5,7 +5,7 @@ import { Block } from '../../ui/editorial'
 
 const Experience = () => {
   return (
-    <div className="editorial">
+    <div className="editorial-page" id="experience">
       <Block label="Journey" title="Experience">
         <div className="space-y-8">
           {experience.map((exp, i) => (
