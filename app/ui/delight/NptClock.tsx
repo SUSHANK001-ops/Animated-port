@@ -22,12 +22,18 @@ interface NptClockProps {
 }
 
 const NptClock = ({ variant = 'card', className = '' }: NptClockProps) => {
+  // Start null so server and first client render match, then tick on mount.
   const [time, setTime] = useState<string | null>(null)
 
   useEffect(() => {
-    setTime(nepalNow())
+    // Defer the first read to the next frame so it isn't a synchronous
+    // setState inside the effect body.
+    const raf = requestAnimationFrame(() => setTime(nepalNow()))
     const id = setInterval(() => setTime(nepalNow()), 1000 * 20)
-    return () => clearInterval(id)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearInterval(id)
+    }
   }, [])
 
   if (variant === 'inline') {

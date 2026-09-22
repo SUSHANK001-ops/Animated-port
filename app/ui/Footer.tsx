@@ -4,12 +4,16 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { identity, nepaliQuote, socials } from '@/data/config'
 import { useGsapReveal } from './useGsapReveal'
+import FlowerField from './delight/FlowerField'
+import NptClock from './delight/NptClock'
 
-const footerLinks = [
+const pageLinks = [
   { label: 'About', href: '/about' },
   { label: 'Projects', href: '/projects' },
   { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Certifications', href: '/certifications' },
   { label: 'Guestbook', href: '/guestbook' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -17,63 +21,83 @@ const Footer = () => {
   const ctaRef = useGsapReveal<HTMLDivElement>()
 
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="relative border-t border-border bg-surface">
       {/* CTA */}
-      <div ref={ctaRef} className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
-        <h2 className="max-w-4xl text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground md:text-7xl lg:text-8xl">
-          LET&apos;S BUILD
-          <br />
-          SOMETHING.
+      <div ref={ctaRef} className="editorial-wide pt-20 pb-14 text-center">
+        <p className="eyebrow mb-4">Say hello</p>
+        <h2 className="text-4xl font-semibold leading-[1.02] tracking-tight text-foreground md:text-5xl">
+          Let&apos;s build{' '}
+          <span className="marker-underline">something good.</span>
         </h2>
         <Link
           href="/contact"
-          className="group mt-10 inline-flex items-center gap-3 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-background transition-transform duration-300 hover:scale-[1.02]"
+          data-click-sound
+          className="pop-btn group mt-8 inline-flex items-center gap-2.5 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-background"
         >
-          Get in Touch
-          <ArrowRight
-            size={16}
-            className="transition-transform duration-300 group-hover:translate-x-1"
-          />
+          Get in touch
+          <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between md:px-10">
-          <p className="font-mono text-xs text-muted">
-            &copy; {new Date().getFullYear()} {identity.name}. All rights reserved.
-          </p>
-
-          <div className="flex flex-wrap gap-5">
-            {footerLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-xs text-muted transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
-            {socials.map((s) => (
-              <a
-                key={s.label}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted transition-colors hover:text-foreground"
-              >
-                {s.label}
-              </a>
-            ))}
+      {/* Link columns */}
+      <div className="editorial-wide border-t border-border py-10">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div>
+            <p className="eyebrow mb-3">Pages</p>
+            <ul className="space-y-2">
+              {pageLinks.slice(0, 4).map((l) => (
+                <li key={l.label}>
+                  <Link href={l.href} className="text-sm text-muted transition-colors hover:text-accent">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="eyebrow mb-3">More</p>
+            <ul className="space-y-2">
+              {pageLinks.slice(4).map((l) => (
+                <li key={l.label}>
+                  <Link href={l.href} className="text-sm text-muted transition-colors hover:text-accent">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="eyebrow mb-3">Elsewhere</p>
+            <ul className="space-y-2">
+              {socials.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted transition-colors hover:text-accent"
+                  >
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="eyebrow mb-3">Now</p>
+            <NptClock variant="inline" className="mb-2" />
+            <p className="font-devanagari text-sm text-foreground/70">{nepaliQuote.text}</p>
+            <p className="mt-1 text-xs text-muted">{nepaliQuote.translation}</p>
           </div>
         </div>
 
-        {/* Nepali quote */}
-        <div className="mx-auto max-w-7xl px-6 pb-8 md:px-10">
-          <p className="font-devanagari text-sm text-foreground/70">{nepaliQuote.text}</p>
-          <p className="font-mono text-xs text-muted">{nepaliQuote.translation}</p>
-        </div>
+        <p className="mt-10 font-mono text-xs text-muted">
+          &copy; {new Date().getFullYear()} {identity.name}. Built with care in Nepal.
+        </p>
       </div>
+
+      {/* Floating flowers */}
+      <FlowerField />
     </footer>
   )
 }
