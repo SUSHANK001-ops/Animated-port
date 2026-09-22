@@ -1,28 +1,32 @@
 @import "tailwindcss";
 
 :root,
-:root[data-theme='dark'] {
-  /* Dark tokens (default) */
-  --background: #0a0a0a;
-  --surface: #111111;
-  --border: #1f1f1f;
-  --foreground: #f0f0f0;
-  --muted: #6b6b6b;
-  --accent: #4ade80;        /* green — DevOps terminal */
-  --accent-secondary: #3b82f6; /* blue */
-  color-scheme: dark;
+:root[data-theme='light'] {
+  /* Warm editorial light tokens (default) — paper, ink, garden green */
+  --background: #faf8f3;      /* warm paper */
+  --surface: #fffdf8;         /* card / raised paper */
+  --surface-2: #f2efe6;       /* sunken panel */
+  --border: #e7e2d6;          /* soft hairline */
+  --foreground: #22201a;      /* warm ink */
+  --muted: #7a756a;           /* pencil grey */
+  --accent: #1f9d55;          /* garden green */
+  --accent-secondary: #e0533d;/* terracotta / flower red */
+  --accent-warm: #e6a817;     /* marigold highlight */
+  color-scheme: light;
 }
 
-:root[data-theme='light'] {
-  /* Light tokens */
-  --background: #f7f7f5;
-  --surface: #ffffff;
-  --border: #e4e4e0;
-  --foreground: #14150f;
-  --muted: #6f6f6a;
-  --accent: #16a34a;        /* deeper green reads better on light */
-  --accent-secondary: #2563eb;
-  color-scheme: light;
+:root[data-theme='dark'] {
+  /* Dark tokens (toggle) */
+  --background: #0d0c0a;
+  --surface: #16150f;
+  --surface-2: #1c1b14;
+  --border: #262418;
+  --foreground: #f2efe6;
+  --muted: #8a857a;
+  --accent: #4ade80;          /* green — DevOps terminal */
+  --accent-secondary: #f0785f;
+  --accent-warm: #f4c542;
+  color-scheme: dark;
 }
 
 /* Smooth theme cross-fade */
@@ -37,11 +41,13 @@ body,
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-secondary: var(--accent-secondary);
+  --color-accent-warm: var(--accent-warm);
 
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
@@ -79,17 +85,17 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262626;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
 }
 
 /* ---- Selection ---- */
 ::selection {
-  background: rgba(74, 222, 128, 0.25);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--foreground);
 }
 
 /* ---- Outlined (stroke) text for the hero ---- */
@@ -149,9 +155,18 @@ body {
 /* ---- Hairline grid background for dashboard/hero ---- */
 .grid-bg {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+/* ---- Dotted paper background ---- */
+.paper-dots {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--foreground) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
 }
 
 /* ---- Section divider ---- */
@@ -266,4 +281,157 @@ body {
 .prose-calm p {
   color: color-mix(in srgb, var(--foreground) 78%, transparent);
   line-height: 1.75;
+}
+
+/* ============================================================
+   Warm editorial delight (manishtamang-inspired)
+   Pinwheel · Polaroids · Flowers · Marker · Tape · Wiggle
+   ============================================================ */
+
+/* ---- Spinning pinwheel ---- */
+.pinwheel-spin {
+  transform-origin: 50% 50%;
+  animation: pinwheel-turn 3.2s linear infinite;
+}
+.pinwheel-spin.paused {
+  animation-play-state: paused;
+}
+.group:hover .pinwheel-spin {
+  animation-duration: 0.7s;
+}
+@keyframes pinwheel-turn {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Marker / highlighter underline for links & emphasis ---- */
+.marker-underline {
+  background-image: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--accent-warm) 45%, transparent) 0%,
+    color-mix(in srgb, var(--accent-warm) 45%, transparent) 100%
+  );
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 0.42em;
+  transition: background-size 0.25s ease;
+}
+.marker-underline:hover {
+  background-size: 100% 1em;
+}
+
+/* ---- Hand-drawn wavy divider ---- */
+.wavy-divider {
+  height: 12px;
+  width: 100%;
+  color: color-mix(in srgb, var(--foreground) 22%, transparent);
+  background-image: radial-gradient(circle at 6px -3px, transparent 8px, currentColor 8px, currentColor 9px, transparent 9px);
+  background-size: 22px 12px;
+  opacity: 0.5;
+}
+
+/* ---- Polaroid photo card ---- */
+.polaroid {
+  background: #fffdf8;
+  padding: 8px 8px 26px;
+  border-radius: 3px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  will-change: transform;
+}
+:root[data-theme='dark'] .polaroid {
+  background: #201f18;
+}
+.polaroid:hover {
+  transform: scale(1.06) rotate(0deg) translateY(-6px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  z-index: 5;
+}
+.polaroid .caption {
+  font-family: var(--font-devanagari), var(--font-geist), cursive;
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ---- Masking tape strip ---- */
+.tape {
+  position: absolute;
+  width: 76px;
+  height: 24px;
+  background: color-mix(in srgb, var(--accent-warm) 40%, #fff);
+  opacity: 0.7;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* ---- Wiggle on hover (buttons / stickers) ---- */
+.wiggle-hover:hover {
+  animation: wiggle 0.5s ease;
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+/* ---- Magnetic / pop button ---- */
+.pop-btn {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+}
+.pop-btn:hover {
+  transform: translateY(-2px);
+}
+.pop-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ---- Floating flowers footer border ---- */
+.flower-field {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.flower-field .flower {
+  position: absolute;
+  bottom: -2px;
+  transform-origin: bottom center;
+  animation: flower-sway var(--dur, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes flower-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* ---- Gentle rise-in for editorial blocks (fallback if GSAP off) ---- */
+.rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Bento card (warm) ---- */
+.bento {
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.35rem;
+  background: var(--surface);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  will-change: transform;
+}
+.bento:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinwheel-spin,
+  .flower-field .flower,
+  .rise-in {
+    animation: none !important;
+  }
 }

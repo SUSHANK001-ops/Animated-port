@@ -15,11 +15,11 @@ export const THEME_STORAGE_KEY = 'portfolio-theme'
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Initialise from the attribute the no-flash script already set on <html>.
-  const [theme, setThemeState] = useState<Theme>('dark')
+  const [theme, setThemeState] = useState<Theme>('light')
 
   useEffect(() => {
     const current =
-      (document.documentElement.getAttribute('data-theme') as Theme | null) ?? 'dark'
+      (document.documentElement.getAttribute('data-theme') as Theme | null) ?? 'light'
     setThemeState(current)
   }, [])
 
@@ -60,11 +60,11 @@ export const themeInitScript = `
     var k = '${THEME_STORAGE_KEY}';
     var t = localStorage.getItem(k);
     if (t !== 'light' && t !== 'dark') {
-      t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      t = 'light';
     }
     document.documentElement.setAttribute('data-theme', t);
   } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'light');
   }
 })();
 `
