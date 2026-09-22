@@ -486,7 +486,7 @@ const BlogPostClient = () => {
         </aside>
 
         {/* Article */}
-        <article className="min-w-0 max-w-none prose-invert">
+        <article className="min-w-0 max-w-none">
 
           {/* Mobile share row */}
           <div className="lg:hidden mb-8">
@@ -499,23 +499,23 @@ const BlogPostClient = () => {
           <BlogContent content={post.content ?? ''} />
 
           {/* ── Share after content ──────────────────────────────────────────── */}
-          <div className="mt-12 pt-8 border-t border-white/10">
+          <div className="mt-12 pt-8 border-t border-border">
             {pageUrl && (
               <ShareButtons url={pageUrl} title={post.title} />
             )}
           </div>
 
           {/* ── Author card ──────────────────────────────────────────────────── */}
-          <div className="flex items-center gap-5 mt-10 p-6 bg-white/5 border border-white/10 rounded-2xl">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-xl font-bold text-[#0a0c0e] shrink-0">
+          <div className="flex items-center gap-5 mt-10 p-6 bg-surface border border-border rounded-2xl">
+            <div className="w-14 h-14 rounded-full bg-foreground flex items-center justify-center text-xl font-bold text-background shrink-0">
               {initials}
             </div>
             <div>
-              <p className="text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1">
+              <p className="text-[11px] font-bold tracking-widest uppercase text-muted mb-1">
                 Written by
               </p>
-              <p className="text-xl font-bold text-white">{post.author}</p>
-              <p className="text-sm text-gray-400 mt-0.5">Developer &amp; Writer</p>
+              <p className="display-serif text-xl text-foreground">{post.author}</p>
+              <p className="text-sm text-muted mt-0.5">Developer &amp; Writer</p>
             </div>
           </div>
 
@@ -525,7 +525,7 @@ const BlogPostClient = () => {
               {post.tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs text-gray-400 hover:border-emerald-500/40 hover:text-emerald-400 transition-colors cursor-default"
+                  className="px-3 py-1 rounded-md bg-surface border border-border text-xs text-muted hover:border-foreground/40 hover:text-foreground transition-colors cursor-default"
                 >
                   #{tag}
                 </span>
@@ -536,8 +536,8 @@ const BlogPostClient = () => {
           {/* ── Back link ────────────────────────────────────────────────────── */}
           <div className="mt-10">
             <Link
-              href="https://blog.sushanka.com.np/"
-              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-emerald-400 transition-colors"
+              href="/blog"
+              className="group inline-flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
             >
               ← Back to all posts
             </Link>
@@ -548,17 +548,16 @@ const BlogPostClient = () => {
       {/* ── RELATED POSTS ─────────────────────────────────────────────────── */}
       {relatedPosts.length > 0 && (
         <section className="max-w-[1100px] mx-auto px-6 pb-20">
-          <h2 className="text-3xl font-bold text-white mb-7">
-            More in <span className="text-emerald-400">{post.category}</span>
+          <h2 className="display-serif text-3xl text-foreground mb-7">
+            More in <span className="display-serif-italic">{post.category}</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {relatedPosts.map((related, idx) => (
               <Link
                 key={idx}
                 href={`/blog/${related.slug}`}
-                className="group relative flex flex-col gap-3 p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                className="group relative flex flex-col gap-3 p-6 bg-surface border border-border rounded-2xl hover:border-foreground/40 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 {related.image && (
                   <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-1">
                     <Image
@@ -570,16 +569,16 @@ const BlogPostClient = () => {
                     />
                   </div>
                 )}
-                <span className="text-[11px] font-bold tracking-widest uppercase text-emerald-400">
+                <span className="text-[11px] font-bold tracking-widest uppercase text-link">
                   {related.category}
                 </span>
-                <h3 className="text-lg font-semibold text-white leading-snug">
+                <h3 className="text-lg font-semibold text-foreground leading-snug">
                   {related.title}
                 </h3>
-                <p className="text-[13px] text-gray-500 mt-auto">
+                <p className="text-[13px] text-muted mt-auto">
                   {related.dateposted} · {related.timeToRead} min read
                 </p>
-                <span className="text-emerald-400 text-lg opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+                <span className="arrow-slide text-foreground text-lg">
                   →
                 </span>
               </Link>
