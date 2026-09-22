@@ -1,87 +1,109 @@
 'use client'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import gsap from 'gsap'
-import { Github, Linkedin, Instagram, Mail } from 'lucide-react'
-import { identity, socials } from '@/data/config'
-
-const socialIcon: Record<string, React.ElementType> = {
-  GitHub: Github,
-  LinkedIn: Linkedin,
-  Instagram: Instagram,
-  Email: Mail,
-}
+import { identity } from '@/data/config'
+import NptClock from '../../ui/delight/NptClock'
 
 const Hero = () => {
   const rootRef = useRef<HTMLElement>(null)
+  const [hover, setHover] = useState(false)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         '[data-hero]',
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' }
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.09, ease: 'power3.out' }
       )
     }, rootRef)
     return () => ctx.revert()
   }, [])
 
   return (
-    <section ref={rootRef} className="editorial pt-28 pb-6 md:pt-32">
+    <section ref={rootRef} className="editorial-page pt-32 md:pt-36">
       <div className="flex items-start justify-between gap-6">
         <div className="min-w-0">
-          <h1 data-hero className="serif-title serif-hero">
-            {identity.name}
+          {/* Handle that morphs to the real name on hover */}
+          <h1
+            data-hero
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            className="display-serif inline-block cursor-default text-4xl text-foreground md:text-5xl"
+          >
+            <span className="relative inline-block overflow-hidden align-bottom">
+              <span
+                className="block transition-all duration-300"
+                style={{
+                  transform: hover ? 'translateY(-100%)' : 'translateY(0)',
+                  opacity: hover ? 0 : 1,
+                }}
+              >
+                @{identity.githubUsername.toLowerCase()}
+              </span>
+              <span
+                className="absolute inset-0 block transition-all duration-300"
+                style={{
+                  transform: hover ? 'translateY(0)' : 'translateY(100%)',
+                  opacity: hover ? 1 : 0,
+                }}
+              >
+                {identity.name}
+              </span>
+            </span>
           </h1>
-          <p data-hero className="mt-1.5 text-sm text-muted">
+          <p data-hero className="mt-2 text-sm text-muted">
             {identity.role}
           </p>
+
+          {/* Short crafted bio */}
           <p
             data-hero
-            className="mt-5 max-w-xl text-[1.02rem] leading-relaxed text-foreground/80"
+            className="mt-5 max-w-md text-[0.975rem] leading-relaxed text-foreground/80"
           >
-            I craft{' '}
+            I build{' '}
             <span className="marker-underline font-medium text-foreground">
-              minimal and functional
+              cloud infrastructure and web apps
             </span>{' '}
-            cloud infrastructure and web apps. Focused on clean design, reliable
-            deploys, and building with modern tools.
+            from {identity.location} — clean design, reliable deploys, and
+            things that keep running while you sleep.
           </p>
 
-          {/* Socials */}
-          <div data-hero className="mt-6 flex items-center gap-1">
-            {socials.map((s) => {
-              const Icon = socialIcon[s.label] ?? Github
-              return (
-                <a
-                  key={s.label}
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-click-sound
-                  aria-label={s.label}
-                  className="pop-btn rounded-full p-2 text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-                >
-                  <Icon size={17} />
-                </a>
-              )
-            })}
+          {/* Availability + live clock */}
+          <div data-hero className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted">
+              <span className="pulse-dot relative inline-block h-1.5 w-1.5 rounded-full bg-c-green" />
+              {identity.availability}
+            </span>
+            <NptClock variant="inline" />
           </div>
         </div>
 
-        {/* Avatar */}
-        <div data-hero className="shrink-0">
-          <div className="relative">
+        {/* Character avatar (bobbing) + waving GIF */}
+        <div data-hero className="relative hidden shrink-0 sm:block">
+          <div className="avatar-bob relative">
             <Image
               src={identity.profileImage}
               alt={identity.name}
-              width={92}
-              height={92}
-              className="h-20 w-20 rounded-2xl object-cover ring-1 ring-border md:h-23 md:w-23"
-              style={{ width: 92, height: 92 }}
+              width={104}
+              height={104}
+              className="rounded-2xl object-cover ring-1 ring-border"
+              style={{ width: 104, height: 104 }}
             />
-            <span className="pulse-dot absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-c-green" />
+            <span className="absolute -bottom-2 -right-2 grid h-8 w-8 place-items-center rounded-full border border-border bg-surface text-base shadow-sm">
+              {identity.locationFlag}
+            </span>
           </div>
+          {/* waving sticker */}
+          <Image
+            src="/stickers/wave.gif"
+            alt=""
+            width={44}
+            height={44}
+            unoptimized
+            className="absolute -left-8 -top-4 select-none"
+            style={{ width: 44, height: 44 }}
+          />
         </div>
       </div>
     </section>

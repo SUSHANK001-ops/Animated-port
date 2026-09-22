@@ -433,13 +433,13 @@ body {
 /* ---- Floating flowers footer border ---- */
 .flower-field {
   position: relative;
-  height: 64px;
+  height: 88px;
   overflow: hidden;
   pointer-events: none;
 }
 .flower-field .flower {
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   transform-origin: bottom center;
   animation: flower-sway var(--dur, 4s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
