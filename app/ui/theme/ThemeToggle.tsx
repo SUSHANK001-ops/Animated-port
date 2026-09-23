@@ -12,7 +12,7 @@ const ThemeToggle = () => {
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
-      className="relative flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent/50 hover:text-foreground"
+      className="relative flex h-8 w-8 items-center justify-center rounded-full text-muted transition-all hover:bg-foreground/8 hover:text-foreground active:scale-90"
       data-click-sound
     >
       <Sun

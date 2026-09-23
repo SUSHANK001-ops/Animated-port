@@ -12,10 +12,10 @@ interface PinwheelProps {
  */
 const Pinwheel = ({ size = 96, className = '' }: PinwheelProps) => {
   const blades = [
-    { rot: 0, fill: 'var(--accent)' },
-    { rot: 90, fill: 'var(--accent-secondary)' },
-    { rot: 180, fill: 'var(--accent-warm)' },
-    { rot: 270, fill: 'var(--accent-secondary)' },
+    { rot: 0, fill: 'var(--c-red)' },
+    { rot: 90, fill: 'var(--c-blue)' },
+    { rot: 180, fill: 'var(--c-green)' },
+    { rot: 270, fill: 'var(--c-yellow)' },
   ]
 
   return (

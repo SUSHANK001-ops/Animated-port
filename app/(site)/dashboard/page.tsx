@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-4xl px-5 pt-32 pb-24 md:pt-40">
-      <p className="eyebrow mb-3">Live</p>
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+    <div className="mx-auto max-w-4xl px-5 pt-32 pb-24 md:pt-36">
+      <p className="eyebrow eyebrow-dot mb-3">Live</p>
+      <h1 className="display-serif text-4xl text-foreground md:text-5xl">
         Dashboard
       </h1>
       <p className="mt-4 max-w-xl text-[0.975rem] leading-relaxed text-muted">

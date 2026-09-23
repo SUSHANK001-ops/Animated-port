@@ -11,7 +11,7 @@ const SoundToggle = () => {
       onClick={toggle}
       aria-label={enabled ? 'Mute click sounds' : 'Enable click sounds'}
       title={enabled ? 'Mute click sounds' : 'Enable click sounds'}
-      className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-accent/50 hover:text-foreground"
+      className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition-all hover:bg-foreground/8 hover:text-foreground active:scale-90"
     >
       {enabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
     </button>

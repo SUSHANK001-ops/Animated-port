@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function GuestbookPage() {
   return (
-    <div className="editorial pt-32 md:pt-40">
-      <p className="eyebrow mb-3">Sign in</p>
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+    <div className="editorial-page pt-32 md:pt-36">
+      <p className="eyebrow eyebrow-dot mb-3">Sign in</p>
+      <h1 className="display-serif text-4xl text-foreground md:text-5xl">
         Guestbook
       </h1>
       <p className="mt-4 text-[0.975rem] leading-relaxed text-muted">
