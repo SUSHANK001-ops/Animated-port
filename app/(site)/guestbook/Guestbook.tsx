@@ -195,8 +195,8 @@ const Guestbook = () => {
     if (!file) return
     setUploading(true)
     try {
-      const url = await uploadFile(file)
-      if (url) setEditImage(url)
+      const uploaded = await uploadFile(file)
+      if (uploaded) setEditImage(uploaded.url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed.')
     } finally {
