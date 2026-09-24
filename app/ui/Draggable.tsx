@@ -9,10 +9,9 @@ interface DraggableProps {
 }
 
 /**
- * Pointer-based draggable wrapper — no library. While held, the element
- * switches to a fixed overlay so it can be dragged ANYWHERE on the page
- * (it escapes any parent with overflow:hidden). Releases back into flow
- * at its dragged offset. Respects reduced-motion by skipping the spring.
+ * Pointer-based draggable wrapper — no library. The element can be dragged
+ * anywhere within the viewport; it springs a subtle scale while held.
+ * Respects reduced-motion by simply being draggable without extra flourish.
  */
 const Draggable = ({ children, className = '', rotate = 0 }: DraggableProps) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -54,12 +53,12 @@ const Draggable = ({ children, className = '', rotate = 0 }: DraggableProps) => 
       style={{
         transform: `translate(${pos.x}px, ${pos.y}px) rotate(${rotate}deg) scale(${dragging ? 1.08 : 1})`,
         transition: dragging ? 'none' : 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-        // Always float above other cards; jump even higher while dragging.
-        zIndex: dragging ? 9999 : 50,
+        // Always float above sibling cards so it never hides beneath them.
         position: 'relative',
+        zIndex: dragging ? 9999 : 30,
         willChange: 'transform',
       }}
-      title="Drag me anywhere"
+      title="Drag me"
     >
       {children}
     </div>

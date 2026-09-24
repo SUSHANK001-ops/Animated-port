@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react'
 import { identity, currentlyLearning, photos } from '@/data/config'
 import { Block } from '../../ui/editorial'
 import Draggable from '../../ui/Draggable'
@@ -17,12 +17,10 @@ const primaryTools = [
   { src: '/tech/nextjs.svg', label: 'Next.js' },
 ]
 
-/**
- * Colourful bento mosaic — the manishtamang.com "About" grid, populated
- * with this site's real identity. Colour lives here (soft gradient tiles),
- * while the rest of the page stays quiet monochrome. Cards stagger in on
- * scroll (80ms each) via the .bento-stagger CSS + an in-view observer.
- */
+// Name split across two lines like the reference note.
+const [nameLine1, ...nameRest] = identity.name.split(' ')
+const nameLine2 = nameRest.join(' ')
+
 const AboutBento = () => {
   const photo = photos[0]
   const gridRef = useRef<HTMLDivElement>(null)
@@ -49,16 +47,16 @@ const AboutBento = () => {
       <Block label="About" title="A little about me">
         <div
           ref={gridRef}
-          className={`bento-stagger grid grid-cols-2 gap-3 md:grid-cols-4 ${
+          className={`bento-stagger grid grid-cols-2 gap-3 md:grid-cols-3 md:auto-rows-[168px] ${
             inView ? 'in-view' : ''
           }`}
         >
-          {/* Sticky-note / intro card with a DRAGGABLE name note.
-              tile-open lets the note roam the whole page without being clipped. */}
-          <div className="tile tile-open tile-blue col-span-2 flex min-h-[180px] flex-col justify-between">
+          {/* Blue note card — draggable name note. tile-open + high z so the
+              note is never clipped or hidden beneath sibling cards. */}
+          <div className="tile tile-open tile-blue relative z-30 col-span-1 flex min-h-[160px] flex-col justify-between md:col-span-1">
             <Draggable rotate={-5} className="w-fit">
               <div
-                className="relative px-5 py-5 shadow-lg"
+                className="relative px-5 py-4"
                 style={{
                   background: '#fffdf5',
                   boxShadow: '0 10px 24px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.10)',
@@ -66,59 +64,74 @@ const AboutBento = () => {
               >
                 {/* pin */}
                 <span className="absolute -top-2 left-4 h-3.5 w-3.5 rounded-full bg-c-green shadow-md ring-2 ring-white/70" />
-                <p className="font-devanagari text-lg font-medium leading-snug text-[#2a2620]">
-                  {identity.name}
+                <p className="font-devanagari text-[1.05rem] font-medium leading-tight text-[#2a2620]">
+                  {nameLine1}
+                  <br />
+                  {nameLine2}
                 </p>
-                <p className="mt-1 text-[0.68rem] text-[#8a8378]">drag me anywhere ✦</p>
+                <p className="mt-1 text-[0.66rem] text-[#8a8378]">drag me anywhere ✦</p>
               </div>
             </Draggable>
             <Link
               href="/about"
               data-click-sound
-              className="pop-btn mt-3 inline-flex w-fit items-center gap-1.5 self-end rounded-full bg-c-yellow px-4 py-1.5 text-xs font-semibold text-foreground"
+              className="pop-btn inline-flex w-fit items-center gap-1.5 self-end rounded-full bg-c-yellow px-4 py-1.5 text-xs font-semibold text-[#2a2620]"
             >
               About me
             </Link>
           </div>
 
-          {/* Role card */}
-          <div className="tile tile-pink flex flex-col justify-between">
-            <Sparkles size={18} className="text-foreground/60" />
-            <div className="mt-6">
-              <p className="text-sm font-bold tracking-tight text-foreground">{identity.shortRole}</p>
+          {/* Pink role card */}
+          <div className="tile tile-pink flex min-h-[160px] flex-col justify-between">
+            <Sparkles size={18} className="text-foreground/50" />
+            <div>
+              <p className="text-base font-bold leading-tight tracking-tight text-foreground">
+                {identity.shortRole}
+              </p>
               <p className="tile-sub mt-1 text-xs text-foreground/55">& Full-Stack Dev</p>
+              <p className="eyebrow mt-3">Current role</p>
             </div>
           </div>
 
-          {/* Photo card */}
-          <div className="tile relative col-span-1 min-h-[132px] overflow-hidden p-0">
+          {/* Photo card — full width on mobile, spans TWO rows (tall) on md+ like the reference */}
+          <div className="tile relative col-span-2 min-h-[220px] overflow-hidden p-0 md:col-span-1 md:row-span-2 md:min-h-0">
             <Image
               src={photo.src}
               alt={photo.caption}
               fill
-              sizes="180px"
+              sizes="(max-width:768px) 100vw, 240px"
               className="object-cover"
             />
-            <span className="absolute bottom-2 left-2 rounded-md bg-black/45 px-1.5 py-0.5 text-[0.6rem] text-white backdrop-blur-sm">
+            <span className="absolute bottom-2 left-2 rounded-md bg-black/50 px-2 py-0.5 text-[0.62rem] font-medium text-white backdrop-blur-sm">
               {photo.caption}
             </span>
           </div>
 
-          {/* Green welcome card */}
-          <div className="tile tile-green col-span-2 flex flex-col justify-between md:col-span-1">
-            <p className="text-sm font-semibold leading-snug text-foreground">
-              Welcome to my corner of the internet 👋
+          {/* Green welcome card — with a "My journey" link */}
+          <div className="tile tile-green col-span-1 flex min-h-[150px] flex-col justify-between">
+            <p className="text-[0.9rem] font-semibold leading-snug text-foreground">
+              Welcome to my corner of the web — where infrastructure meets craft. 👋
             </p>
-            <p className="tile-sub mt-2 text-xs text-foreground/55">{identity.location}</p>
+            <Link
+              href="/about"
+              data-click-sound
+              className="group/j mt-2 inline-flex w-fit items-center gap-1 text-xs font-semibold text-foreground/70 transition-colors hover:text-foreground"
+            >
+              My journey
+              <ArrowUpRight
+                size={13}
+                className="transition-transform group-hover/j:-translate-y-0.5 group-hover/j:translate-x-0.5"
+              />
+            </Link>
           </div>
 
-          {/* Now-playing / album card — frosted glass */}
-          <div className="tile tile-frost col-span-2 md:col-span-1">
+          {/* Recent favorite / now-playing — same single-cell size as the pink card above it */}
+          <div className="tile tile-frost col-span-1 min-h-[150px]">
             <SpotifyNowPlaying bare />
           </div>
 
-          {/* Currently learning — wide brown card with vector-icon toolbar */}
-          <div className="tile tile-brown col-span-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-center md:col-span-4">
+          {/* Constantly learning — wide brown card, full width */}
+          <div className="tile tile-brown col-span-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-center md:col-span-3">
             <div>
               <p className="text-base font-bold tracking-tight">Constantly learning</p>
               <p className="tile-sub mt-1.5 max-w-md text-xs leading-relaxed">

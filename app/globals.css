@@ -724,6 +724,38 @@ body {
   overflow: visible;
 }
 
+/* ---- Spotify vinyl disk (peeks out behind album art, spins on hover) ---- */
+.disk {
+  border-radius: 9999px;
+  background:
+    repeating-radial-gradient(circle at 50% 50%,
+      #1a1a1a 0, #1a1a1a 1.5px, #2b2b2b 1.5px, #2b2b2b 3px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: left 0.35s ease-out, transform 0.35s ease-out;
+  animation: disk-spin 3s linear infinite;
+  animation-play-state: paused;
+}
+.disk::after {
+  content: "";
+  position: absolute;
+  inset: 40%;
+  border-radius: 9999px;
+  background: var(--c-red);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+/* On card hover the disk slides out to the right of the art (within its
+   own clipped box, so it never covers the track text) and starts spinning. */
+.group\/spotify:hover .disk {
+  left: 22px;
+  animation-play-state: running;
+}
+@keyframes disk-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .disk { animation: none !important; }
+}
+
 /* ---- Bento stagger fade-in-up (each child delays by 80ms) ---- */
 .bento-stagger > * {
   opacity: 0;
