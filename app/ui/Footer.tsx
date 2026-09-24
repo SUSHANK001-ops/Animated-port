@@ -69,8 +69,8 @@ function FooterLink({ item }: { item: FLink }) {
 
 const Footer = () => {
   return (
-    <footer className="relative mt-20">
-      <div className="editorial-page pt-10 pb-8">
+    <footer className="relative border-t border-border/60">
+      <div className="editorial-page pt-12 pb-8">
         {/* Link columns */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
           {columns.map((col, i) => (

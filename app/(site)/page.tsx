@@ -38,7 +38,7 @@ export default function HomePage() {
       <Experience />
       <Divider />
       <CertificationsTeaser />
-      <div className="pb-24" />
+      <div className="pb-12" />
     </>
   )
 }

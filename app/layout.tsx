@@ -107,6 +107,12 @@ export default function RootLayout({
         <link rel="canonical" href="https://sushanka.com.np" />
         {/* Set theme before paint to avoid a flash of the wrong theme. */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* Umami analytics — privacy-friendly, cookieless page view tracking. */}
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="33496c24-217f-414d-8213-f9b51c8575bf"
+        />
       </head>
 
       <body

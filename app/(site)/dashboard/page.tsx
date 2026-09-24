@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-4xl px-5 pt-32 pb-24 md:pt-36">
+    <div className="mx-auto max-w-4xl px-5 pt-32 pb-16 md:pt-36">
       <p className="eyebrow eyebrow-dot mb-3">Live</p>
       <h1 className="display-serif text-4xl text-foreground md:text-5xl">
         Dashboard

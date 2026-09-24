@@ -253,7 +253,7 @@ const Guestbook = ({ providers }: GuestbookProps) => {
   }
 
   return (
-    <div className="pb-24">
+    <div className="pb-16">
       {showLimit && <LimitPopup onClose={() => setShowLimit(false)} />}
 
       {/* Compose / auth area */}

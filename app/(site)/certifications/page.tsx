@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function CertificationsPage() {
   return (
-    <div className="editorial-page pt-32 pb-24 md:pt-36">
+    <div className="editorial-page pt-32 pb-16 md:pt-36">
       <p className="eyebrow eyebrow-dot mb-3">Certified</p>
       <h1 className="display-serif text-4xl text-foreground md:text-5xl">
         Certifications
