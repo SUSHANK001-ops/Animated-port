@@ -41,7 +41,10 @@ export async function POST(req: NextRequest) {
 export async function GET() {
     try {
         await connectDB();
-        const blogs = await BlogModel.find().sort({ dateposted: -1 });
+        // Public endpoint: only published posts, newest first.
+        // `published` may be missing on older docs — treat missing as published.
+        const blogs = await BlogModel.find({ published: { $ne: false } })
+            .sort({ dateposted: -1, createdAt: -1 });
         return NextResponse.json({ blogs }, { status: 200 })
     } catch (error) {
         console.error("Error fetching blog posts:", error)

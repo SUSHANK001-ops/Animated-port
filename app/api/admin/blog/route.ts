@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       category,
       author,
       content,
+      published,
     } = body;
 
     if (
@@ -84,6 +85,8 @@ export async function POST(req: NextRequest) {
       category,
       author,
       content,
+      published: published !== false, // default to published unless explicitly false
+      dateposted: new Date(),
     });
 
     return NextResponse.json(

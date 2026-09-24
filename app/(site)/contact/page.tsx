@@ -1,21 +1,13 @@
 import React from 'react'
 import type { Metadata } from 'next'
-import { Mail, MapPin, Github, Linkedin, Instagram, Send, ArrowUpRight } from 'lucide-react'
-import { identity, socials } from '@/data/config'
+import { Send } from 'lucide-react'
+import { identity } from '@/data/config'
 import ContactForm from './ContactForm'
 import LocalTimeNote from './LocalTimeNote'
 
 export const metadata: Metadata = {
   title: 'Contact · Sushanka Lamichhane',
   description: 'Get in touch for projects, collaboration, or remote work.',
-}
-
-/** Map a social label to its icon. */
-const socialIcon: Record<string, React.ElementType> = {
-  GitHub: Github,
-  LinkedIn: Linkedin,
-  Instagram: Instagram,
-  Email: Mail,
 }
 
 export default function ContactPage() {
@@ -31,9 +23,8 @@ export default function ContactPage() {
       </p>
       <LocalTimeNote />
 
-
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-        {/* Form card */}
+      {/* Single-column form card */}
+      <div className="mt-12">
         <div className="rounded-2xl border border-border bg-surface p-6 md:p-8">
           <div className="mb-6 flex items-center gap-2 text-muted">
             <Send size={15} />
@@ -42,70 +33,17 @@ export default function ContactPage() {
           <ContactForm />
         </div>
 
-        {/* Info sidebar */}
-        <aside className="flex flex-col gap-4">
-          {/* Email */}
+        {/* Direct email line */}
+        <div className="mt-10 text-center">
+          <p className="text-sm text-muted">You can also reach me directly at</p>
           <a
             href={`mailto:${identity.email}`}
             data-click-sound
-            className="group flex items-start gap-3 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-accent/40"
+            className="mt-1 inline-block text-[0.975rem] font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent/50"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-muted transition-colors group-hover:border-accent/40 group-hover:text-accent">
-              <Mail size={16} />
-            </span>
-            <div className="min-w-0">
-              <p className="eyebrow mb-1">Email</p>
-              <p className="truncate text-sm text-foreground transition-colors group-hover:text-accent">
-                {identity.email}
-              </p>
-            </div>
+            {identity.email}
           </a>
-
-          {/* Location */}
-          <div className="flex items-start gap-3 rounded-2xl border border-border bg-surface p-5">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-muted">
-              <MapPin size={16} />
-            </span>
-            <div>
-              <p className="eyebrow mb-1">Location</p>
-              <p className="text-sm text-foreground">
-                {identity.location} {identity.locationFlag}
-              </p>
-              <p className="mt-1 text-xs text-muted">{identity.availability}</p>
-            </div>
-          </div>
-
-          {/* Connect */}
-          <div className="rounded-2xl border border-border bg-surface p-5">
-            <p className="eyebrow mb-3">Connect</p>
-            <ul className="space-y-1">
-              {socials.map((s) => {
-                const Icon = socialIcon[s.label] ?? ArrowUpRight
-                const external = !s.url.startsWith('mailto:')
-                return (
-                  <li key={s.label}>
-                    <a
-                      href={s.url}
-                      target={external ? '_blank' : undefined}
-                      rel={external ? 'noopener noreferrer' : undefined}
-                      data-click-sound
-                      className="group flex items-center justify-between rounded-lg px-2 py-2 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <Icon size={15} className="text-muted transition-colors group-hover:text-foreground" />
-                        {s.label}
-                      </span>
-                      <ArrowUpRight
-                        size={14}
-                        className="opacity-0 transition-opacity group-hover:opacity-100"
-                      />
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        </aside>
+        </div>
       </div>
     </div>
   )
