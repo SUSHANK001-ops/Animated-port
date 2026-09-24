@@ -34,9 +34,24 @@ interface SpotifyTrack {
   url: string | null
 }
 
+/**
+ * Small in-memory access-token cache. Spotify access tokens live ~1h, so we
+ * reuse one across requests instead of hitting the token endpoint every poll.
+ */
+let cachedToken: { value: string; expiresAt: number } | null = null
+
 async function getAccessToken(): Promise<string | null> {
   const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REFRESH_TOKEN } = process.env
   if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET || !SPOTIFY_REFRESH_TOKEN) return null
+
+  // A refresh token is a long opaque string. A stray placeholder like "180"
+  // can never work, so skip the network round-trip and report unconfigured.
+  if (SPOTIFY_REFRESH_TOKEN.length < 20) return null
+
+  // Reuse a still-valid cached token (60s safety margin).
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
+    return cachedToken.value
+  }
 
   const basic = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString('base64')
   const res = await fetch(TOKEN_URL, {
@@ -51,9 +66,18 @@ async function getAccessToken(): Promise<string | null> {
     }),
     cache: 'no-store',
   })
-  if (!res.ok) return null
+  if (!res.ok) {
+    cachedToken = null
+    return null
+  }
   const data = await res.json()
-  return data.access_token ?? null
+  if (!data.access_token) return null
+
+  cachedToken = {
+    value: data.access_token,
+    expiresAt: Date.now() + (Number(data.expires_in) || 3600) * 1000,
+  }
+  return cachedToken.value
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

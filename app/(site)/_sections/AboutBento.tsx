@@ -47,7 +47,7 @@ const AboutBento = () => {
       <Block label="About" title="A little about me">
         <div
           ref={gridRef}
-          className={`bento-stagger grid grid-cols-2 gap-3 md:grid-cols-3 md:auto-rows-[168px] ${
+          className={`bento-stagger grid grid-cols-2 gap-3 md:grid-cols-3 md:auto-rows-[176px] ${
             inView ? 'in-view' : ''
           }`}
         >
@@ -93,14 +93,15 @@ const AboutBento = () => {
             </div>
           </div>
 
-          {/* Photo card — full width on mobile, spans TWO rows (tall) on md+ like the reference */}
-          <div className="tile relative col-span-2 min-h-[220px] overflow-hidden p-0 md:col-span-1 md:row-span-2 md:min-h-0">
+          {/* Photo card — full width on mobile with a tall portrait aspect so the
+              whole image is visible; spans TWO rows on md+ like the reference. */}
+          <div className="tile relative col-span-2 aspect-[4/5] overflow-hidden p-0 sm:aspect-[3/2] md:col-span-1 md:row-span-2 md:aspect-auto md:min-h-0">
             <Image
               src={photo.src}
               alt={photo.caption}
               fill
               sizes="(max-width:768px) 100vw, 240px"
-              className="object-cover"
+              className="object-cover object-[center_25%]"
             />
             <span className="absolute bottom-2 left-2 rounded-md bg-black/50 px-2 py-0.5 text-[0.62rem] font-medium text-white backdrop-blur-sm">
               {photo.caption}
