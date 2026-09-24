@@ -88,6 +88,7 @@ const Guestbook = () => {
 
   // Compose image
   const [imageUrl, setImageUrl] = useState('')
+  const [imagePublicId, setImagePublicId] = useState('')
   const [uploading, setUploading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -108,14 +109,14 @@ const Guestbook = () => {
 
   useEffect(load, [])
 
-  /** Upload a file to the guestbook uploader, returns the hosted URL. */
-  const uploadFile = async (file: File): Promise<string | null> => {
+  /** Upload a file to the guestbook uploader, returns url + publicId. */
+  const uploadFile = async (file: File): Promise<{ url: string; publicId?: string } | null> => {
     const fd = new FormData()
     fd.append('file', file)
     const res = await fetch('/api/guestbook/upload', { method: 'POST', body: fd })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Upload failed.')
-    return data.url as string
+    return { url: data.url as string, publicId: data.publicId as string | undefined }
   }
 
   const onPickImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,8 +125,11 @@ const Guestbook = () => {
     setError('')
     setUploading(true)
     try {
-      const url = await uploadFile(file)
-      if (url) setImageUrl(url)
+      const uploaded = await uploadFile(file)
+      if (uploaded) {
+        setImageUrl(uploaded.url)
+        setImagePublicId(uploaded.publicId ?? '')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed.')
     } finally {
@@ -146,7 +150,12 @@ const Guestbook = () => {
       const res = await fetch('/api/guestbook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, website, image: imageUrl || undefined }),
+        body: JSON.stringify({
+          message,
+          website,
+          image: imageUrl || undefined,
+          imagePublicId: imagePublicId || undefined,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -161,6 +170,7 @@ const Guestbook = () => {
       else load()
       setMessage('')
       setImageUrl('')
+      setImagePublicId('')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to post message.')
     } finally {
@@ -302,7 +312,10 @@ const Guestbook = () => {
               {imageUrl && (
                 <button
                   type="button"
-                  onClick={() => setImageUrl('')}
+                  onClick={() => {
+                    setImageUrl('')
+                    setImagePublicId('')
+                  }}
                   className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-foreground text-background shadow"
                   aria-label="Remove image"
                 >
