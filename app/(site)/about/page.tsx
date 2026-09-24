@@ -30,28 +30,28 @@ export default function AboutPage() {
     <div className="editorial-page pt-32 pb-24 md:pt-36">
       <p className="eyebrow eyebrow-dot mb-3">About</p>
 
-      <div className="flex items-start justify-between gap-6">
-        <div className="min-w-0">
-          <h1 className="display-serif text-4xl text-foreground md:text-5xl">{identity.name}</h1>
-          <p className="mt-2 text-sm text-muted">{identity.role}</p>
-          <p className="mt-5 max-w-md text-[0.975rem] leading-relaxed text-foreground/80">
-            Hi, I&apos;m {identity.name.split(' ')[0]} from {identity.location}, where I{' '}
-            <span className="marker-underline font-medium text-foreground">
-              craft, break, and rebuild the internet
-            </span>{' '}
-            one deploy at a time.
-          </p>
-        </div>
-        <div className="hidden shrink-0 sm:block">
-          <Pinwheel size={96} />
-        </div>
+      <div>
+        <h1 className="display-serif text-4xl text-foreground md:text-5xl">{identity.name}</h1>
+        <p className="mt-2 text-sm text-muted">{identity.role}</p>
+        <p className="mt-5 max-w-md text-[0.975rem] leading-relaxed text-foreground/80">
+          Hi, I&apos;m {identity.name.split(' ')[0]} from {identity.location}, where I{' '}
+          <span className="marker-underline font-medium text-foreground">
+            craft, break, and rebuild the internet
+          </span>{' '}
+          one deploy at a time.
+        </p>
       </div>
 
-      {/* Bio */}
-      <div className="prose-calm mt-8 space-y-4">
-        {identity.bio.map((line, i) => (
-          <p key={i}>{line}</p>
-        ))}
+      {/* Bio — with the origami shuriken sitting lower, beside the text */}
+      <div className="mt-8 flex items-start justify-between gap-6">
+        <div className="prose-calm space-y-4">
+          {identity.bio.map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+        <div className="hidden shrink-0 pt-2 sm:block">
+          <Pinwheel size={104} />
+        </div>
       </div>
 
       {/* Socials + résumé */}

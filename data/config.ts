@@ -60,7 +60,7 @@ export const identity = {
   shortRole: 'DevOps Engineer',
   location: 'Pokhara, Nepal',
   locationFlag: '🇳🇵',
-  education: 'BSc IT · Infomax College',
+  education: 'BSc IT · Asia Pacific University',
   availability: 'Available for remote work',
   heroLines: ['DEVOPS', 'ENGINEER', '&', 'DEVELOPER'],
   heroTagline:
@@ -277,10 +277,10 @@ export const experience: ExperienceEntry[] = [
   },
   {
     role: 'BSc IT',
-    company: 'Infomax College',
+    company: 'Asia Pacific University',
     date: '2024 – 2028 (Expected)',
     description:
-      'Pursuing a Bachelor\'s degree in Information Technology with a focus on programming, data structures, algorithms, and software engineering.',
+      'Pursuing a Bachelor\'s degree in Information Technology at Asia Pacific University, with a focus on programming, data structures, algorithms, and software engineering.',
   },
 ]
 

@@ -1113,3 +1113,34 @@ a:hover > .arrow-slide { transform: translateX(3px); }
   .vinyl, .spin-badge { animation: none !important; }
   .reveal { opacity: 1; transform: none; transition: none; }
 }
+
+/* ---- Origami shuriken (folded paper star) ---- */
+.origami-spin {
+  transform-origin: 50% 50%;
+  animation: origami-turn 7s linear infinite;
+}
+.group:hover .origami-spin {
+  animation-duration: 1.6s;
+}
+@keyframes origami-turn {
+  to { transform: rotate(360deg); }
+}
+/* Each point folds in on hover, staggered — the "build the paper" effect. */
+.origami-point {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.group:hover .origami-point {
+  animation: origami-fold 0.9s ease-out;
+  animation-delay: calc(var(--i) * 90ms);
+}
+@keyframes origami-fold {
+  0% { transform: scaleX(0.15) scaleY(0.6); opacity: 0.4; }
+  60% { transform: scaleX(1.08) scaleY(1.04); opacity: 1; }
+  100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .origami-spin { animation: none !important; }
+  .group:hover .origami-point { animation: none !important; }
+}
