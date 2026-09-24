@@ -1,0 +1,172 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Eye, EyeOff, Trash2, Loader2, RefreshCw } from "lucide-react";
+
+interface Entry {
+  _id: string;
+  name: string;
+  message: string;
+  avatar?: string;
+  image?: string;
+  userId?: string;
+  isHidden?: boolean;
+  createdAt: string;
+}
+
+export default function AdminGuestbookPage() {
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    fetch("/api/admin/guestbook")
+      .then((r) => r.json())
+      .then((d) => setEntries(d.entries ?? []))
+      .catch(() => setError("Failed to load entries."))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const toggleHide = async (entry: Entry) => {
+    setBusyId(entry._id);
+    try {
+      const res = await fetch(`/api/admin/guestbook/${entry._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isHidden: !entry.isHidden }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed.");
+      setEntries((prev) =>
+        prev.map((e) => (e._id === entry._id ? { ...e, isHidden: data.isHidden } : e))
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed.");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const remove = async (entry: Entry) => {
+    if (!confirm(`Delete ${entry.name}'s message permanently? Its photo will also be removed.`)) return;
+    setBusyId(entry._id);
+    try {
+      const res = await fetch(`/api/admin/guestbook/${entry._id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed.");
+      setEntries((prev) => prev.filter((e) => e._id !== entry._id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed.");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Guestbook Moderation</h1>
+          <p className="mt-1 text-sm text-white/40">
+            Hide or delete any visitor message. Deleting also removes its photo.
+          </p>
+        </div>
+        <button
+          onClick={load}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm text-white/70 transition-colors hover:text-white"
+        >
+          <RefreshCw size={15} /> Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center gap-2 text-white/50">
+          <Loader2 size={16} className="animate-spin" /> Loading…
+        </div>
+      ) : entries.length === 0 ? (
+        <p className="text-sm text-white/50">No guestbook entries yet.</p>
+      ) : (
+        <ul className="space-y-3">
+          {entries.map((entry) => (
+            <li
+              key={entry._id}
+              className={`rounded-xl border p-4 transition-colors ${
+                entry.isHidden
+                  ? "border-white/5 bg-white/[0.01] opacity-60"
+                  : "border-white/10 bg-white/[0.03]"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {entry.avatar && (
+                      <img
+                        src={entry.avatar}
+                        alt=""
+                        className="h-6 w-6 rounded-full"
+                      />
+                    )}
+                    <span className="text-sm font-semibold text-white">{entry.name}</span>
+                    {entry.isHidden && (
+                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white/50">
+                        Hidden
+                      </span>
+                    )}
+                    <span className="text-xs text-white/30">
+                      {new Date(entry.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-white/70">{entry.message}</p>
+                  {entry.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={entry.image}
+                      alt="attachment"
+                      className="mt-3 h-24 w-auto rounded-lg border border-white/10 object-cover"
+                    />
+                  )}
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    onClick={() => toggleHide(entry)}
+                    disabled={busyId === entry._id}
+                    title={entry.isHidden ? "Show" : "Hide"}
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-white/60 transition-colors hover:text-white disabled:opacity-50"
+                  >
+                    {busyId === entry._id ? (
+                      <Loader2 size={15} className="animate-spin" />
+                    ) : entry.isHidden ? (
+                      <Eye size={15} />
+                    ) : (
+                      <EyeOff size={15} />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => remove(entry)}
+                    disabled={busyId === entry._id}
+                    title="Delete permanently"
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-red-500/30 text-red-400 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

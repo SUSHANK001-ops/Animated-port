@@ -1,79 +1,113 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { identity, nepaliQuote, socials } from '@/data/config'
-import { useGsapReveal } from './useGsapReveal'
+import Image from 'next/image'
+import {
+  User, LayoutDashboard, FileText, Sparkles,
+  MessageSquare, Mail, BookOpen, Wrench,
+  FolderGit2, Image as ImageIcon, MessageCircle, BarChart3,
+  Instagram, Github, Linkedin, Rss,
+} from 'lucide-react'
+import { identity, nepaliQuote } from '@/data/config'
+import SpinBadge from './delight/SpinBadge'
+import NptClock from './delight/NptClock'
 
-const footerLinks = [
-  { label: 'About', href: '/about' },
-  { label: 'Projects', href: '/projects' },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Guestbook', href: '/guestbook' },
-  { label: 'Contact', href: '/contact' },
+interface FLink {
+  label: string
+  href: string
+  icon: React.ElementType
+  external?: boolean
+}
+
+const columns: FLink[][] = [
+  [
+    { label: 'About', href: '/about', icon: User },
+    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { label: 'Certifications', href: '/certifications', icon: FileText },
+    { label: 'Home', href: '/', icon: Sparkles },
+  ],
+  [
+    { label: 'Guestbook', href: '/guestbook', icon: MessageSquare },
+    { label: 'Contact', href: '/contact', icon: Mail },
+    { label: 'Blog', href: '/blog', icon: BookOpen },
+    { label: 'Projects', href: '/projects', icon: Wrench },
+  ],
+  [
+    { label: 'Projects', href: '/projects', icon: FolderGit2 },
+    { label: 'GitHub', href: 'https://github.com/SUSHANK001-ops', icon: ImageIcon, external: true },
+    { label: 'Feedback', href: '/guestbook', icon: MessageCircle },
+    { label: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+  ],
+  [
+    { label: 'Instagram', href: 'https://www.instagram.com/the_sushank_lamichhane/', icon: Instagram, external: true },
+    { label: 'Blog', href: identity.blogUrl, icon: Rss, external: true },
+    { label: 'GitHub', href: 'https://github.com/SUSHANK001-ops', icon: Github, external: true },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lamichhane--68b754341/', icon: Linkedin, external: true },
+  ],
 ]
 
+function FooterLink({ item }: { item: FLink }) {
+  const Icon = item.icon
+  const cls =
+    'group inline-flex items-center gap-2 text-[0.82rem] text-muted transition-colors hover:text-foreground'
+  const inner = (
+    <>
+      <Icon size={13} className="social-pulse text-muted transition-colors group-hover:text-foreground" />
+      <span className="link-quiet !text-muted group-hover:!text-foreground">{item.label}</span>
+    </>
+  )
+  return item.external ? (
+    <a href={item.href} target="_blank" rel="noopener noreferrer" className={cls}>
+      {inner}
+    </a>
+  ) : (
+    <Link href={item.href} className={cls}>
+      {inner}
+    </Link>
+  )
+}
+
 const Footer = () => {
-  const ctaRef = useGsapReveal<HTMLDivElement>()
-
   return (
-    <footer className="border-t border-border bg-background">
-      {/* CTA */}
-      <div ref={ctaRef} className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32">
-        <h2 className="max-w-4xl text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground md:text-7xl lg:text-8xl">
-          LET&apos;S BUILD
-          <br />
-          SOMETHING.
-        </h2>
-        <Link
-          href="/contact"
-          className="group mt-10 inline-flex items-center gap-3 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-background transition-transform duration-300 hover:scale-[1.02]"
-        >
-          Get in Touch
-          <ArrowRight
-            size={16}
-            className="transition-transform duration-300 group-hover:translate-x-1"
-          />
-        </Link>
-      </div>
-
-      {/* Bottom bar */}
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between md:px-10">
-          <p className="font-mono text-xs text-muted">
-            &copy; {new Date().getFullYear()} {identity.name}. All rights reserved.
-          </p>
-
-          <div className="flex flex-wrap gap-5">
-            {footerLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-xs text-muted transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
-            {socials.map((s) => (
-              <a
-                key={s.label}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted transition-colors hover:text-foreground"
-              >
-                {s.label}
-              </a>
-            ))}
-          </div>
+    <footer className="relative mt-20">
+      <div className="editorial-page pt-10 pb-8">
+        {/* Link columns */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
+          {columns.map((col, i) => (
+            <ul key={i} className="space-y-3">
+              {col.map((item, j) => (
+                <li key={`${i}-${j}`}>
+                  <FooterLink item={item} />
+                </li>
+              ))}
+            </ul>
+          ))}
         </div>
 
         {/* Nepali quote */}
-        <div className="mx-auto max-w-7xl px-6 pb-8 md:px-10">
+        <div className="mt-10 border-t border-border pt-6">
           <p className="font-devanagari text-sm text-foreground/70">{nepaliQuote.text}</p>
-          <p className="font-mono text-xs text-muted">{nepaliQuote.translation}</p>
+          <p className="mt-1 text-xs text-muted">{nepaliQuote.translation}</p>
+        </div>
+
+        {/* Name + year · local time */}
+        <div className="mt-6 flex items-center justify-between">
+          <p className="font-mono text-xs text-muted">
+            {identity.name} &copy; {new Date().getFullYear()}
+          </p>
+          <NptClock variant="inline" />
         </div>
       </div>
+
+      {/* Flower image border + spinning badge */}
+      {/* <div className="relative">
+        <div className="relative h-24 w-full overflow-hidden md:h-28">
+          
+        </div>
+        <div className="absolute bottom-3 right-4 z-10 hidden sm:block">
+          <SpinBadge size={68} />
+        </div>
+      </div> */}
     </footer>
   )
 }

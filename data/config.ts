@@ -20,6 +20,10 @@ export interface Project {
   deployedOn?: string[]
   liveUrl?: string
   githubUrl?: string
+  /** Optional thumbnail (drop images in /public). Falls back to a placeholder. */
+  image?: string
+  /** Short one-line tagline shown in the featured list. */
+  tagline?: string
 }
 
 export interface Service {
@@ -56,7 +60,7 @@ export const identity = {
   shortRole: 'DevOps Engineer',
   location: 'Pokhara, Nepal',
   locationFlag: '🇳🇵',
-  education: 'BSc IT · Infomax College',
+  education: 'BSc IT · Asia Pacific University',
   availability: 'Available for remote work',
   heroLines: ['DEVOPS', 'ENGINEER', '&', 'DEVELOPER'],
   heroTagline:
@@ -72,6 +76,24 @@ export const identity = {
   githubUsername: 'SUSHANK001-ops',
   blogUrl: 'https://blog.sushanka.com.np/',
 }
+
+/* ------------------------------------------------------------------ */
+/*  Photos (Polaroid strip on the homepage)                           */
+/*  Drop real images in /public and update src + caption below.       */
+/* ------------------------------------------------------------------ */
+
+export interface Photo {
+  src: string
+  caption: string
+  rotate?: number
+}
+
+export const photos: Photo[] = [
+  { src: '/profile.jpeg', caption: 'me, mid-deploy', rotate: -5 },
+  { src: '/assests/Placeholder.png', caption: 'the homelab', rotate: 3 },
+  { src: '/profile.jpeg', caption: 'coffee & configs', rotate: -2 },
+  { src: '/assests/Placeholder.png', caption: 'shipping day', rotate: 4 },
+]
 
 /* ------------------------------------------------------------------ */
 /*  Social links                                                      */
@@ -186,6 +208,7 @@ export const projects: Project[] = [
   {
     number: '01',
     title: 'VProfile DevOps Project',
+    tagline: 'Multi-tier app on AWS with a full CI/CD pipeline.',
     description:
       'Multi-tier application deployed on AWS using EC2, RDS, ELB, S3, and Route 53. CI/CD pipeline with Jenkins and GitHub Actions. Containerized with Docker, orchestrated with Kubernetes, infrastructure managed with Terraform and Ansible.',
     builtWith: ['Java', 'MySQL', 'RabbitMQ', 'Memcached', 'Nginx'],
@@ -195,6 +218,7 @@ export const projects: Project[] = [
   {
     number: '02',
     title: 'SenChat',
+    tagline: 'Real-time chat with instant messaging and auth.',
     description:
       'A real-time chatting application with instant messaging, user authentication, and a sleek conversational UI. Built as a full-stack project with modern web technologies.',
     builtWith: ['MERN Stack', 'Socket.io', 'Real-time', 'Authentication'],
@@ -204,6 +228,7 @@ export const projects: Project[] = [
   {
     number: '03',
     title: 'UrlShare',
+    tagline: 'File sharing with QR links and auto-expiry.',
     description:
       'A full-stack file sharing web app that allows users to upload files up to 100MB and generate public download links with QR code sharing and automatic expiration. Built with a responsive UI and cloud-based file storage.',
     builtWith: ['Next.js', 'Express', 'PostgreSQL', 'Cloudinary'],
@@ -252,10 +277,10 @@ export const experience: ExperienceEntry[] = [
   },
   {
     role: 'BSc IT',
-    company: 'Infomax College',
+    company: 'Asia Pacific University',
     date: '2024 – 2028 (Expected)',
     description:
-      'Pursuing a Bachelor\'s degree in Information Technology with a focus on programming, data structures, algorithms, and software engineering.',
+      'Pursuing a Bachelor\'s degree in Information Technology at Asia Pacific University, with a focus on programming, data structures, algorithms, and software engineering.',
   },
 ]
 

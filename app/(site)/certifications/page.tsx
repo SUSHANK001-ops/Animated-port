@@ -1,7 +1,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import { certifications } from '@/data/config'
-import SectionHeader from '../../ui/SectionHeader'
 import CertList from './CertList'
 
 export const metadata: Metadata = {
@@ -11,13 +10,18 @@ export const metadata: Metadata = {
 
 export default function CertificationsPage() {
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-32 md:px-10 md:pt-40">
-      <SectionHeader label="Certified" title="Certifications" className="mb-6" />
-      <p className="mb-14 max-w-xl text-sm text-muted">
+    <div className="editorial-page pt-32 pb-24 md:pt-36">
+      <p className="eyebrow eyebrow-dot mb-3">Certified</p>
+      <h1 className="display-serif text-4xl text-foreground md:text-5xl">
+        Certifications
+      </h1>
+      <p className="mt-4 text-[0.975rem] leading-relaxed text-muted">
         Credentials earned across Linux, DevOps, and full-stack web development.
       </p>
 
-      <CertList certifications={certifications} />
-    </section>
+      <div className="mt-10">
+        <CertList certifications={certifications} />
+      </div>
+    </div>
   )
 }

@@ -1,21 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/blog',
-        destination: 'https://blog.sushanka.com.np/',
-        permanent: true,
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'sushanka.com.np',
-        
       },
       {
         protocol: 'https',
@@ -24,7 +14,15 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i.scdn.co', // Spotify album art
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com', // GitHub avatars (auth)
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com', // Google avatars (auth)
+      },
     ],
   },
 };
