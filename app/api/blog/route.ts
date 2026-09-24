@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
         await connectDB();
         const { slug, title, timeToRead, Titledescription, image, tags, category, dateposted, author, content } = await req.json();
 
-        if (!slug || !title || !timeToRead || !Titledescription || !image || !tags || !category || !dateposted || !author || !content) {
+        if (!slug || !title || !timeToRead || !Titledescription || !image || !tags || !category || !author || !content) {
             return NextResponse.json({ error: "All fields are required" }, { status: 400 })
         }
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             image,
             tags: parsedTags,
             category,
-            dateposted,
+            dateposted: dateposted ? new Date(dateposted) : new Date(),
             author,
             content
         });

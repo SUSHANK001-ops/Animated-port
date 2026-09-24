@@ -16,10 +16,16 @@ interface BlogPost {
   tags?: string[]
   category?: string
   dateposted?: string
+  createdAt?: string
   author?: string
 }
 
 const FALLBACK = '/assests/Placeholder.png'
+
+/** Prefer dateposted, fall back to createdAt for older posts. */
+function postDate(post: BlogPost) {
+  return post.dateposted || post.createdAt
+}
 
 function formatDate(value?: string) {
   if (!value) return ''
