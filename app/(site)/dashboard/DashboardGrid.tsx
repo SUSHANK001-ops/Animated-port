@@ -33,10 +33,11 @@ function formatDate(iso: string) {
   })
 }
 
-interface LiveAnalytics {
+interface UmamiStats {
   totalViews: string
-  uniqueVisitorsThisMonth: string
-  mostVisitedPage: string
+  uniqueVisitors: string
+  totalVisits: string
+  shareUrl: string
 }
 
 interface LatestPost {
@@ -52,13 +53,18 @@ const DashboardGrid = () => {
   const { data: session } = useSession()
   const isAdmin = Boolean(session?.user?.isAdmin)
 
-  // Live analytics from MongoDB, falling back to config defaults.
-  const [stats, setStats] = useState<LiveAnalytics>(analytics)
+  // Live analytics from Umami (public share), falling back to config defaults.
+  const [stats, setStats] = useState<UmamiStats>({
+    totalViews: analytics.totalViews,
+    uniqueVisitors: analytics.uniqueVisitorsThisMonth,
+    totalVisits: '—',
+    shareUrl: 'https://cloud.umami.is/share/kraP5kOntalF4dZ3',
+  })
   useEffect(() => {
-    fetch('/api/analytics')
+    fetch('/api/umami')
       .then((r) => r.json())
       .then((d) => {
-        if (d && d.totalViews) setStats(d)
+        if (d && d.ok) setStats(d)
       })
       .catch(() => {})
   }, [])
@@ -201,32 +207,39 @@ const DashboardGrid = () => {
         <p className="text-lg font-bold leading-snug text-accent">{currentlyLearning}</p>
       </div>
 
-      {/* Card 4 — Analytics (full width) */}
+      {/* Card 4 — Analytics (full width) — powered by Umami */}
       <div className="rounded-2xl border border-border bg-surface p-6 md:col-span-2">
-        <div className="mb-5 flex items-center gap-2 text-muted">
-          <BarChart3 size={16} />
-          <span className="font-mono text-xs uppercase tracking-widest">Site Analytics</span>
+        <div className="mb-5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-muted">
+            <BarChart3 size={16} />
+            <span className="font-mono text-xs uppercase tracking-widest">Site Analytics</span>
+          </div>
+          <a
+            href={stats.shareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-mono text-[0.7rem] uppercase tracking-widest text-muted transition-colors hover:text-accent"
+          >
+            Umami <ArrowUpRight size={12} />
+          </a>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div>
             <p className="text-3xl font-extrabold text-foreground">{stats.totalViews}</p>
-            <p className="font-mono text-xs uppercase tracking-widest text-muted">Total Views</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-muted">Page Views</p>
           </div>
           <div>
-            <p className="text-3xl font-extrabold text-foreground">
-              {stats.uniqueVisitorsThisMonth}
-            </p>
+            <p className="text-3xl font-extrabold text-foreground">{stats.uniqueVisitors}</p>
             <p className="font-mono text-xs uppercase tracking-widest text-muted">
-              Unique / Month
+              Unique Visitors
             </p>
           </div>
           <div>
-            <p className="text-3xl font-extrabold text-foreground">{stats.mostVisitedPage}</p>
-            <p className="font-mono text-xs uppercase tracking-widest text-muted">
-              Most Visited
-            </p>
+            <p className="text-3xl font-extrabold text-foreground">{stats.totalVisits}</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-muted">Total Visits</p>
           </div>
         </div>
+        <p className="mt-4 font-mono text-[0.7rem] text-muted">Last 12 months · via Umami</p>
       </div>
       </div>
     </>

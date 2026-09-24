@@ -159,48 +159,47 @@ const ContactForm = () => {
               className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/5 px-4 py-1.5 text-sm text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {otpStatus === 'sending' && <Loader2 size={14} className="animate-spin" />}
-              Send OTP
+              Send code
             </button>
-            <span className="text-xs text-muted">
-              {verified ? 'Verified for this email.' : 'Request a code before submitting.'}
-            </span>
+            {verified ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-accent">
+                <Check size={13} /> Verified for this email
+              </span>
+            ) : (
+              <span className="text-xs text-muted">Request a code before submitting.</span>
+            )}
           </div>
 
           <div className="mt-4 space-y-3">
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="6-digit verification code"
-              className={inputClass}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            />
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="6-digit code"
+                className={`${inputClass} flex-1 font-mono tracking-[0.3em]`}
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              />
               <button
                 type="button"
                 onClick={verifyOtp}
                 disabled={otpStatus === 'sending' || otpStatus === 'verifying'}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-foreground transition-colors hover:border-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors hover:border-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {otpStatus === 'verifying' ? (
                   <Loader2 size={14} className="animate-spin" />
                 ) : (
                   <ShieldCheck size={14} />
                 )}
-                Verify Code
+                Verify
               </button>
-              {verified && (
-                <span className="inline-flex items-center gap-1.5 text-sm text-accent">
-                  <Check size={14} /> Email verified
-                </span>
-              )}
             </div>
             {otpMessage && (
               <p
                 className={`text-xs ${
                   otpStatus === 'error'
-                    ? 'text-red-400'
+                    ? 'text-c-red'
                     : otpStatus === 'verified'
                     ? 'text-accent'
                     : 'text-muted'
@@ -261,7 +260,7 @@ const ContactForm = () => {
       </button>
 
       {submitMessage && (
-        <p className={`text-sm ${sendStatus === 'error' ? 'text-red-400' : 'text-accent'}`}>
+        <p className={`text-sm ${sendStatus === 'error' ? 'text-c-red' : 'text-accent'}`}>
           {submitMessage}
         </p>
       )}

@@ -27,7 +27,7 @@ const techIcon: Record<string, string> = {
 
 export default function AboutPage() {
   return (
-    <div className="editorial-page pt-32 pb-24 md:pt-36">
+    <div className="editorial-page pt-32 pb-16 md:pt-36">
       <p className="eyebrow eyebrow-dot mb-3">About</p>
 
       <div>

@@ -8,6 +8,14 @@ export const metadata: Metadata = {
 }
 
 export default function GuestbookPage() {
+  // Only offer providers whose credentials are actually configured. Rendering a
+  // button for a provider that isn't registered sends the user to
+  // /api/auth/error?error=Configuration.
+  const providers = {
+    github: Boolean(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET),
+    google: Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
+  }
+
   return (
     <div className="editorial-page pt-32 md:pt-36">
       <p className="eyebrow eyebrow-dot mb-3">Sign in</p>
@@ -19,7 +27,7 @@ export default function GuestbookPage() {
       </p>
 
       <div className="mt-10">
-        <Guestbook />
+        <Guestbook providers={providers} />
       </div>
     </div>
   )

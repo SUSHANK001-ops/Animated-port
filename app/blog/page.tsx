@@ -92,7 +92,7 @@ const Blogs = () => {
     <>
       <Navbar />
       <main className="min-h-screen">
-        <div className="editorial-page pt-32 pb-24 md:pt-36">
+        <div className="editorial-page pt-32 pb-16 md:pt-36">
           <p className="eyebrow eyebrow-dot mb-3">Writing</p>
           <h1 className="display-serif text-4xl text-foreground md:text-5xl">Blog</h1>
           <p className="mt-4 max-w-lg text-[0.975rem] leading-relaxed text-muted">
