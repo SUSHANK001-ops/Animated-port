@@ -15,13 +15,11 @@ import Image from 'next/image'
  */
 
 const IDLE_FRAMES = [1, 2]
-const HOVER_SEQUENCE = [3, 4, 5, 6]
-const HOVER_HOLD_LOOP = [5, 6]
+const HOVER_FRAMES = [3, 4, 5, 6]
 
 // Timings (ms) — tuned so the hover reveal is smooth and legible.
 const IDLE_INTERVAL = 700
-const HOVER_STEP = 260 // time each of frames 3..6 is shown
-const HOLD_INTERVAL = 560
+const HOVER_STEP = 220 // time each hover frame (3..6) is shown before advancing
 
 interface AnimatedAvatarProps {
   size?: number
@@ -54,22 +52,14 @@ const AnimatedAvatar = ({ size = 180, className = '' }: AnimatedAvatarProps) => 
       }, IDLE_INTERVAL)
       timers.current.push(id)
     } else {
-      // Hover: play frames 3→4→5→6 in sequence, one at a time.
-      HOVER_SEQUENCE.forEach((frame, idx) => {
-        const t = setTimeout(() => setActive(frame), idx * HOVER_STEP)
-        timers.current.push(t)
-      })
-      // After the sequence finishes, hold a soft 5 ↔ 6 loop.
-      const startHold = setTimeout(() => {
-        let b = 0
-        setActive(HOVER_HOLD_LOOP[0])
-        const loop = setInterval(() => {
-          b = (b + 1) % HOVER_HOLD_LOOP.length
-          setActive(HOVER_HOLD_LOOP[b])
-        }, HOLD_INTERVAL)
-        timers.current.push(loop)
-      }, HOVER_SEQUENCE.length * HOVER_STEP)
-      timers.current.push(startHold)
+      // Hover: continuously cycle through ALL reveal frames 3→4→5→6→3…
+      let i = 0
+      setActive(HOVER_FRAMES[0])
+      const loop = setInterval(() => {
+        i = (i + 1) % HOVER_FRAMES.length
+        setActive(HOVER_FRAMES[i])
+      }, HOVER_STEP)
+      timers.current.push(loop)
     }
 
     return clearTimers
@@ -77,8 +67,13 @@ const AnimatedAvatar = ({ size = 180, className = '' }: AnimatedAvatarProps) => 
 
   return (
     <div
-      className={`group relative ${className}`}
-      style={{ width: size, height: size }}
+      className={`group relative cursor-pointer ${className}`}
+      style={{
+        width: size,
+        height: size,
+        transform: hover ? 'translateX(6px) rotate(3deg)' : 'translateX(0) rotate(0deg)',
+        transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
