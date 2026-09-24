@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Mail, MapPin, Github, Linkedin, Instagram, Send, ArrowUpRight } from 'lucide-react'
 import { identity, socials } from '@/data/config'
 import ContactForm from './ContactForm'
+import LocalTimeNote from './LocalTimeNote'
 
 export const metadata: Metadata = {
   title: 'Contact · Sushanka Lamichhane',
@@ -26,8 +27,10 @@ export default function ContactPage() {
       </h1>
       <p className="mt-4 max-w-xl text-[0.975rem] leading-relaxed text-muted">
         Have a project, a question, or just want to say hi? Verify your email and send a
-        message — it lands straight in my inbox.
+        message — it lands straight in my inbox, and I&apos;ll get back to you as soon as I can.
       </p>
+      <LocalTimeNote />
+
 
       <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
         {/* Form card */}

@@ -1,14 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Loader2, ShieldCheck, Check, Send } from 'lucide-react'
+import { Loader2, ShieldCheck, Check, Send, Mail, MessageSquare, CheckCircle2, AlertCircle } from 'lucide-react'
 
 type OtpStatus = 'idle' | 'sending' | 'sent' | 'verifying' | 'verified' | 'error'
 
 const isEmailValid = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
 
-const inputClass =
-  'w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground placeholder-muted outline-none transition-colors focus:border-accent/50'
+const fieldBase =
+  'w-full rounded-xl border bg-surface px-4 py-3 text-sm text-foreground placeholder-muted outline-none transition-all duration-200'
 
 const ContactForm = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
@@ -21,6 +21,9 @@ const ContactForm = () => {
   const [submitMessage, setSubmitMessage] = useState('')
 
   const normalizedEmail = form.email.trim().toLowerCase()
+  const emailLooksValid = isEmailValid(form.email)
+  const verified = otpStatus === 'verified' && verifiedEmail === normalizedEmail
+  const codeSent = otpStatus === 'sent' || otpStatus === 'verifying' || otpStatus === 'error'
 
   // Reset verification if the email changes after being verified.
   useEffect(() => {
@@ -74,7 +77,7 @@ const ContactForm = () => {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to verify the code.')
       setOtpStatus('verified')
-      setOtpMessage('Email verified. You can send your message now.')
+      setOtpMessage('Email verified — you can send your message now.')
       setVerifiedEmail(normalizedEmail)
       setCode('')
     } catch (err) {
@@ -97,6 +100,11 @@ const ContactForm = () => {
       setSubmitMessage('Verify your email before sending the message.')
       return
     }
+    if (!form.message.trim()) {
+      setSendStatus('error')
+      setSubmitMessage('Write a message before sending.')
+      return
+    }
 
     setSending(true)
     setSendStatus('idle')
@@ -109,7 +117,7 @@ const ContactForm = () => {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to send')
       setSendStatus('success')
-      setSubmitMessage('Your message was sent successfully.')
+      setSubmitMessage('Your message was sent successfully. I will be in touch soon.')
       setForm({ name: '', email: '', subject: '', message: '' })
       setVerifiedEmail('')
       setOtpStatus('idle')
@@ -119,15 +127,14 @@ const ContactForm = () => {
       setSubmitMessage(err instanceof Error ? err.message : 'Unable to send the message right now.')
     } finally {
       setSending(false)
-      setTimeout(() => setSendStatus('idle'), 4000)
+      setTimeout(() => setSendStatus('idle'), 5000)
     }
   }
 
-  const verified = otpStatus === 'verified' && verifiedEmail === normalizedEmail
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Name + Subject row */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted">
             Name
@@ -135,132 +142,171 @@ const ContactForm = () => {
           <input
             type="text"
             placeholder="Your name"
-            className={inputClass}
+            className={`${fieldBase} border-border focus:border-accent/60 focus:ring-2 focus:ring-accent/15`}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </div>
         <div>
           <label className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted">
-            Email
+            Subject
           </label>
+          <input
+            type="text"
+            placeholder="What's this about?"
+            className={`${fieldBase} border-border focus:border-accent/60 focus:ring-2 focus:ring-accent/15`}
+            value={form.subject}
+            onChange={(e) => setForm({ ...form, subject: e.target.value })}
+          />
+        </div>
+      </div>
+
+      {/* Email + verification — one guided block */}
+      <div className="rounded-2xl border border-border bg-surface-2/40 p-4 sm:p-5">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <label className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
+            <Mail size={13} /> Email
+          </label>
+          {verified && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+              <CheckCircle2 size={13} /> Verified
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             type="email"
             placeholder="you@example.com"
-            className={inputClass}
+            disabled={verified}
+            className={`${fieldBase} flex-1 border-border focus:border-accent/60 focus:ring-2 focus:ring-accent/15 disabled:opacity-60`}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+          {!verified && (
             <button
               type="button"
               onClick={requestOtp}
-              disabled={otpStatus === 'sending' || otpStatus === 'verifying'}
-              className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/5 px-4 py-1.5 text-sm text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!emailLooksValid || otpStatus === 'sending' || otpStatus === 'verifying'}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {otpStatus === 'sending' && <Loader2 size={14} className="animate-spin" />}
-              Send code
+              {otpStatus === 'sending' ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Send size={14} />
+              )}
+              {codeSent ? 'Resend code' : 'Send code'}
             </button>
-            {verified ? (
-              <span className="inline-flex items-center gap-1.5 text-xs text-accent">
-                <Check size={13} /> Verified for this email
-              </span>
-            ) : (
-              <span className="text-xs text-muted">Request a code before submitting.</span>
-            )}
-          </div>
+          )}
+        </div>
 
-          <div className="mt-4 space-y-3">
-            <div className="flex flex-wrap items-center gap-3">
+        {/* Code entry — only appears after a code has been sent */}
+        {codeSent && !verified && (
+          <div className="mt-4 border-t border-border/60 pt-4">
+            <label className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted">
+              Enter the 6-digit code
+            </label>
+            <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
-                placeholder="6-digit code"
-                className={`${inputClass} flex-1 font-mono tracking-[0.3em]`}
+                placeholder="••••••"
+                className={`${fieldBase} flex-1 border-border text-center font-mono text-lg tracking-[0.5em] focus:border-accent/60 focus:ring-2 focus:ring-accent/15`}
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
               />
               <button
                 type="button"
                 onClick={verifyOtp}
-                disabled={otpStatus === 'sending' || otpStatus === 'verifying'}
-                className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground transition-colors hover:border-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={code.length !== 6 || otpStatus === 'verifying'}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/5 px-5 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {otpStatus === 'verifying' ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 size={15} className="animate-spin" />
                 ) : (
-                  <ShieldCheck size={14} />
+                  <ShieldCheck size={15} />
                 )}
                 Verify
               </button>
             </div>
-            {otpMessage && (
-              <p
-                className={`text-xs ${
-                  otpStatus === 'error'
-                    ? 'text-c-red'
-                    : otpStatus === 'verified'
-                    ? 'text-accent'
-                    : 'text-muted'
-                }`}
-              >
-                {otpMessage}
-              </p>
-            )}
           </div>
-        </div>
+        )}
+
+        {otpMessage && (
+          <p
+            className={`mt-3 flex items-center gap-1.5 text-xs ${
+              otpStatus === 'error'
+                ? 'text-c-red'
+                : verified
+                ? 'text-accent'
+                : 'text-muted'
+            }`}
+          >
+            {otpStatus === 'error' ? (
+              <AlertCircle size={13} />
+            ) : verified ? (
+              <Check size={13} />
+            ) : null}
+            {otpMessage}
+          </p>
+        )}
       </div>
 
+      {/* Message */}
       <div>
-        <label className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted">
-          Subject
-        </label>
-        <input
-          type="text"
-          placeholder="What's this about?"
-          className={inputClass}
-          value={form.subject}
-          onChange={(e) => setForm({ ...form, subject: e.target.value })}
-        />
-      </div>
-
-      <div>
-        <label className="mb-2 block font-mono text-xs uppercase tracking-widest text-muted">
-          Message
+        <label className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
+          <MessageSquare size={13} /> Message
         </label>
         <textarea
           rows={6}
-          placeholder="Tell me about your project..."
-          className={`${inputClass} resize-none`}
+          placeholder="Tell me about your project, idea, or just say hi..."
+          className={`${fieldBase} resize-none border-border focus:border-accent/60 focus:ring-2 focus:ring-accent/15`}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={sending}
-        className={`inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold transition-all ${
-          sendStatus === 'success'
-            ? 'bg-accent text-background'
+      {/* Submit */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button
+          type="submit"
+          disabled={sending || !verified}
+          className={`inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-semibold transition-all ${
+            sendStatus === 'success'
+              ? 'bg-accent text-background'
+              : sendStatus === 'error'
+              ? 'bg-red-500 text-white'
+              : 'bg-accent text-background hover:scale-[1.02]'
+          } ${sending || !verified ? 'cursor-not-allowed opacity-60' : ''}`}
+        >
+          {sending
+            ? 'Sending...'
+            : sendStatus === 'success'
+            ? 'Message sent!'
             : sendStatus === 'error'
-            ? 'bg-red-500 text-white'
-            : 'bg-accent text-background hover:scale-[1.02]'
-        } ${sending ? 'cursor-not-allowed opacity-70' : ''}`}
-      >
-        {sending
-          ? 'Sending...'
-          : sendStatus === 'success'
-          ? 'Message Sent!'
-          : sendStatus === 'error'
-          ? 'Failed to Send'
-          : 'Send Message'}
-        {sendStatus === 'success' ? <Check size={16} /> : <Send size={16} />}
-      </button>
+            ? 'Failed to send'
+            : 'Send message'}
+          {sending ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : sendStatus === 'success' ? (
+            <Check size={16} />
+          ) : (
+            <Send size={16} />
+          )}
+        </button>
+        {!verified && (
+          <span className="text-xs text-muted">Verify your email to enable sending.</span>
+        )}
+      </div>
 
       {submitMessage && (
-        <p className={`text-sm ${sendStatus === 'error' ? 'text-c-red' : 'text-accent'}`}>
+        <p
+          className={`flex items-center gap-1.5 text-sm ${
+            sendStatus === 'error' ? 'text-c-red' : 'text-accent'
+          }`}
+        >
+          {sendStatus === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}
           {submitMessage}
         </p>
       )}
