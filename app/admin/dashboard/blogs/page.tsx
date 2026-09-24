@@ -12,6 +12,7 @@ interface Blog {
   author: string;
   image: string;
   createdAt: string;
+  published?: boolean;
 }
 
 export default function BlogsListPage() {
@@ -127,6 +128,9 @@ export default function BlogsListPage() {
                   Category
                 </th>
                 <th className="text-left p-4 text-white/50 text-sm font-medium">
+                  Status
+                </th>
+                <th className="text-left p-4 text-white/50 text-sm font-medium">
                   Author
                 </th>
                 <th className="text-left p-4 text-white/50 text-sm font-medium">
@@ -154,6 +158,17 @@ export default function BlogsListPage() {
                   <td className="p-4">
                     <span className="text-xs px-2 py-1 bg-white/5 rounded text-white/60">
                       {blog.category}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <span
+                      className={`text-xs px-2 py-1 rounded font-medium ${
+                        blog.published === false
+                          ? "bg-yellow-500/15 text-yellow-400"
+                          : "bg-[#00ff88]/15 text-[#00ff88]"
+                      }`}
+                    >
+                      {blog.published === false ? "Draft" : "Published"}
                     </span>
                   </td>
                   <td className="p-4 text-white/60 text-sm">{blog.author}</td>

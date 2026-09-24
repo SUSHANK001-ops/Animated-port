@@ -27,6 +27,7 @@ export default function EditBlogPage({
     tags: "",
     timeToRead: "",
     author: "",
+    published: true,
   });
 
   const getToken = () => localStorage.getItem("admin_token") || "";
@@ -58,6 +59,7 @@ export default function EditBlogPage({
           tags: Array.isArray(blog.tags) ? blog.tags.join(", ") : blog.tags || "",
           timeToRead: blog.timeToRead || "",
           author: blog.author || "",
+          published: blog.published !== false,
         });
       } catch {
         alert("Failed to fetch blog");
@@ -102,9 +104,11 @@ export default function EditBlogPage({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const savePost = async (publishedOverride?: boolean) => {
     setLoading(true);
+
+    const published =
+      publishedOverride === undefined ? form.published : publishedOverride;
 
     try {
       const res = await fetch(`/api/admin/blog/${slug}`, {
@@ -115,6 +119,7 @@ export default function EditBlogPage({
         },
         body: JSON.stringify({
           ...form,
+          published,
           tags: form.tags
             .split(",")
             .map((t) => t.trim())
@@ -157,7 +162,13 @@ export default function EditBlogPage({
         <h1 className="text-3xl font-bold text-white">Edit Blog Post</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          savePost()
+        }}
+        className="space-y-6"
+      >
         {/* Title */}
         <div>
           <label className="block text-white/70 text-sm mb-1.5">Title</label>
@@ -327,8 +338,26 @@ export default function EditBlogPage({
           />
         </div>
 
+        {/* Status */}
+        <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+              form.published
+                ? "bg-[#00ff88]/15 text-[#00ff88]"
+                : "bg-yellow-500/15 text-yellow-400"
+            }`}
+          >
+            {form.published ? "Published" : "Draft"}
+          </span>
+          <span className="text-sm text-white/50">
+            {form.published
+              ? "This post is visible on the public blog."
+              : "This post is hidden from the public blog."}
+          </span>
+        </div>
+
         {/* Submit */}
-        <div className="flex gap-4 pt-4">
+        <div className="flex flex-wrap gap-4 pt-4">
           <button
             type="submit"
             disabled={loading}
@@ -336,6 +365,31 @@ export default function EditBlogPage({
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
+          {form.published ? (
+            <button
+              type="button"
+              onClick={() => {
+                setForm((prev) => ({ ...prev, published: false }))
+                savePost(false)
+              }}
+              disabled={loading}
+              className="px-6 py-2.5 border border-yellow-500/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Unpublish (Draft)
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setForm((prev) => ({ ...prev, published: true }))
+                savePost(true)
+              }}
+              disabled={loading}
+              className="px-6 py-2.5 border border-[#00ff88]/40 text-[#00ff88] font-semibold rounded-lg hover:bg-[#00ff88]/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Publish Now
+            </button>
+          )}
           <Link
             href="/admin/dashboard/blogs"
             className="px-6 py-2.5 border border-white/10 text-white/60 rounded-lg hover:bg-white/5 transition-colors"

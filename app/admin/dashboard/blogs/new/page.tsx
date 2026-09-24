@@ -21,6 +21,7 @@ export default function NewBlogPage() {
     tags: "",
     timeToRead: "",
     author: "",
+    published: true,
   });
 
   const getToken = () => localStorage.getItem("admin_token") || "";
@@ -72,8 +73,7 @@ export default function NewBlogPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitPost = async (published: boolean) => {
     setLoading(true);
 
     try {
@@ -85,6 +85,7 @@ export default function NewBlogPage() {
         },
         body: JSON.stringify({
           ...form,
+          published,
           tags: form.tags
             .split(",")
             .map((t) => t.trim())
@@ -119,7 +120,13 @@ export default function NewBlogPage() {
         <h1 className="text-3xl font-bold text-white">New Blog Post</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          submitPost(true)
+        }}
+        className="space-y-6"
+      >
         {/* Title */}
         <div>
           <label className="block text-white/70 text-sm mb-1.5">Title</label>
@@ -290,13 +297,21 @@ export default function NewBlogPage() {
         </div>
 
         {/* Submit */}
-        <div className="flex gap-4 pt-4">
+        <div className="flex flex-wrap gap-4 pt-4">
           <button
             type="submit"
             disabled={loading}
             className="px-6 py-2.5 bg-[#00ff88] text-black font-semibold rounded-lg hover:bg-[#00ff88]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Publishing..." : "Publish Blog Post"}
+          </button>
+          <button
+            type="button"
+            onClick={() => submitPost(false)}
+            disabled={loading}
+            className="px-6 py-2.5 border border-white/20 text-white/80 font-semibold rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Saving..." : "Save as Draft"}
           </button>
           <Link
             href="/admin/dashboard/blogs"

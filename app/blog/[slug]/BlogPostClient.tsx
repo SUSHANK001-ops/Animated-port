@@ -15,12 +15,22 @@ interface BlogPost {
   author: string
   category: string
   tags?: string[]
-  dateposted: string
+  dateposted?: string
+  createdAt?: string
   timeToRead: number
   Blogdescription?: string
   Titledescription?: string
   content?: string
   image?: string
+}
+
+/** Prefer dateposted, fall back to createdAt; format nicely. */
+function formatPostDate(post: BlogPost) {
+  const raw = post.dateposted || post.createdAt
+  if (!raw) return ''
+  const d = new Date(raw)
+  if (isNaN(d.getTime())) return raw
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 // ─── Reading Progress Bar ─────────────────────────────────────────────────────
@@ -383,8 +393,15 @@ const BlogPostClient = () => {
     )
   }
 
+  // Latest posts from every category (excluding the current one), newest first.
   const relatedPosts = blogData
-    .filter((p) => p.category === post.category && p.slug !== post.slug)
+    .filter((p) => p.slug !== post.slug)
+    .slice()
+    .sort((a, b) => {
+      const da = new Date(a.dateposted || a.createdAt || 0).getTime()
+      const db = new Date(b.dateposted || b.createdAt || 0).getTime()
+      return db - da
+    })
     .slice(0, 3)
 
   const initials = post.author
@@ -462,7 +479,7 @@ const BlogPostClient = () => {
                 <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" />
                 <path d="M16 2v4M8 2v4M3 10h18" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <span className="text-muted">{post.dateposted}</span>
+              <span className="text-muted">{formatPostDate(post)}</span>
               <span className="text-foreground/20">•</span>
               <span className="text-muted">{post.timeToRead} min read</span>
             </div>
@@ -558,7 +575,7 @@ const BlogPostClient = () => {
       {relatedPosts.length > 0 && (
         <section className="max-w-[1100px] mx-auto px-6 pb-20">
           <h2 className="display-serif text-3xl text-foreground mb-7">
-            More in <span className="display-serif-italic">{post.category}</span>
+            More <span className="display-serif-italic">posts</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {relatedPosts.map((related, idx) => (
@@ -585,7 +602,7 @@ const BlogPostClient = () => {
                   {related.title}
                 </h3>
                 <p className="text-[13px] text-muted mt-auto">
-                  {related.dateposted} · {related.timeToRead} min read
+                  {formatPostDate(related)} · {related.timeToRead} min read
                 </p>
                 <span className="arrow-slide text-foreground text-lg">
                   →
