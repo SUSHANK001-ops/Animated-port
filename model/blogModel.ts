@@ -8,7 +8,8 @@ interface Iblog {
   image: string;
   tags: string[];
   category: string;
-  dateposted: string;
+  dateposted: Date;
+  published: boolean;
   author: string;
   content: string;
 }
@@ -21,6 +22,8 @@ const BlogSchema =  new mongoose.Schema<Iblog>({
     image: { type: String, required: true },
     tags: { type: [String], required: true },
     category: { type: String, required: true },
+    dateposted: { type: Date, default: Date.now },
+    published: { type: Boolean, default: true },
     author: { type: String, required: true },
     content: { type: String, required: true }
 },{ timestamps: true });

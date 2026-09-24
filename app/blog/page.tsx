@@ -16,10 +16,16 @@ interface BlogPost {
   tags?: string[]
   category?: string
   dateposted?: string
+  createdAt?: string
   author?: string
 }
 
 const FALLBACK = '/assests/Placeholder.png'
+
+/** Prefer dateposted, fall back to createdAt for older posts. */
+function postDate(post: BlogPost) {
+  return post.dateposted || post.createdAt
+}
 
 function formatDate(value?: string) {
   if (!value) return ''
@@ -77,15 +83,28 @@ const Blogs = () => {
     })
   }, [blogData, query, activeCat])
 
-  // Group by year, newest first.
+  // Group by year, newest year first, newest post first within each year.
   const grouped = useMemo(() => {
     const map = new Map<string, BlogPost[]>()
     filtered.forEach((p) => {
-      const y = yearOf(p.dateposted)
+      const y = yearOf(postDate(p))
       if (!map.has(y)) map.set(y, [])
       map.get(y)!.push(p)
     })
-    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]))
+    // Newest post first inside each year group.
+    map.forEach((posts) => {
+      posts.sort((a, b) => {
+        const da = new Date(postDate(a) ?? 0).getTime()
+        const db = new Date(postDate(b) ?? 0).getTime()
+        return db - da
+      })
+    })
+    // Newest year first; keep "Undated" at the bottom.
+    return Array.from(map.entries()).sort((a, b) => {
+      if (a[0] === 'Undated') return 1
+      if (b[0] === 'Undated') return -1
+      return b[0].localeCompare(a[0])
+    })
   }, [filtered])
 
   return (
@@ -171,7 +190,7 @@ const Blogs = () => {
                             )}
                           </div>
                           <span className="hidden shrink-0 font-mono text-xs text-muted sm:block">
-                            {formatDate(post.dateposted)}
+                            {formatDate(postDate(post))}
                             {post.timeToRead ? ` · ${post.timeToRead} min` : ''}
                           </span>
                         </Link>
