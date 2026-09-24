@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
       transformation: [{ width: 1200, crop: 'limit' }],
     })
 
-    return NextResponse.json({ url: result.secure_url }, { status: 200 })
+    return NextResponse.json(
+      { url: result.secure_url, publicId: result.public_id },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Guestbook upload error:', error)
     return NextResponse.json({ error: 'Failed to upload image.' }, { status: 500 })

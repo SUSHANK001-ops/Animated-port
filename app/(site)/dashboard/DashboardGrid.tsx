@@ -228,7 +228,8 @@ const DashboardGrid = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

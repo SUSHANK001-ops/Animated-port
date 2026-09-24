@@ -28,7 +28,7 @@ function userKey(session: { user?: { id?: string; email?: string | null } } | nu
 export async function GET() {
   try {
     await connectDB()
-    const entries = await GuestbookModel.find({})
+    const entries = await GuestbookModel.find({ isHidden: { $ne: true } })
       .sort({ createdAt: -1 })
       .limit(200)
       .select('name message avatar provider userId image createdAt updatedAt')
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const message = sanitize(String(body?.message ?? ''))
     const image = body?.image ? String(body.image).trim() : undefined
+    const imagePublicId = body?.imagePublicId ? String(body.imagePublicId).trim() : undefined
     const honeypot = String(body?.website ?? '')
 
     // Honeypot: bots fill hidden fields; pretend success so they don't learn.
@@ -111,7 +112,14 @@ export async function POST(req: NextRequest) {
     const name = sanitize(session.user.name ?? 'Anonymous').slice(0, 60) || 'Anonymous'
     const avatar = session.user.image ?? undefined
 
-    const entry = await GuestbookModel.create({ name, message, avatar, userId: uid, image })
+    const entry = await GuestbookModel.create({
+      name,
+      message,
+      avatar,
+      userId: uid,
+      image,
+      imagePublicId,
+    })
 
     return NextResponse.json({
       success: true,
