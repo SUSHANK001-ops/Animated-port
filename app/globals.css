@@ -719,6 +719,10 @@ body {
   backdrop-filter: blur(10px) saturate(1.2);
   -webkit-backdrop-filter: blur(10px) saturate(1.2);
 }
+/* Tile that must NOT clip its children (so the draggable note can roam). */
+.tile-open {
+  overflow: visible;
+}
 
 /* ---- Bento stagger fade-in-up (each child delays by 80ms) ---- */
 .bento-stagger > * {
@@ -826,10 +830,33 @@ body {
   color: var(--muted);
   transition: color 0.2s ease, background-color 0.2s ease;
 }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.15rem;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s ease-out;
+}
 .nav-link:hover { color: var(--foreground); }
+.nav-link:hover::after { transform: scaleX(1); }
 .nav-link[data-active='true'] {
   color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 7%, transparent);
+}
+.nav-link[data-active='true']::after { transform: scaleX(0); }
+
+/* ---- Social icon pulse on hover ---- */
+.social-pulse {
+  display: inline-flex;
+  transition: transform 0.28s ease-out, color 0.28s ease-out;
+}
+.social-pulse:hover {
+  transform: scale(1.18);
 }
 
 /* ---- Character avatar bob ---- */

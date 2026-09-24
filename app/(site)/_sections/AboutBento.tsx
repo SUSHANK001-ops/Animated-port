@@ -53,22 +53,29 @@ const AboutBento = () => {
             inView ? 'in-view' : ''
           }`}
         >
-          {/* Sticky-note / intro card with a DRAGGABLE name note */}
-          <div className="tile tile-blue col-span-2 flex min-h-[180px] flex-col justify-between">
-            <Draggable rotate={-4} className="w-fit">
-              <div className="relative bg-[#fffdf5] px-5 py-4 shadow-md dark:bg-[#26241c]">
+          {/* Sticky-note / intro card with a DRAGGABLE name note.
+              tile-open lets the note roam the whole page without being clipped. */}
+          <div className="tile tile-open tile-blue col-span-2 flex min-h-[180px] flex-col justify-between">
+            <Draggable rotate={-5} className="w-fit">
+              <div
+                className="relative px-5 py-5 shadow-lg"
+                style={{
+                  background: '#fffdf5',
+                  boxShadow: '0 10px 24px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.10)',
+                }}
+              >
                 {/* pin */}
-                <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-c-green shadow" />
-                <p className="font-devanagari text-base text-foreground/80">
+                <span className="absolute -top-2 left-4 h-3.5 w-3.5 rounded-full bg-c-green shadow-md ring-2 ring-white/70" />
+                <p className="font-devanagari text-lg font-medium leading-snug text-[#2a2620]">
                   {identity.name}
                 </p>
-                <p className="mt-0.5 text-[0.7rem] text-muted">drag me around ✦</p>
+                <p className="mt-1 text-[0.68rem] text-[#8a8378]">drag me anywhere ✦</p>
               </div>
             </Draggable>
             <Link
               href="/about"
               data-click-sound
-              className="pop-btn mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-c-yellow px-3.5 py-1.5 text-xs font-semibold text-foreground"
+              className="pop-btn mt-3 inline-flex w-fit items-center gap-1.5 self-end rounded-full bg-c-yellow px-4 py-1.5 text-xs font-semibold text-foreground"
             >
               About me
             </Link>

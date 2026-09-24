@@ -52,7 +52,7 @@ function FooterLink({ item }: { item: FLink }) {
     'group inline-flex items-center gap-2 text-[0.82rem] text-muted transition-colors hover:text-foreground'
   const inner = (
     <>
-      <Icon size={13} className="text-muted transition-colors group-hover:text-foreground" />
+      <Icon size={13} className="social-pulse text-muted transition-colors group-hover:text-foreground" />
       <span className="link-quiet !text-muted group-hover:!text-foreground">{item.label}</span>
     </>
   )
