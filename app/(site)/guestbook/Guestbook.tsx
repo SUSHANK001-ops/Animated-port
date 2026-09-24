@@ -74,7 +74,14 @@ function LimitPopup({ onClose }: { onClose: () => void }) {
   )
 }
 
-const Guestbook = () => {
+interface GuestbookProps {
+  providers?: { github?: boolean; google?: boolean }
+}
+
+const Guestbook = ({ providers }: GuestbookProps) => {
+  // Default to showing both if the prop isn't supplied (backwards compatible).
+  const showGithub = providers?.github ?? true
+  const showGoogle = providers?.google ?? true
   const { data: session, status } = useSession()
   const myId = session?.user?.id ?? session?.user?.email ?? undefined
 
@@ -376,20 +383,29 @@ const Guestbook = () => {
             Your name and avatar come from your account. No spam, promise.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              onClick={() => signIn('github')}
-              data-click-sound
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-foreground transition-colors hover:border-foreground/40"
-            >
-              <Github size={15} /> Continue with GitHub
-            </button>
-            <button
-              onClick={() => signIn('google')}
-              data-click-sound
-              className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-foreground transition-colors hover:border-foreground/40"
-            >
-              <GoogleGlyph /> Continue with Google
-            </button>
+            {showGithub && (
+              <button
+                onClick={() => signIn('github')}
+                data-click-sound
+                className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-foreground transition-colors hover:border-foreground/40"
+              >
+                <Github size={15} /> Continue with GitHub
+              </button>
+            )}
+            {showGoogle && (
+              <button
+                onClick={() => signIn('google')}
+                data-click-sound
+                className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm text-foreground transition-colors hover:border-foreground/40"
+              >
+                <GoogleGlyph /> Continue with Google
+              </button>
+            )}
+            {!showGithub && !showGoogle && (
+              <p className="text-xs text-c-red">
+                Sign-in is temporarily unavailable — no login providers are configured.
+              </p>
+            )}
           </div>
         </div>
       )}
