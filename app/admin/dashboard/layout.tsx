@@ -1,98 +1,64 @@
 "use client";
 
 import "@mdxeditor/editor/style.css";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LogOut, FileText, PlusCircle, LayoutDashboard, UserPlus } from "lucide-react";
-
-interface Admin {
-  id: string;
-  email: string;
-  username: string;
-}
+import { useSession, signIn, signOut } from "next-auth/react";
+import {
+  LogOut,
+  FileText,
+  PlusCircle,
+  LayoutDashboard,
+  MessageSquare,
+} from "lucide-react";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [admin, setAdmin] = useState<Admin | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("admin_token");
-      const res = await fetch("/api/admin/me", {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
+  const isAdmin = Boolean(session?.user?.isAdmin);
 
-      if (!res.ok) {
-        router.push("/admin");
-        return;
-      }
-
-      const data = await res.json();
-      setAdmin(data.admin);
-    } catch {
-      router.push("/admin");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
-
+  // Gate: only admin emails may see the panel. Everyone else is redirected.
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    if (status === "loading") return;
+    if (!session?.user) {
+      // Not signed in → send to the visitor sign-in (same one the guestbook uses).
+      signIn(undefined, { callbackUrl: pathname });
+      return;
+    }
+    if (!isAdmin) {
+      router.replace("/dashboard");
+    }
+  }, [status, session, isAdmin, pathname, router]);
 
-  const handleLogout = async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
-    localStorage.removeItem("admin_token");
-    router.push("/admin");
-  };
-
-  if (loading) {
+  if (status === "loading" || !session?.user || !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#1A1A1A]">
-        <div className="text-white/50 text-lg">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A]">
+        <div className="text-lg text-white/50">Checking access…</div>
       </div>
     );
   }
 
   const navItems = [
-    {
-      label: "Dashboard",
-      href: "/admin/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      label: "All Blogs",
-      href: "/admin/dashboard/blogs",
-      icon: FileText,
-    },
-    {
-      label: "New Blog",
-      href: "/admin/dashboard/blogs/new",
-      icon: PlusCircle,
-    },
-    {
-      label: "Register Admin",
-      href: "/admin/dashboard/register",
-      icon: UserPlus,
-    },
+    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "All Blogs", href: "/admin/dashboard/blogs", icon: FileText },
+    { label: "New Blog", href: "/admin/dashboard/blogs/new", icon: PlusCircle },
+    { label: "Guestbook", href: "/admin/dashboard/guestbook", icon: MessageSquare },
   ];
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] flex">
+    <div className="flex min-h-screen bg-[#1A1A1A]">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 bg-white/[0.02] p-6 flex flex-col fixed h-full">
+      <aside className="fixed flex h-full w-64 flex-col border-r border-white/10 bg-white/[0.02] p-6">
         <div className="mb-8">
           <h2 className="text-xl font-bold text-white">Admin Panel</h2>
-          <p className="text-white/40 text-sm mt-1">{admin?.username}</p>
+          <p className="mt-1 text-sm text-white/40">{session.user.name}</p>
         </div>
 
         <nav className="flex-1 space-y-1">
@@ -102,10 +68,10 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                   isActive
                     ? "bg-[#00ff88]/10 text-[#00ff88]"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    : "text-white/60 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <item.icon size={18} />
@@ -116,16 +82,16 @@ export default function AdminLayout({
         </nav>
 
         <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors mt-auto"
+          onClick={() => signOut({ callbackUrl: "/dashboard" })}
+          className="mt-auto flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-400 transition-colors hover:bg-red-500/10"
         >
           <LogOut size={18} />
-          Logout
+          Sign out
         </button>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 ml-64 p-8">{children}</main>
+      <main className="ml-64 flex-1 p-8">{children}</main>
     </div>
   );
 }

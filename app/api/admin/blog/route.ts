@@ -1,12 +1,12 @@
 import connectDB from "@/lib/db";
 import BlogModel from "@/model/blogModel";
-import { authenticateAdmin } from "@/lib/auth";
+import { requireAdminSession } from "@/lib/adminAuth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all blogs (admin - includes all data)
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const admin = authenticateAdmin(req);
+    const admin = await requireAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 // CREATE a new blog post
 export async function POST(req: NextRequest) {
   try {
-    const admin = authenticateAdmin(req);
+    const admin = await requireAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

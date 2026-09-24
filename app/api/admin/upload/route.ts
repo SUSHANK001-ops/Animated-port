@@ -1,10 +1,10 @@
-import { authenticateAdmin } from "@/lib/auth";
+import { requireAdminSession } from "@/lib/adminAuth";
 import cloudinary from "@/lib/cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = authenticateAdmin(req);
+    const admin = await requireAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

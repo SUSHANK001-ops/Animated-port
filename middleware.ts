@@ -1,91 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { NextResponse } from "next/server";
+import { auth, isAdminEmail } from "@/auth";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "");
-
-// Routes that require authentication
-const protectedPageRoutes = ["/admin/dashboard"];
-const protectedApiRoutes = [
-  "/api/admin/blog",
-  "/api/admin/upload",
-  "/api/admin/me",
-  "/api/admin/register",
-  "/api/admin/logout",
-];
-
-async function verifyJWT(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as { id: string; email: string; username: string };
-  } catch {
-    return null;
-  }
-}
-
-function getToken(req: NextRequest): string | null {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    return authHeader.slice(7);
-  }
-  const cookie = req.cookies.get("admin_token");
-  return cookie?.value ?? null;
-}
-
-export async function middleware(req: NextRequest) {
+/**
+ * Admin gating via the next-auth (Auth.js) session.
+ * - /admin/dashboard/* pages: the client layout also guards, but we redirect
+ *   early here for non-admins.
+ * - /api/admin/* routes (except auth helpers): require an admin session.
+ *
+ * The visitor sign-in (Google/GitHub) is the SAME one the guestbook uses;
+ * only allowlisted emails (see auth.ts ADMIN_EMAILS) are treated as admins.
+ */
+export default auth((req) => {
   const { pathname } = req.nextUrl;
+  const email = req.auth?.user?.email;
+  const admin = isAdminEmail(email);
 
-  // Check if it's a protected page route
-  const isProtectedPage = protectedPageRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  const isAdminPage = pathname.startsWith("/admin/dashboard");
+  const isAdminApi =
+    pathname.startsWith("/api/admin/") &&
+    !pathname.startsWith("/api/admin/login") &&
+    !pathname.startsWith("/api/admin/logout") &&
+    !pathname.startsWith("/api/admin/me") &&
+    !pathname.startsWith("/api/admin/register");
 
-  // Check if it's a protected API route
-  const isProtectedApi = protectedApiRoutes.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
-  );
-
-  if (!isProtectedPage && !isProtectedApi) {
+  if (!isAdminPage && !isAdminApi) {
     return NextResponse.next();
   }
 
-  const token = getToken(req);
-
-  if (!token) {
-    if (isProtectedPage) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+  if (!admin) {
+    if (isAdminPage) {
+      // Bounce non-admins to the public dashboard (which offers sign-in).
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const decoded = await verifyJWT(token);
-
-  if (!decoded) {
-    if (isProtectedPage) {
-      const response = NextResponse.redirect(new URL("/admin", req.url));
-      response.cookies.set("admin_token", "", { maxAge: 0, path: "/" });
-      return response;
-    }
-    return NextResponse.json({ error: "Unauthorized - Invalid token" }, { status: 401 });
-  }
-
-  // Attach admin info to headers for route handlers
-  const requestHeaders = new Headers(req.headers);
-  requestHeaders.set("x-admin-id", decoded.id);
-  requestHeaders.set("x-admin-email", decoded.email as string);
-  requestHeaders.set("x-admin-username", decoded.username as string);
-
-  return NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-}
+  return NextResponse.next();
+});
 
 export const config = {
-  matcher: [
-    "/admin/dashboard/:path*",
-    "/api/admin/blog/:path*",
-    "/api/admin/upload/:path*",
-    "/api/admin/me/:path*",
-    "/api/admin/register/:path*",
-    "/api/admin/logout/:path*",
-  ],
+  matcher: ["/admin/dashboard/:path*", "/api/admin/:path*"],
 };
