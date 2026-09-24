@@ -399,9 +399,9 @@ const BlogPostClient = () => {
       <ReadingProgress progress={readProgress} />
       <Navbar />
 
-      {/* ── HERO ────────────────────────────────────────────────────────────── */}
+      {/* ── HERO — title on the left, compact info card top-right ──────────── */}
       <header className="relative overflow-hidden">
-        <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-28 pb-10 flex flex-col gap-5">
+        <div className="relative z-10 w-full max-w-3xl mx-auto px-6 pt-28 pb-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-[13px] text-muted">
             <Link href="/blog" className="hover:text-foreground transition-colors">
@@ -411,30 +411,46 @@ const BlogPostClient = () => {
             <span className="text-muted">{post.category}</span>
           </nav>
 
-          {/* Category pill */}
-          {post.category && (
-            <span className="inline-flex w-fit items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase bg-c-green/15 border border-c-green/30 text-link">
-              {post.category}
-            </span>
-          )}
+          <div className="mt-5 flex items-start justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              {/* Category pill */}
+              {post.category && (
+                <span className="mb-4 inline-flex w-fit items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase bg-c-green/15 border border-c-green/30 text-link">
+                  {post.category}
+                </span>
+              )}
 
-          {/* Title */}
-          <h1 className="display-serif text-4xl md:text-5xl lg:text-[45px] leading-[1.12] text-foreground">
-            {post.title}
-          </h1>
+              {/* Title */}
+              <h1 className="display-serif text-4xl leading-[1.12] text-foreground md:text-[2.7rem]">
+                {post.title}
+              </h1>
+            </div>
 
-          {/* Description */}
+            {/* Compact info card (top-right, like the reference) */}
+            {(post.Titledescription || post.Blogdescription) && (
+              <aside className="hidden w-56 shrink-0 rounded-2xl border border-border bg-surface p-4 md:block">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted">
+                  In this article
+                </p>
+                <p className="mt-2 text-[13px] leading-relaxed text-foreground/80 line-clamp-5">
+                  {post.Titledescription ?? post.Blogdescription}
+                </p>
+              </aside>
+            )}
+          </div>
+
+          {/* Description (mobile / full width) */}
           {(post.Titledescription || post.Blogdescription) && (
-            <p className="text-base text-muted leading-relaxed max-w-2xl">
+            <p className="mt-5 text-base leading-relaxed text-muted md:hidden">
               {post.Titledescription ?? post.Blogdescription}
             </p>
           )}
 
           {/* Divider */}
-          <hr className="border-t border-border" />
+          <hr className="mt-6 border-t border-border" />
 
           {/* Meta row */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="mt-6 flex items-center gap-3 flex-wrap">
             <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center text-[13px] font-bold text-background shrink-0">
               {initials}
             </div>
@@ -457,39 +473,32 @@ const BlogPostClient = () => {
       {/* ── FEATURED IMAGE ─────────────────────────────────────────────────── */}
       {post.image && (
         <div className="max-w-3xl mx-auto px-6 mb-4">
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border">
             <Image
               src={post.image}
               alt={post.title}
               fill
               priority
               sizes="(max-width: 768px) 100vw, 768px"
-              className="object-contain object-center"
+              className="object-cover object-center"
             />
           </div>
         </div>
       )}
 
-      {/* ── BODY ──────────────────────────────────────────────────────────── */}
-      <div className="max-w-[1100px] mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-12 items-start">
-
-        {/* Sidebar */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 flex flex-col gap-5">
-            {post.content && <TableOfContents content={post.content} />}
-
-            {/* Share in sidebar */}
-            {pageUrl && (
-              <ShareButtons url={pageUrl} title={post.title} />
-            )}
-          </div>
-        </aside>
-
-        {/* Article */}
+      {/* ── BODY — centred single reading column ───────────────────────────── */}
+      <div className="max-w-3xl mx-auto px-6 py-10">
         <article className="min-w-0 max-w-none">
 
-          {/* Mobile share row */}
-          <div className="lg:hidden mb-8">
+          {/* Table of contents (collapsible, above the article) */}
+          {post.content && (
+            <div className="mb-8">
+              <TableOfContents content={post.content} />
+            </div>
+          )}
+
+          {/* Share row */}
+          <div className="mb-8">
             {pageUrl && (
               <ShareButtons url={pageUrl} title={post.title} />
             )}

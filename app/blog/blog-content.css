@@ -10,6 +10,40 @@
   overflow-wrap: break-word;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Legacy content was authored for a DARK theme, so many elements carry
+   baked-in inline colours (e.g. style="color:#d1d5db"). On the LIGHT paper
+   theme those are near-invisible. Force text back to the readable ink token
+   in light theme, overriding inline colours on body text.
+   (Dark theme keeps whatever the author set.)
+   ────────────────────────────────────────────────────────────────────────── */
+:root[data-theme='light'] .blog-html-content,
+:root[data-theme='light'] .blog-html-content p,
+:root[data-theme='light'] .blog-html-content li,
+:root[data-theme='light'] .blog-html-content span,
+:root[data-theme='light'] .blog-html-content div,
+:root[data-theme='light'] .blog-html-content td,
+:root[data-theme='light'] .blog-html-content font {
+  color: color-mix(in srgb, var(--foreground) 85%, transparent) !important;
+}
+/* Keep strong/headings/links their own (already dark / accent) even in light. */
+:root[data-theme='light'] .blog-html-content strong,
+:root[data-theme='light'] .blog-html-content b,
+:root[data-theme='light'] .blog-html-content h1,
+:root[data-theme='light'] .blog-html-content h2,
+:root[data-theme='light'] .blog-html-content h3,
+:root[data-theme='light'] .blog-html-content h4 {
+  color: var(--foreground) !important;
+}
+:root[data-theme='light'] .blog-html-content a {
+  color: var(--link) !important;
+}
+/* Code blocks keep their dark editor background, so their light text stays. */
+:root[data-theme='light'] .blog-html-content pre,
+:root[data-theme='light'] .blog-html-content pre * {
+  color: #d1d5db !important;
+}
+
 /* ── Headings ── */
 .blog-html-content h1 {
   font-family: var(--font-serif), Georgia, serif;
