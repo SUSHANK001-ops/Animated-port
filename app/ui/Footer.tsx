@@ -100,20 +100,14 @@ const Footer = () => {
       </div>
 
       {/* Flower image border + spinning badge */}
-      <div className="relative">
+      {/* <div className="relative">
         <div className="relative h-24 w-full overflow-hidden md:h-28">
-          <Image
-            src="/assests/footer_flower.jpg"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover object-bottom"
-          />
+          
         </div>
         <div className="absolute bottom-3 right-4 z-10 hidden sm:block">
           <SpinBadge size={68} />
         </div>
-      </div>
+      </div> */}
     </footer>
   )
 }
