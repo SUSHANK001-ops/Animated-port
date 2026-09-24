@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   User, LayoutDashboard, FileText, Sparkles,
   MessageSquare, Mail, BookOpen, Wrench,
@@ -8,7 +9,6 @@ import {
   Instagram, Github, Linkedin, Rss,
 } from 'lucide-react'
 import { identity, nepaliQuote } from '@/data/config'
-import FlowerField from './delight/FlowerField'
 import SpinBadge from './delight/SpinBadge'
 import NptClock from './delight/NptClock'
 
@@ -69,8 +69,8 @@ function FooterLink({ item }: { item: FLink }) {
 
 const Footer = () => {
   return (
-    <footer className="relative mt-24 border-t border-border bg-surface">
-      <div className="editorial-page pt-16 pb-10">
+    <footer className="relative mt-20">
+      <div className="editorial-page pt-10 pb-8">
         {/* Link columns */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4">
           {columns.map((col, i) => (
@@ -99,11 +99,19 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Flowers + spinning badge */}
+      {/* Flower image border + spinning badge */}
       <div className="relative">
-        <FlowerField />
-        <div className="absolute bottom-4 right-5 z-10 hidden sm:block">
-          <SpinBadge size={72} />
+        <div className="relative h-24 w-full overflow-hidden md:h-28">
+          <Image
+            src="/assests/footer_flower.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-bottom"
+          />
+        </div>
+        <div className="absolute bottom-3 right-4 z-10 hidden sm:block">
+          <SpinBadge size={68} />
         </div>
       </div>
     </footer>

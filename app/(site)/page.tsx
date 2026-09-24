@@ -5,7 +5,6 @@ import AboutBento from './_sections/AboutBento'
 import ProjectsGrid from './_sections/ProjectsGrid'
 import Services from './_sections/Services'
 import LatestBlog from './_sections/LatestBlog'
-import VinylQuote from './_sections/VinylQuote'
 import Experience from './_sections/Experience'
 import CertificationsTeaser from './_sections/CertificationsTeaser'
 
@@ -35,8 +34,6 @@ export default function HomePage() {
       <Services />
       <Divider />
       <LatestBlog />
-      <Divider />
-      <VinylQuote />
       <Divider />
       <Experience />
       <Divider />

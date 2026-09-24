@@ -808,6 +808,15 @@ body {
 .feat-row:hover .feat-thumb {
   transform: scale(1.06);
 }
+/* Numbered index badge used in place of a project thumbnail. */
+.feat-badge {
+  width: 96px;
+  height: 68px;
+  transition: transform 0.3s ease-out;
+}
+.feat-row:hover .feat-badge {
+  transform: scale(1.06) rotate(-1.5deg);
+}
 
 /* ---- Stacked paper blog cards (home 'Latest from Blog') ---- */
 .paper-card {
