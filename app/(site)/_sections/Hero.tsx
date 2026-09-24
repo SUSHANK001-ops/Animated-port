@@ -1,9 +1,9 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import gsap from 'gsap'
 import { identity } from '@/data/config'
 import NptClock from '../../ui/delight/NptClock'
+import AnimatedAvatar from '../../ui/delight/AnimatedAvatar'
 
 const Hero = () => {
   const rootRef = useRef<HTMLElement>(null)
@@ -38,7 +38,7 @@ const Hero = () => {
 
   return (
     <section ref={rootRef} className="editorial-page pt-32 md:pt-40">
-      <div className="flex items-start justify-between gap-6">
+      <div className="flex items-center justify-between gap-6">
         <div className="min-w-0">
           {/* Name that flips to the @handle on hover */}
           <h1
@@ -102,31 +102,9 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Character avatar (bobbing) + waving GIF */}
-        <div data-hero className="relative hidden shrink-0 sm:block">
-          <div className="avatar-bob relative">
-            <Image
-              src={identity.profileImage}
-              alt={identity.name}
-              width={112}
-              height={112}
-              className="rounded-3xl object-cover shadow-lg ring-1 ring-border"
-              style={{ width: 112, height: 112 }}
-            />
-            <span className="absolute -bottom-2 -right-2 grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-base shadow-md">
-              {identity.locationFlag}
-            </span>
-          </div>
-          {/* waving sticker */}
-          <Image
-            src="/stickers/wave.gif"
-            alt=""
-            width={46}
-            height={46}
-            unoptimized
-            className="absolute -left-8 -top-4 select-none"
-            style={{ width: 46, height: 46 }}
-          />
+        {/* Animated avatar — idle loops frames 1↔2, hover plays 3→6 */}
+        <div data-hero className="relative hidden shrink-0 self-center sm:block">
+          <AnimatedAvatar size={200} />
         </div>
       </div>
     </section>
