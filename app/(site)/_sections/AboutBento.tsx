@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Sparkles } from 'lucide-react'
@@ -19,16 +19,40 @@ const primaryTools = [
 
 /**
  * Colourful bento mosaic — the manishtamang.com "About" grid, populated
- * with this site's real identity. Colour lives here (soft tinted tiles),
- * while the rest of the page stays quiet monochrome.
+ * with this site's real identity. Colour lives here (soft gradient tiles),
+ * while the rest of the page stays quiet monochrome. Cards stagger in on
+ * scroll (80ms each) via the .bento-stagger CSS + an in-view observer.
  */
 const AboutBento = () => {
   const photo = photos[0]
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   return (
     <div className="editorial-page">
       <Block label="About" title="A little about me">
-        <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4">
+        <div
+          ref={gridRef}
+          className={`bento-stagger grid grid-cols-2 gap-3 md:grid-cols-4 ${
+            inView ? 'in-view' : ''
+          }`}
+        >
           {/* Sticky-note / intro card with a DRAGGABLE name note */}
           <div className="tile tile-blue col-span-2 flex min-h-[180px] flex-col justify-between">
             <Draggable rotate={-4} className="w-fit">
@@ -44,7 +68,7 @@ const AboutBento = () => {
             <Link
               href="/about"
               data-click-sound
-              className="pop-btn mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-c-yellow px-3.5 py-1.5 text-xs font-medium text-foreground"
+              className="pop-btn mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-c-yellow px-3.5 py-1.5 text-xs font-semibold text-foreground"
             >
               About me
             </Link>
@@ -54,7 +78,7 @@ const AboutBento = () => {
           <div className="tile tile-pink flex flex-col justify-between">
             <Sparkles size={18} className="text-foreground/60" />
             <div className="mt-6">
-              <p className="text-sm font-semibold text-foreground">{identity.shortRole}</p>
+              <p className="text-sm font-bold tracking-tight text-foreground">{identity.shortRole}</p>
               <p className="tile-sub mt-1 text-xs text-foreground/55">& Full-Stack Dev</p>
             </div>
           </div>
@@ -66,7 +90,7 @@ const AboutBento = () => {
               alt={photo.caption}
               fill
               sizes="180px"
-              className="object-cover transition-transform duration-500 hover:scale-105"
+              className="object-cover"
             />
             <span className="absolute bottom-2 left-2 rounded-md bg-black/45 px-1.5 py-0.5 text-[0.6rem] text-white backdrop-blur-sm">
               {photo.caption}
@@ -75,22 +99,22 @@ const AboutBento = () => {
 
           {/* Green welcome card */}
           <div className="tile tile-green col-span-2 flex flex-col justify-between md:col-span-1">
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-sm font-semibold leading-snug text-foreground">
               Welcome to my corner of the internet 👋
             </p>
             <p className="tile-sub mt-2 text-xs text-foreground/55">{identity.location}</p>
           </div>
 
-          {/* Now-playing / album card */}
-          <div className="tile col-span-2 bg-surface md:col-span-1">
+          {/* Now-playing / album card — frosted glass */}
+          <div className="tile tile-frost col-span-2 md:col-span-1">
             <SpotifyNowPlaying bare />
           </div>
 
           {/* Currently learning — wide brown card with vector-icon toolbar */}
           <div className="tile tile-brown col-span-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-center md:col-span-4">
             <div>
-              <p className="text-sm font-semibold">Constantly learning</p>
-              <p className="tile-sub mt-1 max-w-md text-xs">
+              <p className="text-base font-bold tracking-tight">Constantly learning</p>
+              <p className="tile-sub mt-1.5 max-w-md text-xs leading-relaxed">
                 Outside of client work I&apos;m going deeper on {currentlyLearning},
                 automating everything, and sharpening my craft.
               </p>
@@ -100,7 +124,7 @@ const AboutBento = () => {
                 <span
                   key={t.label}
                   title={t.label}
-                  className="grid h-7 w-7 place-items-center transition-transform hover:-translate-y-1 hover:scale-110"
+                  className="grid h-7 w-7 place-items-center transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-110"
                 >
                   <Image src={t.src} alt={t.label} width={22} height={22} />
                 </span>

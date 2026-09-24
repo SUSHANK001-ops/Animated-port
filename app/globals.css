@@ -661,26 +661,86 @@ body {
   transform: scale(1.05) rotate(-1deg);
 }
 
-/* ---- Colourful bento tiles (home) ---- */
+/* ---- Colourful bento tiles (home) — frosted / soft-gradient fills ---- */
 .tile {
-  border-radius: 1.15rem;
-  padding: 1.1rem 1.2rem;
-  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
-  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  border-radius: 1.15rem; /* ~18px */
+  padding: 1.25rem 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent);
+  transition: transform 0.28s ease-out, box-shadow 0.28s ease-out,
+    border-color 0.28s ease-out;
   will-change: transform;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 .tile:hover {
-  transform: translateY(-4px) rotate(-0.4deg);
-  box-shadow: 0 16px 34px rgba(0,0,0,0.10);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.10);
+  border-color: color-mix(in srgb, var(--foreground) 16%, transparent);
 }
-.tile-blue   { background: var(--c-blue-soft); }
-.tile-pink   { background: var(--c-pink-soft); }
-.tile-green  { background: var(--c-green-soft); }
-.tile-yellow { background: var(--c-yellow-soft); }
-.tile-brown  { background: var(--c-brown); color: #f3ead9; }
-.tile-brown .tile-sub { color: rgba(243,234,217,0.7); }
+/* Any image inside a tile scales gently on hover. */
+.tile:hover img {
+  transform: scale(1.05);
+}
+.tile img {
+  transition: transform 0.3s ease-out;
+}
+/* Soft diagonal gradient fills for depth instead of flat colour. */
+.tile-blue {
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--c-blue-soft) 100%, transparent),
+    color-mix(in srgb, var(--c-blue-soft) 55%, var(--surface)));
+}
+.tile-pink {
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--c-pink-soft) 100%, transparent),
+    color-mix(in srgb, var(--c-pink-soft) 55%, var(--surface)));
+}
+.tile-green {
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--c-green-soft) 100%, transparent),
+    color-mix(in srgb, var(--c-green-soft) 55%, var(--surface)));
+}
+.tile-yellow {
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--c-yellow-soft) 100%, transparent),
+    color-mix(in srgb, var(--c-yellow-soft) 55%, var(--surface)));
+}
+.tile-brown {
+  background: linear-gradient(150deg,
+    var(--c-brown),
+    color-mix(in srgb, var(--c-brown) 78%, #000));
+  color: #f3ead9;
+}
+.tile-brown .tile-sub { color: rgba(243, 234, 217, 0.7); }
+/* Frosted-glass surface tile (e.g. the now-playing card). */
+.tile-frost {
+  background: color-mix(in srgb, var(--surface) 62%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+}
+
+/* ---- Bento stagger fade-in-up (each child delays by 80ms) ---- */
+.bento-stagger > * {
+  opacity: 0;
+  animation: bento-rise 0.55s ease-out forwards;
+}
+.bento-stagger.in-view > *:nth-child(1) { animation-delay: 0ms; }
+.bento-stagger.in-view > *:nth-child(2) { animation-delay: 80ms; }
+.bento-stagger.in-view > *:nth-child(3) { animation-delay: 160ms; }
+.bento-stagger.in-view > *:nth-child(4) { animation-delay: 240ms; }
+.bento-stagger.in-view > *:nth-child(5) { animation-delay: 320ms; }
+.bento-stagger.in-view > *:nth-child(6) { animation-delay: 400ms; }
+.bento-stagger.in-view > *:nth-child(7) { animation-delay: 480ms; }
+/* Hold hidden until the section scrolls into view. */
+.bento-stagger:not(.in-view) > * { animation: none; opacity: 0; }
+@keyframes bento-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bento-stagger > * { opacity: 1 !important; animation: none !important; }
+}
 
 /* ---- Featured project row with thumbnail ---- */
 .feat-row {
@@ -690,12 +750,15 @@ body {
   padding: 1rem;
   border-radius: 1rem;
   border: 1px solid transparent;
-  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0);
+  transition: border-color 0.28s ease-out, background-color 0.28s ease-out,
+    transform 0.28s ease-out, box-shadow 0.28s ease-out;
 }
 .feat-row:hover {
   border-color: var(--border);
   background: var(--surface);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.10);
 }
 .feat-thumb {
   width: 96px;
@@ -704,10 +767,10 @@ body {
   object-fit: cover;
   border: 1px solid var(--border);
   background: var(--surface-2);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease-out;
 }
 .feat-row:hover .feat-thumb {
-  transform: scale(1.04) rotate(-1deg);
+  transform: scale(1.06);
 }
 
 /* ---- Stacked paper blog cards (home 'Latest from Blog') ---- */
