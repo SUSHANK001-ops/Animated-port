@@ -11,18 +11,27 @@ export const dynamic = 'force-dynamic'
 const SIGN_LIMIT = 3
 const SIGN_WINDOW = 60 * 60 // 1 hour
 
+// Max messages a single signed-in person may keep. Not advertised in the UI.
+const MAX_PER_USER = 5
+
 function sanitize(value: string) {
   return value.replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim()
 }
 
-/** GET — newest messages first. */
+/** Stable identity key for the signed-in user. */
+function userKey(session: { user?: { id?: string; email?: string | null } } | null) {
+  return session?.user?.id ?? session?.user?.email ?? undefined
+}
+
+/** GET — newest messages first. Includes userId so the client can show
+ *  edit/delete controls on the viewer's own entries. */
 export async function GET() {
   try {
     await connectDB()
     const entries = await GuestbookModel.find({})
       .sort({ createdAt: -1 })
       .limit(200)
-      .select('name message avatar provider createdAt')
+      .select('name message avatar provider userId image createdAt updatedAt')
       .lean()
 
     return NextResponse.json({ entries })
@@ -46,6 +55,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const message = sanitize(String(body?.message ?? ''))
+    const image = body?.image ? String(body.image).trim() : undefined
     const honeypot = String(body?.website ?? '')
 
     // Honeypot: bots fill hidden fields; pretend success so they don't learn.
@@ -58,6 +68,29 @@ export async function POST(req: NextRequest) {
     }
     if (message.length > 500) {
       return NextResponse.json({ error: 'Message is too long (max 500).' }, { status: 400 })
+    }
+    // Only accept our own hosted (cloudinary) image URLs.
+    if (image && !/^https?:\/\//i.test(image)) {
+      return NextResponse.json({ error: 'Invalid image.' }, { status: 400 })
+    }
+
+    const uid = userKey(session)
+
+    await connectDB()
+
+    // Per-user cap (silent). When reached, tell the client with a flag so it
+    // can show a friendly popup — without ever advertising the number.
+    if (uid) {
+      const count = await GuestbookModel.countDocuments({ userId: uid })
+      if (count >= MAX_PER_USER) {
+        return NextResponse.json(
+          {
+            error: "You've reached the number of messages you can keep here. Delete one to add another.",
+            limitReached: true,
+          },
+          { status: 409 }
+        )
+      }
     }
 
     // Rate limit by client IP.
@@ -77,10 +110,8 @@ export async function POST(req: NextRequest) {
     // Identity comes from the verified session, never from the client.
     const name = sanitize(session.user.name ?? 'Anonymous').slice(0, 60) || 'Anonymous'
     const avatar = session.user.image ?? undefined
-    const userId = session.user.id ?? session.user.email ?? undefined
 
-    await connectDB()
-    const entry = await GuestbookModel.create({ name, message, avatar, userId })
+    const entry = await GuestbookModel.create({ name, message, avatar, userId: uid, image })
 
     return NextResponse.json({
       success: true,
@@ -89,6 +120,8 @@ export async function POST(req: NextRequest) {
         name: entry.name,
         message: entry.message,
         avatar: entry.avatar,
+        userId: entry.userId,
+        image: entry.image,
         createdAt: entry.createdAt,
       },
     })
