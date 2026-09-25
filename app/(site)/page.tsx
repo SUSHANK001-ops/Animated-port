@@ -14,6 +14,10 @@ export const metadata: Metadata = {
     'DevOps Engineer and Full-Stack Developer from Nepal. AWS · Docker · Kubernetes · Terraform · CI/CD · Red Hat Certified.',
 }
 
+// Revalidate the homepage every 60s so newly published blog posts appear in the
+// "Latest from the blog" section without a full rebuild.
+export const revalidate = 60
+
 function Divider() {
   return (
     <div className="editorial-page my-14">

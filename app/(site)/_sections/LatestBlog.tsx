@@ -9,29 +9,39 @@ interface PostPreview {
   slug: string
   title: string
   description: string
-  date: string
+  date?: string
 }
 
-function formatDate(value: string) {
+function formatDate(value?: string) {
+  if (!value) return ''
   const d = new Date(value)
-  if (isNaN(d.getTime())) return value
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  if (isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 async function getLatestPosts(): Promise<PostPreview[]> {
   try {
     await connectDB()
-    const blogs = await BlogModel.find()
-      .sort({ dateposted: -1 })
+    // Only published posts, newest first (dateposted, falling back to createdAt).
+    const blogs = await BlogModel.find({ published: { $ne: false } })
+      .sort({ dateposted: -1, createdAt: -1 })
       .limit(3)
-      .select('slug title Titledescription dateposted')
-      .lean<{ slug: string; title: string; Titledescription: string; dateposted: string }[]>()
+      .select('slug title Titledescription dateposted createdAt')
+      .lean<
+        {
+          slug: string
+          title: string
+          Titledescription: string
+          dateposted?: string
+          createdAt?: string
+        }[]
+      >()
 
     return blogs.map((b) => ({
       slug: b.slug,
       title: b.title,
       description: b.Titledescription,
-      date: b.dateposted,
+      date: b.dateposted || b.createdAt,
     }))
   } catch {
     return []
@@ -68,9 +78,11 @@ const LatestBlog = async () => {
               data-click-sound
               className="paper-card group block"
             >
-              <span className="font-mono text-[0.65rem] text-muted">
-                {formatDate(post.date)}
-              </span>
+              {formatDate(post.date) && (
+                <span className="font-mono text-[0.65rem] text-muted">
+                  {formatDate(post.date)}
+                </span>
+              )}
               <h3 className="mt-2 serif-title text-base leading-snug text-foreground group-hover:text-link">
                 {post.title}
               </h3>
